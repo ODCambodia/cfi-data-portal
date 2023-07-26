@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+</head>
+
+<body>
+    <div id="map" style="height: 95vh;"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-wms-header@1.0.13/index.min.js"></script>
+    <script>
+        var map = L.map('map').setView([12.5657, 104.991], 7);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        const faoServer = "http://localhost:8080/https://staging.fia.db.opendevcam.net/geoserver/cfr/wms";
+        const odcServer = "http://localhost:8080/https://geoserver.opendevelopmentmekong.net/geoserver/ODVietnam/wms";
+
+        var wmsLayers = {
+            'CFR Status Assessment 2022': L.TileLayer.wmsHeader('http://localhost:8080/https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', {
+                layers: 'cfr:assessment_2022',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'CFi': L.TileLayer.wmsHeader(faoServer, {
+                layers: 'cfi:cfi',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Vietnam': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODVietnam:07395968-2f11-4753-b8f8-fc108a76a428',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Vietnam Population': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODVietnam:0d8d48df-cad2-4015-be5a-6593771a13e8',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Community Fisheries': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODCambodia:1',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+        }
+
+        L.control.layers(wmsLayers).addTo(map);
+
+        wmsLayers.Vietnam.addTo(map);
+    </script>
+</body>
+
+</html>
