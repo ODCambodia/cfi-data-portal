@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" class="dark" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+    integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
+
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+  <title>Document</title>
+  <style>
+    html,
+    body {
+      background-color: #11101D;
+      width: 100%;
+      height: 100%;
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="width: 95%; position: absolute; left: 2.5%; top: 100px;">
+    <table id="example" class="display cell-border stripe"></table>
+  </div>
+  <script>
+    const dataSet = [
+      {
+        "name": "Tiger Nixon",
+        "hr": {
+          "position": "System Architect",
+          "salary": "$320,800",
+          "start_date": "2011/04/25"
+        },
+        "contact": [
+          "Edinburgh",
+          "5421"
+        ]
+      },
+      {
+        "name": "Garrett Winters",
+        "hr": {
+          "position": "Accountant",
+          "salary": "$170,750",
+          "start_date": "2011/07/25"
+        },
+        "contact": [
+          "Tokyo",
+          "8422"
+        ]
+      },
+      {
+        "name": "Ashton Cox",
+        "hr": {
+          "position": "Junior Technical Author",
+          "salary": "$86,000",
+          "start_date": "2009/01/12"
+        },
+        "contact": [
+          "San Francisco",
+          "1562"
+        ]
+      },
+      {
+        "name": "Cedric Kelly",
+        "hr": {
+          "position": "Senior Javascript Developer",
+          "salary": "$433,060",
+          "start_date": "2012/03/29"
+        },
+        "contact": [
+          "Edinburgh",
+          "6224"
+        ]
+      },
+      {
+        "name": "Airi Satou",
+        "hr": {
+          "position": "Accountant",
+          "salary": "$162,700",
+          "start_date": "2008/11/28"
+        },
+        "contact": [
+          "Tokyo",
+          "5407"
+        ]
+      }];
+
+    new DataTable('#example', {
+      columns: [
+        { data: 'name' },
+        { data: 'hr.position' },
+        { data: 'contact.0' },
+        { data: 'contact.1' },
+        { data: 'hr.start_date' },
+        { data: 'hr.salary' }
+      ],
+      data: dataSet,
+    });
+  </script>
+</body>
+
+</html>

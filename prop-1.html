@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- <link href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css" rel="stylesheet" /> -->
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>DataPortal</title>
+</head>
+
+<body>
+    <div class="sidebar open">
+        <div class="logo-details">
+            <i class="bx bxl-c-plus-plus icon"></i>
+            <a href="home.html" class="logo_name">Data Portal</a>
+            <svg id="btn" viewBox="0 0 40 40" width="20" height="22" fill="#fff">
+                <rect width="40" height="8" rx="4"></rect>
+                <rect y="15" width="40" height="8" rx="4"></rect>
+                <rect y="30" width="40" height="8" rx="4"></rect>
+            </svg>
+        </div>
+
+        <h3 class="nav-header">Filters</h3>
+        <hr>
+        <ul class="nav-list">
+            <li>
+                <label class="form-label" for="provinceSelect">Province</label>
+                <select id="provinceSelect" name="provinceSelect">
+                    <option value="">Select A province</option>
+                    <option value="បន្ទាយមានជ័យ">បន្ទាយមានជ័យ</option>
+                    <option value="បាត់ដំបង">បាត់ដំបង</option>
+                    <option value="កំពង់ចាម">កំពង់ចាម</option>
+                    <option value="កំពង់ឆ្នាំង">កំពង់ឆ្នាំង</option>
+                    <option value="កំពង់ស្ពឺ">កំពង់ស្ពឺ</option>
+                    <option value="កំពង់ធំ">កំពង់ធំ</option>
+                    <option value="កំពត">កំពត</option>
+                    <option value="កណ្តាល">កណ្តាល</option>
+                    <option value="កោះកុង">កោះកុង</option>
+                    <option value="ក្រចេះ">ក្រចេះ</option>
+                    <option value="មណ្ឌលគិរី">មណ្ឌលគិរី</option>
+                    <option value="ភ្នំពេញ">ភ្នំពេញ</option>
+                    <option value="ព្រះវិហារ">ព្រះវិហារ</option>
+                    <option value="ព្រៃវែង">ព្រៃវែង</option>
+                    <option value="ពោធិ៍សាត់">ពោធិ៍សាត់</option>
+                    <option value="រតនគិរី">រតនគិរី</option>
+                    <option value="សៀមរាប">សៀមរាប</option>
+                    <option value="ព្រះសីហនុ">ព្រះសីហនុ</option>
+                    <option value="ស្ទឹងត្រែង">ស្ទឹងត្រែង</option>
+                    <option value="ស្វាយរៀង">ស្វាយរៀង</option>
+                    <option value="តាកែវ">តាកែវ</option>
+                    <option value="ឧត្តរមានជ័យ">ឧត្តរមានជ័យ</option>
+                    <option value="កែប">កែប</option>
+                    <option value="ប៉ៃលិន">ប៉ៃលិន</option>
+                    <option value="ត្បូងឃ្មុំ">ត្បូងឃ្មុំ</option>
+                </select>
+            </li>
+            <li>
+                <label class="form-label">Date Range</label>
+                <div class="form-inline-wrapper">
+                    <input placeholder="Start Date" class="form-input__date" type="text" id="startDate" />
+                    <input placeholder="End Date" class="form-input__date" type="text" id="endDate" />
+                </div>
+            </li>
+        </ul>
+
+        <h3 class="nav-header">Navigation</h3>
+        <hr>
+        <ul class="nav-list">
+            <li>
+                <a href="home.html">Home</a>
+            </li>
+            <li>
+                <a href="index.html?map=cfi">CFI</a>
+            </li>
+            <li>
+                <a href="index.html?map=cfr">CFR</a>
+            </li>
+        </ul>
+    </div>
+    <section id="map" class="home-section">
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-wms-header@1.0.13/index.min.js"></script>
+    <script>
+        const layerKeys = {
+            cfr: 'cfr:cfr_wf_assessment_2022',
+            cfi: 'cfi:cfi'
+        }
+
+        var map = L.map('map').setView([12.5657, 104.991], 7);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        const faoServer = "http://localhost:8080/https://staging.fia.db.opendevcam.net/geoserver/cfr/wms";
+        const odcServer = "http://localhost:8080/https://geoserver.opendevelopmentmekong.net/geoserver/ODVietnam/wms";
+
+        var wmsLayers = {
+            'CFR Status Assessment 2022': L.TileLayer.wmsHeader('http://localhost:8080/https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', {
+                layers: 'cfr:cfr_wf_assessment_2022',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'CFi': L.TileLayer.wmsHeader(faoServer, {
+                layers: 'cfi:cfi',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Vietnam': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODVietnam:07395968-2f11-4753-b8f8-fc108a76a428',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Vietnam Population': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODVietnam:0d8d48df-cad2-4015-be5a-6593771a13e8',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+            'Community Fisheries': L.TileLayer.wmsHeader(odcServer, {
+                layers: 'ODCambodia:1',
+                format: 'image/png',
+                transparent: true,
+            }, [
+                { header: 'X-Requested-With', value: 'XMLHttpRequest' },
+            ]),
+        }
+
+        L.control.layers(wmsLayers).addTo(map);
+
+        wmsLayers['CFR Status Assessment 2022'].addTo(map);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            function isEmpty(obj) {
+                return Object.keys(obj).length === 0;
+            }
+
+            function updateFilter(obj, key, val) {
+                obj[key] = val;
+
+                console.log(obj);
+                return Object.values(obj).filter(x => x).join(' AND ');
+            }
+
+            (function filter() {
+                let cql_filter = {};
+                const LAYER_KEY = 'CFR Status Assessment 2022';
+
+                document.getElementById('provinceSelect').addEventListener('change', function (e) {
+                    const val = e.currentTarget.value;
+                    const param = val ? `province = '${e.currentTarget.value}'` : '';
+
+                    wmsLayers[LAYER_KEY].setParams({ CQL_FILTER: updateFilter(cql_filter, 'province', param) });
+                });
+
+                document.getElementById('startDate').addEventListener('change', function (e) {
+                    const val = e.currentTarget.value;
+                    const param = val ? `today AFTER ${new Date(val).toISOString()}` : '';
+
+                    wmsLayers[LAYER_KEY].setParams({ CQL_FILTER: updateFilter(cql_filter, 'startDate', param) });
+                });
+
+                document.getElementById('endDate').addEventListener('change', function (e) {
+                    const val = e.currentTarget.value;
+                    const param = val ? `today BEFORE ${new Date(val).toISOString()}` : '';
+
+                    wmsLayers[LAYER_KEY].setParams({ CQL_FILTER: updateFilter(cql_filter, 'endDate', param) });
+                });
+
+
+            })();
+
+            document.querySelectorAll('.form-input__date').forEach((element) => {
+                function showDate(e) {
+                    e.currentTarget.type = 'date';
+                    e.currentTarget.showPicker();
+                }
+
+                element.addEventListener('focus', showDate);
+                element.addEventListener('click', showDate);
+                element.addEventListener('change', function (e) {
+
+                });
+            });
+
+            (function initMenu() {
+                let sidebar = document.querySelector(".sidebar");
+                let closeBtn = document.querySelector("#btn");
+                let searchBtn = document.querySelector(".bx-search");
+
+                closeBtn.addEventListener("click", () => {
+                    sidebar.classList.toggle("open");
+                    menuBtnChange();//calling the function(optional)
+                });
+
+                // following are the code to change sidebar button(optional)
+                function menuBtnChange() {
+                    if (sidebar.classList.contains("open")) {
+                        closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");//replacing the iocns class
+                    } else {
+                        closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");//replacing the iocns class
+                    }
+                }
+            })();
+        });
+    </script>
+</body>
+
+</html>
