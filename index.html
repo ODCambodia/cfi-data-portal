@@ -13,7 +13,7 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>DataPortal</title>
+    <title>Data Portal</title>
 </head>
 
 <body>
@@ -34,11 +34,11 @@
             <li>
                 <label class="form-label" for="provinceSelect">Province</label>
                 <select id="provinceSelect" name="provinceSelect">
-                    <option value="">Select A province</option>
+                    <option value="">Select a province</option>
                     <option value="បន្ទាយមានជ័យ">បន្ទាយមានជ័យ</option>
                     <option value="បាត់ដំបង">បាត់ដំបង</option>
                     <option value="កំពង់ចាម">កំពង់ចាម</option>
-                    <option value="កំពង់ឆ្នាំង">កំពង់ឆ្នាំង</option>
+                    <option value="កំពង់់ឆ្នាំង">កំពង់់ឆ្នាំង</option>
                     <option value="កំពង់ស្ពឺ">កំពង់ស្ពឺ</option>
                     <option value="កំពង់ធំ">កំពង់ធំ</option>
                     <option value="កំពត">កំពត</option>
@@ -78,15 +78,14 @@
                 <a href="home.html">Home</a>
             </li>
             <li>
-                <a href="home.html">Report (In Progress)</a>
+                <a href="#">Report (In Progress)</a>
             </li>
         </ul>
     </div>
     <section id="map" class="home-section">
     </section>
 
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-wms-header@1.0.13/index.min.js"></script>
-
+    <!-- <script src="https://cdn.jsdelivr.net/npm/leaflet-wms-header@1.0.13/index.min.js"></script> -->
 
     <script>
         function getQueryParam(key) {
@@ -111,39 +110,44 @@
 
         function handleJson(data, key) {
             const styleHashMap = {
-                'CFI_A': (feature) => ({
+                'CFI_A': {
+                    radius: 4,
+                    fillColor: "#ff7800",
+                    color: "#000",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                },
+                'CFI_B': {
                     color: "black",
                     fillColor: "orange",
-                    wieght: "1",
-                    fillOpacity: "0.5",
-                    opacity: "0.5",
-                }),
-                'CFI_B': (feature) => ({
-                    color: "black",
-                    fillColor: "orange",
-                    wieght: "1",
-                    fillOpacity: "0.5",
-                    opacity: "0.5",
-                }),
-                'CFR_A': (feature) => ({
-                    color: "black",
-                    fillColor: "orange",
-                    wieght: "1",
-                    fillOpacity: "0.5",
-                    opacity: "0.5",
-                })
+                    weight: 1,
+                    fillOpacity: 0.5,
+                    opacity: 0.5,
+                },
+                // 'CFR_A': {
+                //     radius: 4,
+                //     fillColor: "#ff7800",
+                //     color: "#000",
+                //     weight: 1,
+                //     opacity: 1,
+                //     fillOpacity: 0.8
+                // }
+                CFR_A: (feature) => {
+                    switch (feature.properties.is_qualified_cfr) {
+                        case 'បាទ/ចាស៎': return {color: "green", radius: 4, weight: 1, opacity: 1, fillOpacity: 0.8};
+                        case 'ទេ': return {color: "red", radius: 4, weight: 1, opacity: 1, fillOpacity: 0.8};
+                        default: return {color: "blue", radius: 4, weight: 1, opacity: 1, fillOpacity: 0.8}
+                    }
+                }
             }
 
             const featureHandler = {
                 'CFI_A': function (feature, layer) {
                     layer.bindPopup(
-                        '<li>' + `CFI Name (EN): ${feature.properties.name_en}` + '</li>' +
-                        '<li>' + `CFI Name (KM): ${feature.properties.name}` + '</li>' +
-                        '<li>' + `Area (Ha): ${feature.properties.area_ha}` + '</li>' +
-                        '<li>' + `Province: ${feature.properties.province}` + '</li>' +
-                        '<li>' + `Type: ${feature.properties.type}` + '</li>' +
-                        '<li>' + `Created on: ${feature.properties.creation_date}` + '</li>' +
-                        '<li>' + `Registered on: ${feature.properties.registration_date}` + '</li>'
+                        '<li>' + `Community: ${feature.properties.cfi_name}` + '</li>' +
+                        '<li>' + `FiAC Score: ${feature.properties.fiac_score}` + '</li>' +
+                        '<li>' + `Province: ${feature.properties.province}` + '</li>'
                     )
                 },
                 'CFI_B': function (feature, layer) {
@@ -159,20 +163,23 @@
                 },
                 'CFR_A': function (feature, layer) {
                     layer.bindPopup(
-                        '<li>' + `CFI Name (EN): ${feature.properties.name_en}` + '</li>' +
-                        '<li>' + `CFI Name (KM): ${feature.properties.name}` + '</li>' +
-                        '<li>' + `Area (Ha): ${feature.properties.area_ha}` + '</li>' +
+                        '<li>' + `Community: ${feature.properties.cfr_name}` + '</li>' +
                         '<li>' + `Province: ${feature.properties.province}` + '</li>' +
-                        '<li>' + `Type: ${feature.properties.type}` + '</li>' +
-                        '<li>' + `Created on: ${feature.properties.creation_date}` + '</li>' +
-                        '<li>' + `Registered on: ${feature.properties.registration_date}` + '</li>'
+                        '<li>' + `Type: ${feature.properties.cfr_type}` + '</li>' +
+                        '<li>' + `Qualified?: ${feature.properties.is_qualified_cfr}` + '</li>'
                     )
                 }
             }
+
             OVERLAY_MAP[key] = L.geoJson(data, {
                 style: styleHashMap[key],
+                pointToLayer: function (feature, latlng) {
+                    var circleMarker = L.circleMarker(latlng, styleHashMap[key]);
+                    return(circleMarker);
+                },
                 onEachFeature: featureHandler[key],
             });
+            map.flyToBounds(OVERLAY_MAP[key].getBounds());
 
             // IMPORTANT MAKE THIS DYNAMIC
             const len = Object.keys(OVERLAY_MAP).length;
@@ -183,6 +190,8 @@
                 OVERLAY_MAP[key].addTo(map);
             }
         }
+
+        L.control.scale().addTo(map);
 
         function handleJsonCFI_B(data) {
             handleJson(data, 'CFI_B')
@@ -242,7 +251,7 @@
                 getAjax('CFI_B');
 
             } else if (server === 'cfr') {
-                //CFR
+                //CFR Assessment
                 getAjax('CFR_A');
             }
 
