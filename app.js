@@ -1,6 +1,7 @@
 import express from 'express'
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const app = express();
 const port = process.env.PORT || 3000;
