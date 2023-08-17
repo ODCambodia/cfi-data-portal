@@ -4,7 +4,8 @@
   "description": "cfi web data portal",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "build": "npm install",
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
