@@ -8,6 +8,10 @@
   font-family: "Poppins", sans-serif;
 }
 
+span {
+  background-color: gray;
+}
+
 .sidebar {
   position: fixed;
   left: 0;

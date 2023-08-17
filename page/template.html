@@ -1,11 +1,223 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>CFAMP Template</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <style>
+    span {
+      /* background-color: rgba(1, 1, 1, .3); */
+      color: blue;
+      font-weight: 600;
+      border-radius: .1rem;
+      padding: .1rem;
+    }
+
+    .container {
+      /* border: 1px solid;
+      margin: 4rem;
+      padding: 5rem; */
+    }
+  </style>
 </head>
 <body>
-  
+  <div class="loading"></div>
+
+  <div class="container content">
+    <section class="cover-page">
+      <p class="text-center fs-2">Kingdom of Cambodia</p>
+      <p class="text-center fs-3 lh-lg">Nation Religion King</p>
+      <p class="text-center fs-3 fw-bolder">Model Community Fishing Area Management Plan for a 3 year period</p>
+      <h3 class="text-center">(20.... - 20....)</h3>
+      <br>
+      <table style="margin: auto">
+        <tr>
+          <td>Name of community fisheries:</span></td>
+          <td><span id="cfi_name"></span></td>
+        </tr>
+        <tr>
+          <td>Village:</td>
+          <td><span id="cfi_village_1"></span></td>
+        </tr>
+        <tr>
+          <td>Commune / Sangkat:</td>
+          <td><span id="cfi_commune_1"></span></td>
+        </tr>
+        <tr>
+          <td>District / Khan:</td>
+          <td><span id="cfi_district_1"></span></td>
+        </tr>
+        <tr>
+          <td>Province / Municipality:</td>
+          <td><span id="cfi_province"></span></td>
+        </tr>
+      </table>
+    </section>
+
+    <section id="overall_situation">
+      <p class="fs-4">1. Overall situation</p>
+      <p>
+        The <span id="cfi_name_1"></span> community fisheries was established with an initial founding congress on <span id="election_year"></span> and entered into a community fishing area agreement dated <span id="cfi_register_date"></span> <span id="cfi_register_month"></span> <span id="cfi_register_year"></span>. 
+      </p>
+      <p>
+        The <span id="cfi_name_2"></span> community fisheries is located in <span id="cfi_village_2"></span> village, <span id="cfi_commune_2"></span> commune, <span id="cfi_district_2"></span> district, <span id="cfi_province_1"></span> province, and has <span id="cfi_member_total"></span> members (<span id="cfi_member_female"></span> women), and <span id="cfi_committee_total"></span> committee members (<span id="cfi_committee_female"></span> women). The total number of families is <span id="demo_total_family"></span>. 
+      </p>
+      <p>
+        In the past, important activities of the community fisheries have included .....
+      </p>
+    </section>
+
+    <section>
+      <p class="fs-4">2. Demography and Socio-Economics</p>
+      <p class="fs-5">A. The people</p>
+      <ul>
+        <li>
+          The total number of people in the community fisheries is <span id="demo_total_population"></span> including <span id="demo_male_population"></span> males and <span id="demo_female_population"></span> females; of them, there are <span id="demo_khmer"></span>% Khmer, <span id="demo_khmer_islam"></span>% Khmer Islam, and <span id="demo_vietnamese"></span>% Vietnamese immigrants.
+        </li>
+        <li>
+          The number of widowed/divorced women in the community fisheries is <span id="demo_total_widow"></span>.
+        </li>
+        <li>
+          The number of disabled people in the community fisheries is <span id="demo_total_disable"></span> (<span id="demo_female_disable"></span> females). The number of elderly people in the community fisheries is .......... (......... women). The number of orphans in the community fisheries is <span id="demo_total_orphan"></span> (<span id="demo_female_orphan"></span> girls). The number of people with long-term illnesses in the community fisheries is <span id="demo_total_chronic_disease"></span> (<span id="demo_female_chronic_disease"></span> females)
+        </li>
+        <li>
+          <span id="demo_buddist"></span>% of the people in the community are Buddhist. In addition, about <span id="demo_muslim"></span>% are Muslim, and <span id="demo_christian"></span>% are Catholic.
+        </li>
+        <li>
+          Among the family members of all the community fisheries members, <span id="demo_no_edu_total"></span> people are illiterate (<span id="demo_no_edu_female"></span> female), <span id="demo_primary_edu_total"></span> have a primary school education (<span id="demo_primary_edu_female"></span> females), <span id="demo_secondary_edu_total"></span> have a secondary school education (<span id="demo_secondary_edu_female"></span> females), and <span id="demo_tertiary_edu_total"></span> have a tertiary school education (<span id="demo_tertiary_edu_female"></span> women).
+        </li>
+      </ul>
+
+      <!-- <p class="fs-5">B. Occupations</p>
+      <p>The main occupations of people in this community are:</p>
+      <ul>
+        <li>
+          Fishing:<span id="demo_secondary_edu_female"></span> families
+        </li>
+        <li>
+          Rice farming: <span id="demo_secondary_edu_female"></span> families, area of <span id="demo_secondary_edu_female"></span> hectares
+        </li>
+        <li>
+          Aquaculture: <span id="demo_secondary_edu_female"></span> families, area of........ hectare or ......... cages
+        </li>
+        <li>
+          Vegetable farming: <span id="demo_secondary_edu_female"></span> families, area of........ hectare
+        </li>
+        <li>
+          Carpenters:<span id="demo_secondary_edu_female"></span> families
+        </li>
+        <li>
+          Chamkar farming:<span id="demo_secondary_edu_female"></span> families, area of........ hectare
+        </li>
+        <li>
+          Making crafts:<span id="demo_secondary_edu_female"></span> families
+        </li>
+        <li>
+          Chamkar farming:<span id="demo_secondary_edu_female"></span> families, area of........ hectare
+        </li>
+        <li>
+          Making crafts:<span id="demo_secondary_edu_female"></span> families
+        </li>
+        <li>
+          Making crafts:<span id="demo_secondary_edu_female"></span> families
+        </li>
+      </ul>
+    </section> -->
+  </div>
+
+  <script>
+    const kobo_api = '/api/template';
+    
+    async function getapi(api_url) {
+      const response = await fetch(api_url);
+
+     return response.json();
+    }
+    
+    const getId = (id) => document.getElementById(id);
+    // const getClass = (class) => document.querySelectorAll(class);
+
+    //main
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Load data
+      const koboData = (await getapi(kobo_api)).results[0];
+      
+      // Remove loading div
+
+      // Insert
+      const dictionary = {
+        'cfi_name':                   'g_section_a_p1/g_cfi_basic_info/cfi_name',
+        'cfi_name_1':                 'g_section_a_p1/g_cfi_basic_info/cfi_name',
+        'cfi_name_2':                 'g_section_a_p1/g_cfi_basic_info/cfi_name',
+        'cfi_province':               'g_section_a_p1/cfi_province',
+        'cfi_province_1':             'g_section_a_p1/cfi_province',
+        'cfi_register_date':          'g_section_b_p3/g_cfi_register/cfi_register_date',
+        'cfi_register_month':         'g_section_b_p3/g_cfi_register/cfi_register_month',
+        'cfi_register_year':          'g_section_b_p3/g_cfi_register/cfi_register_year',
+        'cfi_member_total':           'g_section_a_p2/g_cfi_member_and_committee/g_cfi_member/cfi_member_total',
+        'cfi_member_female':          'g_section_a_p2/g_cfi_member_and_committee/g_cfi_member/cfi_member_female',
+        'cfi_committee_total':        'g_section_a_p2/g_cfi_member_and_committee/g_cfi_committee/cfi_committee_total',
+        'cfi_committee_female':       'g_section_a_p2/g_cfi_member_and_committee/g_cfi_committee/cfi_committee_female',
+        'demo_total_family':          'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_total_family',
+        'demo_total_population':      'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_total_population',
+        'demo_female_population':     'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_female_population',
+        'demo_male_population':       'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_male_population',
+        'demo_khmer':                 'g_section_e_p8/demo_ethnicity/demo_khmer',
+        'demo_khmer_islam':           'g_section_e_p8/demo_ethnicity/demo_khmer_islam',
+        'demo_vietnamese':            'g_section_e_p8/demo_ethnicity/demo_vietnamese',
+        'demo_total_widow':           'g_section_e_p8/g_cfi_demographic_info/g_demo_widow_widower/demo_total_widow',
+        'demo_total_disable':         'g_section_e_p8/g_cfi_demographic_info/g_demo_disable/demo_total_disable',
+        'demo_female_disable':        'g_section_e_p8/g_cfi_demographic_info/g_demo_disable/demo_female_disable',
+        'demo_total_orphan':          'g_section_e_p8/g_cfi_demographic_info/g_demo_orphan/demo_total_orphan',
+        'demo_female_orphan':         'g_section_e_p8/g_cfi_demographic_info/g_demo_orphan/demo_female_orphan',
+        'demo_total_chronic_disease': 'g_section_e_p8/g_cfi_demographic_info/g_demo_chronic_disease/demo_total_chronic_disease',
+        'demo_female_chronic_disease': 'g_section_e_p8/g_cfi_demographic_info/g_demo_chronic_disease/demo_female_chronic_disease',
+        'demo_buddist':               'g_section_e_p8/demo_religion/demo_buddist',
+        'demo_muslim':                'g_section_e_p8/demo_religion/demo_muslim',
+        'demo_christian':             'g_section_e_p8/demo_religion/demo_christian',
+        'demo_no_edu_total':          'g_section_e_p8/g_demo_education_lvl/g_demo_no_edu/demo_no_edu_total',
+        'demo_no_edu_female':         'g_section_e_p8/g_demo_education_lvl/g_demo_no_edu/demo_no_edu_female',
+        'demo_primary_edu_total':     'g_section_e_p8/g_demo_education_lvl/g_demo_primary_edu/demo_primary_edu_total',
+        'demo_primary_edu_female':    'g_section_e_p8/g_demo_education_lvl/g_demo_primary_edu/demo_primary_edu_female',
+        'demo_secondary_edu_total':   'g_section_e_p8/g_demo_education_lvl/g_demo_secondary_edu/demo_secondary_edu_total',
+        'demo_secondary_edu_female':  'g_section_e_p8/g_demo_education_lvl/g_demo_secondary_edu/demo_secondary_edu_female',
+        'demo_tertiary_edu_total':    'g_section_e_p8/g_demo_education_lvl/g_demo_tertiary_edu/demo_tertiary_edu_total',
+        'demo_tertiary_edu_female':   'g_section_e_p8/g_demo_education_lvl/g_demo_tertiary_edu/demo_tertiary_edu_female',
+      }
+
+      for (let key in dictionary) {
+        getId(key).innerText =  koboData[dictionary[key]];
+      }
+
+      // CFi Village
+      getId('cfi_village_1').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_village'];
+
+      getId('cfi_village_2').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_village'];
+
+      // CFi Commune
+      getId('cfi_commune_1').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_commune'];
+
+      getId('cfi_commune_2').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_commune'];
+
+      // CFi District
+      getId('cfi_district_1').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_district'];
+
+      getId('cfi_district_2').innerText = koboData['g_section_a_p1/rpt_cfi_location'][0]['g_section_a_p1/rpt_cfi_location/cfi_district'];
+
+      // CFi Election Year
+      getId('election_year').innerText = koboData['g_section_b_p3/g_election_status/rpt_cfi_election'][0]['g_section_b_p3/g_election_status/rpt_cfi_election/election_year'];
+    });
+
+
+    // const kobodata = fetch('api/v2/assets/a6EAL6ktxuP9UQRdYLwYja/data.json', {
+    //   method: 'GET',
+    //   headers: {
+    //     'X-Auth-Token': 'TOKEN 853ebba588d07208b7776765ce3176baace0b716'
+    //   }
+    // }).then(res => res.json())
+    // .then(data => console.log(JSON.stringify(data)))
+  </script>
 </body>
 </html>
