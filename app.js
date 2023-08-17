@@ -19,20 +19,20 @@ const dirName = path.dirname(fileURLToPath(import.meta.url));
 //   changeOrigin: true,
 // }));
 
-app.get('/', function (req, res) {
-  res.sendFile(path.join(dirName, 'page/index.html'));
-});
+// app.get('/', function (req, res) {
+//   res.sendFile(path.join(dirName, 'page/index.html'));
+// });
 
-app.get('/map', function (req, res) {
-  res.sendFile(path.join(dirName, 'page/map.html'));
-});
+// app.get('/map', function (req, res) {
+//   res.sendFile(path.join(dirName, 'page/map.html'));
+// });
 
 app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.use('/api/cfi', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfi/wms', changeOrigin: true }));
-app.use('/api/cfr', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', changeOrigin: true }));
+// app.use('/api/cfi', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfi/wms', changeOrigin: true }));
+// app.use('/api/cfr', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', changeOrigin: true }));
 
 app.get('/api/template', async function (req, res) {
   try {
