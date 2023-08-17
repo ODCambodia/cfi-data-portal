@@ -20,17 +20,8 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/api', async function (req, res) {
-  try {
-    const response = await fetch('https://cat-fact.herokuapp.com/facts');
-    res.send(response);
-  } catch (error) {
-    console.log('There was an error', error);
-    res.send(error);
-  }
-
-  res.sendFile(path.join(dirName, 'page/index.html'));
-});
+app.use('/api/cfi', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfi/wms', changeOrigin: true }));
+app.use('/api/cfr', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', changeOrigin: true }));
 
 app.listen(port);
 console.log('Server started at http://localhost:' + port);
