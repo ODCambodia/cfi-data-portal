@@ -7,85 +7,90 @@ const KEYS = {
   CFI_B: 'CFi Boundary',
 };
 
+const TYPENAME = {
+  [KEYS.CFR_A]: 'cfr:cfr_wf_assessment_2022',
+  [KEYS.CFI_A]: 'cfi:Effectiveness_Assessment_2022',
+  [KEYS.CFI_B]: 'cfi:cfi',
+}
+
 // CONFIG OVERLAY STYLES
-const STYLES = (key) => {
-  const OBJ = {
-    [KEYS.CFI_A]: {
-      Strong: {
+const STYLES = {
+  [KEYS.CFI_A]: (feature) => {
+    switch (feature.properties.fiac_score) {
+      case 'Strong': return {
         color: "green",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-      Average: {
+      };
+      case 'Average': return {
         color: "orange",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-      Weak: {
+      };
+      case 'Weak': return {
         color: "red",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-      default: {
+      };
+      default: return {
         color: "blue",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
       }
-    },
-    [KEYS.CFI_B]: {
-      null: {
+    }
+  },
+  [KEYS.CFI_B]: (feature) => {
+    switch (feature.properties.registration_date) {
+      case null: return {
         color: "black",
         fillColor: "yellow",
         weight: 1,
         fillOpacity: 0.5,
         opacity: 0.5,
-      },
-      default: {
+      };
+      default: return {
         color: "black",
         fillColor: "purple",
         weight: 1,
         fillOpacity: 0.5,
         opacity: 0.5,
       }
-    },
-    [KEYS.CFR_A]: {
-      'បាទ/ចាស៎': {
+    }
+  },
+  [KEYS.CFR_A]: (feature) => {
+    switch (feature.properties.is_qualified_cfr) {
+      case 'បាទ/ចាស៎': return {
         color: "green",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-      'ទេ': {
+      };
+      case 'ទេ': return {
         color: "red",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-      default: {
+      };
+      default: return {
         color: "blue",
         radius: 4,
         weight: 1,
         opacity: 1,
         fillOpacity: 0.7
-      },
-
+      }
     }
   }
-
-  console.log(key);
-
-  return OBJ[key] || OBJ.default;
-};
+}
 
 // OVERLAY FEATURE HANDLER
 const EACH_FEATURES_HANDLER = {

@@ -1,119 +1,118 @@
-function getQueryParam(key) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(key);
-}
-
-let map = L.map('map', {
+const map = L.map('map', {
   center: [12.5657, 104.991],
   zoom: 7
 });
 
-let osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-const BASE_MAP = { "Open Street Map": osm }
-const OVERLAY_MAP = {}
-
-const server = getQueryParam('map') || 'cfi';
-const geoServer = `https://staging.fia.db.opendevcam.net/geoserver/${server}/wms`;
-
-function handleJson(data, key) {
-  console.log(CONFIGS.styles(key));
-  OVERLAY_MAP[key] = L.geoJson(data, {
-    style: CONFIGS.styles(key),
-    onEachFeature: CONFIGS.eachFeatureHandler[key],
-    pointToLayer: (feature, latlng) => L.circleMarker(latlng, CONFIGS.styles(key)),
-  });
-
-  console.log(OVERLAY_MAP[key])
-
-  map.flyToBounds(OVERLAY_MAP[key].getBounds());
-
-  // IMPORTANT MAKE THIS DYNAMIC
-  const len = Object.keys(OVERLAY_MAP).length;
-  const shouldAddLayer = (server === 'cfi' && len === 2) || (server === 'cfr' && len === 1);
-
-  if (shouldAddLayer) {
-    OVERLAY_MAP[key].addTo(map);
-    L.control.layers(BASE_MAP, OVERLAY_MAP).addTo(map);
-  }
-}
-
 L.control.scale().addTo(map);
 
-function handleJsonCFI_B(data) {
-  handleJson(data, KEYS.CFI_B)
+const BASE_MAP = {
+  "Open Street Map": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map)
+}
+const OVERLAY_MAP = {}
+const SERVER = Utils.getQueryParam('map') || 'cfi';
+const geoServer = `http://localhost:3000/geoserver/${SERVER}/ows`;
+
+function handleJson(data, key) {
+  OVERLAY_MAP[key] = L.geoJson(data, {
+    style: CONFIGS.styles[key],
+    onEachFeature: CONFIGS.eachFeatureHandler[key],
+    pointToLayer: (feature, latlng) => L.circleMarker(latlng, CONFIGS.styles[key](feature)),
+  });
 }
 
-function handleJsonCFI_A(data) {
-  handleJson(data, KEYS.CFI_A)
-}
+function handleBoundaryFilter(val) {
+  OVERLAY_MAP[KEYS.CFI_B].off('popupopen');
 
-function handleJsonCFR_A(data) {
-  handleJson(data, KEYS.CFR_A)
-}
+  OVERLAY_MAP[KEYS.CFI_B].on('popupopen', function (e) {
+    OVERLAY_MAP[KEYS.CFI_A].remove();
+    map.setView(e.popup._latlng);
 
-function getAjax(key,) {
-  const PARAM = {
-    CFI_A: {
-      typename: 'cfi:Effectiveness_Assessment_2022',
-      callback: 'callback:handleJsonCFI_A'
-    },
-    CFI_B: {
-      typename: 'cfi:cfi',
-      callback: 'callback:handleJsonCFI_B'
-    },
-    CFR_A: {
-      typename: 'cfr:cfr_wf_assessment_2022',
-      callback: 'callback:handleJsonCFR_A'
-    }
-  };
+    Utils.fetch(KEYS.CFI_A, function (data) {
+      handleJson(data, KEYS.CFI_A);
+      OVERLAY_MAP[KEYS.CFI_A].addTo(map);
 
-  const CQL = getQueryParam('province') ? `province = '${getQueryParam('province')}'` : '';
+      const body = document.querySelector('.about__body');
+      body.innerHTML = '';
 
-  $.ajax(geoServer, {
-    type: 'GET',
-    async: false,
-    data: {
-      service: 'WFS',
-      version: '1.1.0',
-      request: 'GetFeature',
-      typename: PARAM[key].typename,
-      CQL_FILTER: CQL,
-      srsname: 'EPSG:4326',
-      outputFormat: 'text/javascript',
-    },
-    dataType: 'jsonp',
-    jsonpCallback: PARAM[key].callback,
-    jsonp: 'format_options'
+      const ul = document.createElement('ul');
+      data.features.forEach((item) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = item.properties.cfi_name;
+
+        btn.addEventListener('click', function () {
+          const body = document.querySelector('.about__body');
+          body.innerHTML = '';
+
+          const ul = document.createElement('ul');
+          for (const key in item.properties) {
+            const li = document.createElement('li');
+            li.innerText = key + ': ' + item.properties[key];
+            ul.append(li);
+          }
+
+          body.append(ul);
+        })
+        const li = document.createElement('li');
+        li.append(btn);
+        ul.append(li);
+      })
+      ul.style.paddingLeft = '20px';
+      body.append(ul);
+    }, { CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${e.layer.feature.id}'')')), 0, meters)` });
   });
 }
 
 // MAIN 
 $(document).ready(function () {
-  if (server === 'cfi') {
-    // CFI assessment
-    getAjax('CFI_A');
-
-    // CFI Boundary
-    getAjax('CFI_B');
-
-  } else if (server === 'cfr') {
-    //CFR Assessment
-    getAjax('CFR_A');
+  if (SERVER !== 'cfi' && SERVER !== 'cfr') {
+    alert('Wrong Server Params');
+    return;
   }
 
-  document.getElementById('provinceSelect').addEventListener('change', function (e) {
-    const val = e.currentTarget.value;
+  if (SERVER === 'cfi') {
+    Utils.fetch(KEYS.CFI_A, function (data) {
+      handleJson(data, [KEYS.CFI_A]);
+    });
 
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("province", e.currentTarget.value);
+    Utils.fetch(KEYS.CFI_B, function (data) {
+      handleJson(data, KEYS.CFI_B);
+      OVERLAY_MAP[KEYS.CFI_B].addTo(map);
 
-    window.location.href = 'index.html?' + searchParams.toString();
+    });
+
+  } else if (SERVER === 'cfr') {
+    Utils.fetch(KEYS.CFR_A, handleJson)
+  }
+
+  $.ajax('/api/provinces  ', {
+    type: 'GET',
+    async: true,
+    dataType: 'json',
+    success: function (data) {
+      console.log(data);
+      data.features.forEach(function (item) {
+        $('#provinceSelect').append($('<option>', {
+          value: item.properties.pro_code,
+          text: item.properties.pro_name_k
+        }))
+      })
+    }
   });
 
-  if (getQueryParam('province')) {
-    $('#provinceSelect').val(getQueryParam('province'))
-  }
+
+  $('#provinceSelect').on('change', function (e) {
+    const val = e.currentTarget.value;
+    OVERLAY_MAP[KEYS.CFI_B].remove();
+
+    Utils.fetch(KEYS.CFI_B, function (data) {
+      handleJson(data, [KEYS.CFI_B]);
+      handleBoundaryFilter(val);
+      OVERLAY_MAP[KEYS.CFI_B].addTo(map);
+      map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
+
+    }, { CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','pro_code = ${val}')))` });
+  });
 })
