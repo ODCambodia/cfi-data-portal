@@ -12,7 +12,7 @@ const BASE_MAP = {
 }
 const OVERLAY_MAP = {}
 const SERVER = Utils.getQueryParam('map') || 'cfi';
-const geoServer = `http://localhost:3000/geoserver/${SERVER}/ows`;
+const geoServer = `/geoserver/${SERVER}/ows`;
 
 function handleJson(data, key) {
   OVERLAY_MAP[key] = L.geoJson(data, {

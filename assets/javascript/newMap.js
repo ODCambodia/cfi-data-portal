@@ -13,9 +13,7 @@ const BASE_MAP = {
 };
 const OVERLAY_MAP = {};
 const SERVER = Utils.getQueryParam('map') || 'cfi';
-const GEOSERVER = `http://localhost:3000/geoserver/${SERVER}/ows`;
-
-
+const GEOSERVER = `/geoserver/${SERVER}/ows`;
 
 function getRandom(min = 1, max = 100) {
   return Math.floor(Math.random() * (max - min) + min);
