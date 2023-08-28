@@ -98,10 +98,11 @@ function showCFI_A(data) {
     btn.addEventListener('click', function () {
       const tbody = document.querySelector('#cfiModal tbody');
       tbody.innerHTML = '';
+      Utils.omitFromObject(item.properties, ['id_516_cfi', 'date', '_id', '_uuid'])
       for (const key in item.properties) {
         const tr = document.createElement('tr');
 
-        [key, item.properties[key]].forEach(x => {
+        [TRANSLATE[key] || key, item.properties[key]].forEach(x => {
           const td = document.createElement('td');
           td.innerText = x;
           tr.append(td);
@@ -131,7 +132,7 @@ function showCFI_B(data) {
       continue;
     } else if (key === 'province') {
       cfi_b[key] += `(${cfi_b['province_en']})`;
-    } else if (key === 'creation_date' || key === 'registration_date' && cfi_b[key]) {
+    } else if (key === 'creation_date' || key === 'registration_date' && typeof cfi_b[key] === 'string') {
       cfi_b[key] = cfi_b[key].slice(0, -1);
     }
 
@@ -216,10 +217,6 @@ async function loadProvince() {
       provinceSelect.append(option);
     });
 
-    if (SERVER === 'cfr') {
-      return;
-    }
-
     // on province select
     provinceSelect.addEventListener('change', async function (e) {
       const val = e.currentTarget.value;
@@ -268,8 +265,42 @@ async function loadProvince() {
     });
 
   } catch (e) {
-    console.log('Unable to load province select', e);
+    console.warn('Unable to load province select', e);
   }
+}
+
+function showCFR_A(data) {
+  const { cfr_name, sub_name, name_en, ...cfr_a } = data.properties;
+  const tbody = document.createElement('tbody');
+  Utils.omitFromObject(cfr_a, ['_validation_status', 'Remark', 'cfr_image_URL', 'cfr_image', 'total_men', 'total_women', '_id', '_uuid'])
+  for (const key in cfr_a) {
+    // terrible code
+
+    const tr = document.createElement('tr');
+
+    [TRANSLATE[key] || key, cfr_a[key]].forEach(x => {
+      const td = document.createElement('td');
+      td.innerText = x;
+      tr.append(td);
+    })
+
+    tbody.append(tr);
+  }
+  const table = document.createElement('table');
+  table.append(tbody);
+  table.style.display = 'block';
+  table.style.marginBottom = '5px';
+
+  const header = document.createElement('strong');
+  header.innerText = `ឈ្មោះ​សហគមន៍៖ ${cfr_name}`;
+
+  const body = document.querySelector('.about__body');
+  body.innerHTML = '';
+  body.append(header);
+  body.append(table);
+
+  CustomCharts.pieChart();
+  CustomCharts.barChart();
 }
 
 async function loadCFIMap() {
@@ -283,53 +314,76 @@ async function loadCFIMap() {
 }
 
 async function loadCFRMap(options) {
-  const cfi_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
-  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfi_data, KEYS.CFR_A);
+  const cfr_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
-  console.log(OVERLAY_MAP[KEYS.CFR_A]);
-
   OVERLAY_MAP[KEYS.CFR_A].off('popupopen');
   OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
-    console.log(e);
-    const { cfr_name, sub_name, name_en, ...cfr_a } = e.layer.feature.properties;
-    const tbody = document.createElement('tbody');
-    for (const key in cfr_a) {
-      // terrible code
-      if (key === 'province_en') {
-        continue;
-      } else if (key === 'province') {
-        cfr_a[key] += `(${cfr_a['province_en']})`;
-      } else if (key === 'creation_date' || key === 'registration_date' && cfr_a[key]) {
-        cfr_a[key] = cfr_a[key].slice(0, -1);
-      }
+    showCFR_A(e.layer.feature);
+  });
+}
 
-      const tr = document.createElement('tr');
+async function loadCFRSelect(options) {
+  const cfr_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfr_data, KEYS.CFR_A);
+  OVERLAY_MAP[KEYS.CFR_A].addTo(map);
+  OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
+    showCFR_A(e.layer.feature);
+  });
 
-      [TRANSLATE[key] || key, cfr_a[key]].forEach(x => {
-        const td = document.createElement('td');
-        td.innerText = x;
-        tr.append(td);
-      })
+  const cfiSelect = document.getElementById('cfiSelect');
 
-      tbody.append(tr);
-    }
-    const table = document.createElement('table');
-    table.append(tbody);
-    table.style.display = 'block';
-    table.style.marginBottom = '5px';
-
-    const header = document.createElement('strong');
-    header.innerText = `ឈ្មោះ​សហគមន៍៖ ${name || sub_name} (${name_en})`;
-
-    const body = document.querySelector('.about__body');
-    body.append(header);
-    body.append(table);
-
-    CustomCharts.pieChart();
-    CustomCharts.barChart();
+  cfr_data.features.forEach((item) => {
+    const option = document.createElement('option');
+    option.text = item.properties.cfr_name;
+    option.value = item.id;
+    cfiSelect.append(option);
   });
 
 
+  cfiSelect.addEventListener('change', async function (e) {
+    const val = e.currentTarget.value;
+    const selectedCFR = cfr_data.features.find((item) => item.id === val);
+
+    document.querySelector('.about__body').innerHTML = '';
+
+    if (selectedCFR) {
+      showCFR_A(selectedCFR);
+    }
+  });
+
+  cfiSelect.removeAttribute('disabled');
+}
+
+async function loadProvinceCFR() {
+  try {
+    const res = await fetch('/api/provinces/cfr');
+    const data = await res.json();
+    const provinceSelect = document.getElementById('provinceSelect');
+
+    // append options to select
+    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+    data.features.forEach((item) => {
+      const option = document.createElement('option');
+      option.text = item.properties.ADM1_EN || item.properties.province;
+      option.value = item.id;
+      provinceSelect.append(option);
+    });
+
+    provinceSelect.addEventListener('change', async function (e) {
+      const val = e.currentTarget.value;
+      OVERLAY_MAP[KEYS.CFR_A].remove();
+
+      const cfiSelect = document.getElementById('cfiSelect');
+      cfiSelect.value = '';
+      cfiSelect.innerHTML = '';
+      cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
+
+      loadCFRSelect({ CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` });
+    });
+  } catch (e) {
+    console.warn(e);
+  }
 }
 
 async function init() {
@@ -340,23 +394,16 @@ async function init() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   init().then(() => {
     document.getElementById('loadingOverlay').classList.remove('is-active');
     document.getElementById('provinceSelect').removeAttribute('disabled');
   });
 
-  loadProvince();
   if (SERVER === 'cfr') {
-    provinceSelect.addEventListener('change', async function (e) {
-      const val = e.currentTarget.options[e.currentTarget.selectedIndex].text;
-      OVERLAY_MAP[KEYS.CFR_A].remove();
-
-      const CQL_FILTER = e.currentTarget.value ? `province = '${val}'` : '';
-      loadCFRMap({ CQL_FILTER });
-    });
-    // document.getElementById('provinceSelect').parentElement.style.display = 'none';
-    document.getElementById('cfiSelect').parentElement.style.display = 'none';
+    loadProvinceCFR();
+  } else {
+    loadProvince();
   }
 
   const modal = document.getElementById('cfiModal');

@@ -1,6 +1,13 @@
 /* Google Font Link */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
 
+html,
+body,
+.home-section,
+.about__wrapper {
+  height: 100%;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -167,6 +174,7 @@ span {
   font-size: 14px;
   padding: 5px;
   max-width: 350px;
+  overflow-y: auto;
 }
 
 .leaflet-pane.leaflet-popup-pane {
@@ -249,7 +257,7 @@ span {
 
 table {
   width: 100%;
-  max-width: 100% ;
+  max-width: 100%;
   overflow-x: auto;
 }
 
