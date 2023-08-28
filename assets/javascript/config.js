@@ -136,5 +136,5 @@ const TRANSLATE = {
   'type': 'ប្រភេទតំបន់',
   'province': 'ខេត្ត',
   'registration_date': 'កាលបរិច្ឆេទ​ចុះបញ្ជី',
-  'creation_date': 'កាលបរិច្ឆេទ​បង្កើត'
+  'creation_date': 'កាលបរិច្ឆេទ​បង្កើត',
 }

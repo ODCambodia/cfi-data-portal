@@ -26,5 +26,24 @@ const Utils = {
     option.value = '';
     option.disabled = !!isDisabled;
     return option;
+  },
+  pickFromObject: function (obj, keyArr) {
+    const temp = {}
+    keyArr.forEach((key) => {
+      if (key in obj) {
+        temp[key] = obj;
+      }
+    })
+
+    return temp;
+  },
+  omitFromObject: function (obj, keyArr) {
+    keyArr.forEach((key) => {
+      if (key in obj) {
+        delete obj[key];
+      }
+    })
+
+    return obj;
   }
 };

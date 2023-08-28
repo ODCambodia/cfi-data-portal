@@ -119,9 +119,6 @@ function showCFI_A(data) {
   })
 
   const body = document.querySelector('.about__body');
-  const header = document.createElement('h3');
-  header.innerText = 'CFI Assessment list';
-  body.append(header);
   body.append(ul);
 }
 
@@ -198,6 +195,7 @@ async function handleBoundaryFilter() {
       showCFI_A(cfi_data);
     }
 
+    document.getElementById('cfiSelect').value = '';
     showCFI_B(e.layer);
   });
 }
@@ -217,6 +215,10 @@ async function loadProvince() {
       option.value = item.properties.pro_code;
       provinceSelect.append(option);
     });
+
+    if (SERVER === 'cfr') {
+      return;
+    }
 
     // on province select
     provinceSelect.addEventListener('change', async function (e) {
@@ -250,11 +252,10 @@ async function loadProvince() {
         OVERLAY_MAP[KEYS.CFI_A] = getLayer(cfi_data, KEYS.CFI_A);
         OVERLAY_MAP[KEYS.CFI_A].addTo(map);
 
-      
+
         document.querySelector('.about__body').innerHTML = '';
 
         if (cfi_data.features.length > 0) {
-          console.log(cfi_data);
           map.panBy(L.point(cfi_data.features[0].geometry.coordinates));
           showCFI_A(cfi_data);
         }
@@ -273,7 +274,7 @@ async function loadProvince() {
 
 async function loadCFIMap() {
   [OVERLAY_MAP[KEYS.CFI_B], OVERLAY_MAP[KEYS.CFI_A]] = await Promise.all([
-    getGeoJsonLayer(KEYS.CFI_B, KEYS.CFI_A),
+    getGeoJsonLayer(KEYS.CFI_B),
     getGeoJsonLayer(KEYS.CFI_A),
   ]);
 
@@ -281,9 +282,54 @@ async function loadCFIMap() {
   handleBoundaryFilter();
 }
 
-async function loadCFRMap() {
-  OVERLAY_MAP[KEYS.CFR_A] = await getGeoJsonLayer(KEYS.CFR_A);
-  OVERLAY_MAP[KEYS.CFI_A].addTo(map);
+async function loadCFRMap(options) {
+  const cfi_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfi_data, KEYS.CFR_A);
+  OVERLAY_MAP[KEYS.CFR_A].addTo(map);
+  console.log(OVERLAY_MAP[KEYS.CFR_A]);
+
+  OVERLAY_MAP[KEYS.CFR_A].off('popupopen');
+  OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
+    console.log(e);
+    const { cfr_name, sub_name, name_en, ...cfr_a } = e.layer.feature.properties;
+    const tbody = document.createElement('tbody');
+    for (const key in cfr_a) {
+      // terrible code
+      if (key === 'province_en') {
+        continue;
+      } else if (key === 'province') {
+        cfr_a[key] += `(${cfr_a['province_en']})`;
+      } else if (key === 'creation_date' || key === 'registration_date' && cfr_a[key]) {
+        cfr_a[key] = cfr_a[key].slice(0, -1);
+      }
+
+      const tr = document.createElement('tr');
+
+      [TRANSLATE[key] || key, cfr_a[key]].forEach(x => {
+        const td = document.createElement('td');
+        td.innerText = x;
+        tr.append(td);
+      })
+
+      tbody.append(tr);
+    }
+    const table = document.createElement('table');
+    table.append(tbody);
+    table.style.display = 'block';
+    table.style.marginBottom = '5px';
+
+    const header = document.createElement('strong');
+    header.innerText = `ឈ្មោះ​សហគមន៍៖ ${name || sub_name} (${name_en})`;
+
+    const body = document.querySelector('.about__body');
+    body.append(header);
+    body.append(table);
+
+    CustomCharts.pieChart();
+    CustomCharts.barChart();
+  });
+
+
 }
 
 async function init() {
@@ -296,11 +342,22 @@ async function init() {
 
 document.addEventListener('DOMContentLoaded', function () {
   init().then(() => {
-    provinceSelect.removeAttribute('disabled'); document.getElementById('loadingOverlay').classList.remove('is-active');
+    document.getElementById('loadingOverlay').classList.remove('is-active');
+    document.getElementById('provinceSelect').removeAttribute('disabled');
   });
+
   loadProvince();
+  if (SERVER === 'cfr') {
+    provinceSelect.addEventListener('change', async function (e) {
+      const val = e.currentTarget.options[e.currentTarget.selectedIndex].text;
+      OVERLAY_MAP[KEYS.CFR_A].remove();
 
-
+      const CQL_FILTER = e.currentTarget.value ? `province = '${val}'` : '';
+      loadCFRMap({ CQL_FILTER });
+    });
+    // document.getElementById('provinceSelect').parentElement.style.display = 'none';
+    document.getElementById('cfiSelect').parentElement.style.display = 'none';
+  }
 
   const modal = document.getElementById('cfiModal');
   document.getElementsByClassName("close")[0].onclick = function () {
