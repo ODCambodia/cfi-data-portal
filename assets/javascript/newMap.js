@@ -15,8 +15,75 @@ const OVERLAY_MAP = {};
 const SERVER = Utils.getQueryParam('map') || 'cfi';
 const GEOSERVER = `/geoserver/${SERVER}/ows`;
 
-function getRandom(min = 1, max = 100) {
-  return Math.floor(Math.random() * (max - min) + min);
+const CustomCharts = {
+  pieChart: function () {
+    const pieData = {
+      labels: ['ស្រី', 'ប្រុស'],
+      datasets: [{
+        label: 'សមភាពយេនឌ័រនៃសហគមន៍',
+        data: [Utils.getRandom(), Utils.getRandom()],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+        ],
+        hoverOffset: 4
+      }]
+    };
+    const body = document.querySelector('.about__body');
+
+    const pieHeader = document.createElement('p');
+    pieHeader.innerText = 'សមភាពយេនឌ័រនៃសហគមន៍';
+    pieHeader.style.textAlign = 'center';
+    pieHeader.style.color = '#2f4f4f';
+
+    const pieChart = document.createElement('canvas');
+    pieChart.id = 'pieChart';
+
+    body.append(pieHeader);
+    body.append(pieChart);
+
+    new Chart(document.getElementById('pieChart'), { type: 'pie', data: pieData });
+  },
+  barChart: function () {
+    const barChart = document.createElement('canvas');
+    barChart.id = 'barChart';
+
+    const barData = {
+      labels: ['2020', '2021', '2022', '2023'],
+      datasets: [{
+        label: 'ហិរញ្ញទានប្រចាំឆ្នាំ(លានរៀល)',
+        data: [Utils.getRandom(), Utils.getRandom(), Utils.getRandom(), Utils.getRandom()],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(255, 159, 64, 0.5)',
+          'rgba(255, 205, 86, 0.5)',
+          'rgba(75, 192, 192, 0.5)',
+        ],
+        borderColor: [
+          'rgb(255, 99, 132)',
+          'rgb(255, 159, 64)',
+          'rgb(255, 205, 86)',
+          'rgb(75, 192, 192)',
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    const body = document.querySelector('.about__body');
+    body.append(barChart);
+
+    new Chart(document.getElementById('barChart'), {
+      type: 'bar',
+      data: barData,
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      },
+    });
+  }
 }
 
 function showCFI_A(data) {
@@ -26,6 +93,7 @@ function showCFI_A(data) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = item.properties.cfi_name;
+    btn.classList.add('cfi-btn');
 
     btn.addEventListener('click', function () {
       const tbody = document.querySelector('#cfiModal tbody');
@@ -58,28 +126,21 @@ function showCFI_A(data) {
 }
 
 function showCFI_B(data) {
-  const pieData = {
-    labels: [
-      'Female',
-      'Male',
-    ],
-    datasets: [{
-      label: 'Male and females',
-      data: [getRandom(), getRandom()],
-      backgroundColor: [
-        'rgb(255, 99, 132)',
-        'rgb(54, 162, 235)',
-      ],
-      hoverOffset: 4
-    }]
-  };
-
-  const { source, sub_name, name, creation_date, registration_date, ...cfi_b } = data.feature.properties;
+  const { source, sub_name, name, name_en, area, ...cfi_b } = data.feature.properties;
   const tbody = document.createElement('tbody');
   for (const key in cfi_b) {
+    // terrible code
+    if (key === 'province_en') {
+      continue;
+    } else if (key === 'province') {
+      cfi_b[key] += `(${cfi_b['province_en']})`;
+    } else if (key === 'creation_date' || key === 'registration_date' && cfi_b[key]) {
+      cfi_b[key] = cfi_b[key].slice(0, -1);
+    }
+
     const tr = document.createElement('tr');
 
-    [key, cfi_b[key]].forEach(x => {
+    [TRANSLATE[key], cfi_b[key]].forEach(x => {
       const td = document.createElement('td');
       td.innerText = x;
       tr.append(td);
@@ -89,60 +150,17 @@ function showCFI_B(data) {
   }
   const table = document.createElement('table');
   table.append(tbody);
-  table.style.marginBottom = '20px';
+  table.style.marginBottom = '5px';
 
-  const header = document.createElement('h3');
-  header.innerText = 'CFI NAME: ' + (sub_name || name);
+  const header = document.createElement('strong');
+  header.innerText = `ឈ្មោះ​សហគមន៍៖ ${name || sub_name} (${name_en})`;
 
   const body = document.querySelector('.about__body');
   body.append(header);
   body.append(table);
 
-  const pieChart = document.createElement('canvas');
-  pieChart.id = 'pieChart';
-  pieChart.style.marginBottom = '20px';
-
-  body.append(pieChart);
-
-  new Chart(document.getElementById('pieChart'), { type: 'pie', data: pieData });
-
-
-  const barChart = document.createElement('canvas');
-  barChart.id = 'barChart';
-
-  const barData = {
-    labels: ['2020', '2021', '2022', '2023'],
-    datasets: [{
-      label: 'My First Dataset',
-      data: [getRandom(), getRandom(), getRandom(), getRandom()],
-      backgroundColor: [
-        'rgba(255, 99, 132, 0.5)',
-        'rgba(255, 159, 64, 0.5)',
-        'rgba(255, 205, 86, 0.5)',
-        'rgba(75, 192, 192, 0.5)',
-      ],
-      borderColor: [
-        'rgb(255, 99, 132)',
-        'rgb(255, 159, 64)',
-        'rgb(255, 205, 86)',
-        'rgb(75, 192, 192)',
-      ],
-      borderWidth: 1
-    }]
-  };
-
-  body.append(barChart);
-  new Chart(document.getElementById('barChart'), {
-    type: 'bar',
-    data: barData,
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    },
-  });
+  CustomCharts.pieChart();
+  CustomCharts.barChart();
 }
 
 function getLayer(data, key) {
@@ -190,7 +208,9 @@ async function loadProvince() {
     const data = await res.json();
 
     const provinceSelect = document.getElementById('provinceSelect');
+
     // append options to select
+    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
     data.features.forEach((item) => {
       const option = document.createElement('option');
       option.text = item.properties.pro_name_k;
@@ -214,6 +234,7 @@ async function loadProvince() {
       cfiSelect.innerHTML = '';
       const uniqueCfi = [...new Map(cfi_b_data.features.map(item => [item.properties.name, item])).values()];
 
+      cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
       uniqueCfi.forEach((item) => {
         const option = document.createElement('option');
         option.text = item.properties.name;
@@ -229,17 +250,15 @@ async function loadProvince() {
         OVERLAY_MAP[KEYS.CFI_A] = getLayer(cfi_data, KEYS.CFI_A);
         OVERLAY_MAP[KEYS.CFI_A].addTo(map);
 
-        console.log(cfi_data);
-        // map.setView();
+      
         document.querySelector('.about__body').innerHTML = '';
 
         if (cfi_data.features.length > 0) {
+          console.log(cfi_data);
+          map.panBy(L.point(cfi_data.features[0].geometry.coordinates));
           showCFI_A(cfi_data);
         }
 
-        console.log(cfi_b_data);
-        console.log(val);
-        console.log(cfi_b_data.features.find((x) => x.id === val))
         //crap code refactor this
         showCFI_B({ feature: cfi_b_data.features.find((x) => x.id === val) });
       });
@@ -247,7 +266,6 @@ async function loadProvince() {
       cfiSelect.removeAttribute('disabled')
     });
 
-    provinceSelect.removeAttribute('disabled');
   } catch (e) {
     console.log('Unable to load province select', e);
   }
@@ -265,19 +283,24 @@ async function loadCFIMap() {
 
 async function loadCFRMap() {
   OVERLAY_MAP[KEYS.CFR_A] = await getGeoJsonLayer(KEYS.CFR_A);
+  OVERLAY_MAP[KEYS.CFI_A].addTo(map);
 }
 
-function init() {
+async function init() {
   if (SERVER === 'cfi') {
-    loadCFIMap();
+    await loadCFIMap();
   } else if (SERVER === 'cfr') {
-    loadCFRMap();
+    await loadCFRMap();
   }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  init().then(() => {
+    provinceSelect.removeAttribute('disabled'); document.getElementById('loadingOverlay').classList.remove('is-active');
+  });
   loadProvince();
-  init();
+
+
 
   const modal = document.getElementById('cfiModal');
   document.getElementsByClassName("close")[0].onclick = function () {

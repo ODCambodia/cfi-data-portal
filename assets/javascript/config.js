@@ -128,3 +128,13 @@ const CONFIGS = {
   styles: STYLES,
   eachFeatureHandler: EACH_FEATURES_HANDLER
 }
+
+// remove this later and use translation.js
+const TRANSLATE = {
+  'area_ha': 'ក្រឡា​ផ្ទៃ(ហិកតា)',
+  'cfi_code': 'លេខកូដសម្គាល់​សហគមន៍',
+  'type': 'ប្រភេទតំបន់',
+  'province': 'ខេត្ត',
+  'registration_date': 'កាលបរិច្ឆេទ​ចុះបញ្ជី',
+  'creation_date': 'កាលបរិច្ឆេទ​បង្កើត'
+}
