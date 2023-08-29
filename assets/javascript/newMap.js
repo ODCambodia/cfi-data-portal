@@ -132,7 +132,7 @@ function showCFI_B(data) {
       continue;
     } else if (key === 'province') {
       cfi_b[key] += `(${cfi_b['province_en']})`;
-    } else if (key === 'creation_date' || key === 'registration_date' && typeof cfi_b[key] === 'string') {
+    } else if ((key === 'creation_date' || key === 'registration_date') && typeof cfi_b[key] === 'string') {
       cfi_b[key] = cfi_b[key].slice(0, -1);
     }
 
