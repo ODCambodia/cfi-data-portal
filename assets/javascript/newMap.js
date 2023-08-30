@@ -86,43 +86,6 @@ const CustomCharts = {
   }
 }
 
-function showCFI_A(data) {
-  const modal = document.getElementById('cfiModal');
-  const ul = document.createElement('ul');
-  data.features.forEach((item) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = item.properties.cfi_name;
-    btn.classList.add('cfi-btn');
-
-    btn.addEventListener('click', function () {
-      const tbody = document.querySelector('#cfiModal tbody');
-      tbody.innerHTML = '';
-      Utils.omitFromObject(item.properties, ['id_516_cfi', 'date', '_id', '_uuid'])
-      for (const key in item.properties) {
-        const tr = document.createElement('tr');
-
-        [TRANSLATE[key] || key, item.properties[key]].forEach(x => {
-          const td = document.createElement('td');
-          td.innerText = x;
-          tr.append(td);
-        })
-
-        tbody.append(tr);
-      }
-
-      modal.style.display = "block";
-    });
-
-    const li = document.createElement('li');
-    li.append(btn);
-    ul.append(li);
-  })
-
-  const body = document.querySelector('.about__body');
-  body.append(ul);
-}
-
 function showCFI_B(data) {
   const { source, sub_name, name, name_en, area, ...cfi_b } = data.feature.properties;
   const tbody = document.createElement('tbody');
@@ -149,6 +112,7 @@ function showCFI_B(data) {
   const table = document.createElement('table');
   table.append(tbody);
   table.style.marginBottom = '5px';
+  table.style.textAlign = 'left';
 
   const header = document.createElement('strong');
   header.innerText = `ឈ្មោះ​សហគមន៍៖ ${name || sub_name} (${name_en})`;
@@ -156,6 +120,7 @@ function showCFI_B(data) {
   const body = document.querySelector('.about__body');
   body.append(header);
   body.append(table);
+  body.append(document.createElement('hr'));
 
   CustomCharts.pieChart();
   CustomCharts.barChart();
@@ -191,10 +156,6 @@ async function handleBoundaryFilter() {
 
     map.setView(e.popup._latlng);
     document.querySelector('.about__body').innerHTML = '';
-
-    if (cfi_data.features.length > 0) {
-      showCFI_A(cfi_data);
-    }
 
     document.getElementById('cfiSelect').value = '';
     showCFI_B(e.layer);
@@ -254,7 +215,6 @@ async function loadProvince() {
 
         if (cfi_data.features.length > 0) {
           map.panBy(L.point(cfi_data.features[0].geometry.coordinates));
-          showCFI_A(cfi_data);
         }
 
         //crap code refactor this
