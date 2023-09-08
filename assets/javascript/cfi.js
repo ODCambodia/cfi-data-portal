@@ -143,8 +143,7 @@ async function loadRelatedLayers(cfiId) {
     (item) =>
       REGEX_YEAR.test(item[1].innerHTML) &&
       !item[1].innerHTML.includes('profile') &&
-      !item[1].innerHTML.includes('contact') &&
-      !item[1].innerHTML.includes('committee'),
+      !item[1].innerHTML.includes('contact')
   );
 
   const ul = document.createElement('ul');
