@@ -1,6 +1,24 @@
+const map = L.map('map', {
+  center: [12.5657, 104.991],
+  zoom: 7,
+});
+
+L.control.scale().addTo(map);
+
+const BASE_MAP = {
+  'Open Street Map': L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    },
+  ).addTo(map),
+};
+const OVERLAY_MAP = {};
+
 async function loadCFRMap(options) {
-  const cfr_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
-  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfr_data, KEYS.CFR_A);
+  const cfr_data = await Utils.fetchGeoJson({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].off('popupopen');
   OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
@@ -9,8 +27,8 @@ async function loadCFRMap(options) {
 }
 
 async function loadCFRSelect(options) {
-  const cfr_data = await Utils.fetch({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
-  OVERLAY_MAP[KEYS.CFR_A] = getLayer(cfr_data, KEYS.CFR_A);
+  const cfr_data = await Utils.fetchGeoJson({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
     showCFR_A(e.layer.feature);
