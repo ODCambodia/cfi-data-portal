@@ -201,10 +201,14 @@ async function loadCfiContactBody(data) {
     cmte_position: 'តំណែង'
   };
 
-  const contacts = data.features
-    .filter((item) => !!item.properties.cmte_phone)
-    .map((item) => item.properties);
+  const allContacts = data.features.map((item) => item.properties);
+  let contacts = allContacts.filter((item) => !!item.cmte_phone);
 
+  if (contacts.length < 2) {
+    contacts = allContacts.slice(0, 2);
+  } else {
+    contacts = contacts.slice(0, 2);
+  }
 
   const tempCols = Object.keys(contacts[0]).filter((key) => cols[key] !== undefined);
 
@@ -312,7 +316,6 @@ function handleBoundaryFilter() {
 
     const cfiCommitee = await Utils.fetchGeoJson({
       data: {
-        maxFeatures: 2,
         typeName: 'cfi:cfi_committee_2018',
         CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${e.layer.feature.id}'')')), 0, meters)`,
       },
