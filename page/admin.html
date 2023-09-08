@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+  <div class="card p-3 shadow w-100 h-100">
+    <nav>
+      <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
+          role="tab" aria-controls="nav-home" aria-selected="true">Documents</button>
+        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
+          role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
+        <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button"
+          role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
+      </div>
+    </nav>
+    <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
+      <!-- profile -->
+      <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+        <div class="mb-2">
+          <label class="d-inline-block" for="">ជ្រើសរើសខេត្តឬក្រុង</label>
+          <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
+        </div>
+
+        <div id="tableProfile" class="table-wrapper d-none">
+          <div class="table-title mb-2">
+            <h2>Model</h2>
+          </div>
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+
+                <th>CFI Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Test -->
+      <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <p><strong>This is some placeholder content the Profile tab's associated content.</strong></p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="form">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addDocumentModalLabel">Upload related Documents</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body ">
+            <div class="row g-3 mb-3">
+              <div class="col-6">
+                <label for="titleInput" class="form-label">Title</label>
+                <input type="text" class="form-control" id="titleInput" required>
+              </div>
+              <div class="col-6">
+                <label for="titleEnInput" class="form-label">Title En</label>
+                <input type="text" class="form-control" id="titleEnInput">
+              </div>
+            </div>
+            <div class="text-center">
+              <label for="formFile" class="d-block form-label text-start">Documents</label>
+              <label for="formFile" class="form-label text-center mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                  class="bi bi-file-earmark-arrow-up" role="button" viewBox="0 0 16 16">
+                  <path
+                    d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z" />
+                  <path
+                    d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                </svg>
+              </label>
+              <input class="form-control" type="file" id="formFile" name="fileUpload">
+            </div>
+            <input type="hidden" name="positionInput" id="positionInput">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button id="addFormBtn" type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Modal -->
+  <div class="modal fade" id="documentListModal" tabindex="-1" aria-labelledby="documentListModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="documentListModalLabel">Upload related Documents</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+  <script src="/javascript/utils.js"></script>
+  <script>
+    const GEOSERVER = `/geoserver/cfi/ows`;
+
+
+    function createActionBtns(coord) {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.classList.add('btn', 'btn-primary');
+      btn.innerText = 'Add';
+      btn.dataset.bsToggle = 'modal';
+      btn.dataset.bsTarget = '#addDocumentModal';
+      btn.dataset.x = coord.x;
+      btn.dataset.y = coord.y;
+
+      // const btnList = btn.cloneNode();
+      // btnList.innerText = 'Documents list';
+      // btnList.dataset.bsTarget = '#documentListModal';
+
+      // btn.classList.add('btn-primary', 'me-2');
+      // btnList.classList.add('btn-secondary');
+
+      return [btn];
+    }
+
+    // function createCheckbox(index) {
+    //   const span = document.createElement('span');
+    //   span.classList.add('custom-checkbox')
+    //   const input = document.createElement('input');
+    //   input.type = 'checkbox';
+    //   input.id = 'checkbox' + index;
+    //   input.name = 'options';
+    //   input.value = index;
+    //   const label = document.createElement('label');
+    //   label.for = input.id;
+
+    //   span.append(input);
+    //   span.append(label);
+    //   return span;
+    // }
+
+    function createRow(cfi) {
+      const rows = [];
+      for (let i = 0; i < cfi.length; i++) {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.innerText = cfi[i].name;
+
+        const tdBtns = document.createElement('td');
+        const { name, ...coord } = cfi[i];
+        const btns = createActionBtns(coord);
+        btns.forEach((btn) => tdBtns.append(btn));
+
+        tr.append(tdName);
+        tr.append(tdBtns);
+        rows.push(tr);
+      }
+
+      return rows;
+    }
+
+    async function loadProvincesSelect() {
+      const res = await fetch('/api/provinces');
+      const data = await res.json();
+      const provinceSelect = document.getElementById('provinceSelect');
+
+      // append options to select
+      provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+      data.features.forEach((item) => {
+        const option = document.createElement('option');
+        option.text = item.properties.pro_name_k;
+        option.value = item.id;
+        provinceSelect.append(option);
+      });
+
+      provinceSelect.addEventListener('change', async function (e) {
+        const val = e.currentTarget.value;
+        document.getElementById('tableProfile').classList.remove('d-none');
+
+        const tbody = document.querySelector('#tableProfile table tbody');
+        tbody.innerHTML = 'Loading...';
+
+
+        const cfiResponse = await Utils.fetchGeoJson({
+          data: {
+            typeName: 'cfi:cfi_reference',
+            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)`,
+            propertyname: 'name,x,y',
+          }
+        });
+        const cfi = cfiResponse.features.map((item) => item.properties);
+
+        if (cfi.length > 0) {
+          tbody.innerHTML = '';
+
+          createRow(cfi).forEach((tr) => {
+            tbody.append(tr);
+          });
+        } else {
+          tbody.innerHTML = 'Province with no cfi!!!';
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async function () {
+      await loadProvincesSelect();
+
+
+      const modal = document.getElementById('addDocumentModal')
+      modal.addEventListener('show.bs.modal', (e) => {
+        const btn = e.relatedTarget;
+        const form = document.querySelector(`#addDocumentModal form`);
+        form.dataset.x = btn.dataset.x;
+        form.dataset.y = btn.dataset.y;
+      })
+    });
+  </script>
+
+  <script>
+    const form = document.getElementById('form');
+    form.addEventListener('submit', submitForm);
+
+    function submitForm(e) {
+      e.preventDefault();
+      const currentForm = e.currentTarget;
+      const fileInput = document.getElementById('formFile');
+      const title = document.getElementById('titleInput');
+      const titleEn = document.getElementById('titleEnInput');
+      const formData = new FormData();
+      formData.append('title', title.value);
+      formData.append('titleEn', titleEn.value);
+      formData.append('files', fileInput.files[0]);
+      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      const modalEl = document.getElementById('addDocumentModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      const submitBtn = document.querySelector('#addFormBtn');
+      submitBtn.setAttribute('disabled', true);
+      fetch("/upload_files", {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => {
+          setTimeout(() => { alert('Success'); })
+        })
+        .catch((err) => {
+          setTimeout(() => { alert('something went wrong'); })
+        }).finally(() => {
+          modal.hide();
+          submitBtn.removeAttribute('disabled');
+        });
+    }
+  </script>
+</body>
+
+</html>

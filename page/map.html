@@ -33,7 +33,7 @@
         <div class="logo-details">
             <i class="bx bxl-c-plus-plus icon"></i>
             <a href="/" class="logo_name">Data Portal</a>
-            <svg id="btn" viewBox="0 0 40 40" width="20" height="22" fill="#fff">
+            <svg id="sidebarBtn" viewBox="0 0 40 40" width="20" height="22" fill="#fff">
                 <rect width="40" height="8" rx="4"></rect>
                 <rect y="15" width="40" height="8" rx="4"></rect>
                 <rect y="30" width="40" height="8" rx="4"></rect>
@@ -41,7 +41,6 @@
         </div>
 
         <h3 class="nav-header">ចម្រោះទិន្នន័យ</h3>
-        <hr>
         <ul class="nav-list">
             <li>
                 <label class="form-label" for="provinceSelect">ខេត្ត\ក្រុង</label>
@@ -56,13 +55,18 @@
             </li>
         </ul>
 
-        <h3 class="nav-header">ទំព័រ</h3>
-        <hr>
-        <ul class="nav-list">
-            <li>
-                <a href="/">ទំព័រដើម</a>
-            </li>
-        </ul>
+        <div>
+            <h3 class="document__header nav-header">ទិន្នន័យពាក់ព័ន្ធ</h3>
+            <div id="relatedLayers" class="document__body">
+            </div>
+        </div>
+
+        <div>
+            <h3 class="document__header nav-header">ឯកសារ​ពាក់​ព​ន្ធ័</h3>
+            <div id="relatedDocuments" class="document__body">
+
+            </div>
+        </div>
     </div>
 
     <section class="home-section">
@@ -79,21 +83,39 @@
 
     <div id="cfiModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <table style="width: 95%;">
-                <thead>
-                    <th>key</th>
-                    <th>value</th>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <div> <span class="close">&times;</span> </div>
+            <div class="modal__table__wrapper">
+                <table style="width: 98%;" class="modal__table">
+                </table>
+            </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     <script src="/javascript/utils.js"></script>
     <script src="/javascript/config.js"></script>
-    <script src="/javascript/newMap.js"></script>
+    <script>
+        const SERVER = Utils.getQueryParam('map') || 'cfi';
+        const GEOSERVER = `/geoserver/${SERVER}/ows`;
+        const script = document.createElement("script");
+        script.type = "text/javascript";
+        script.src = SERVER === 'cfi' ? '/javascript/cfi.js' : '/javascript/cfr.js';
+        document.body.appendChild(script);
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('cfiModal');
+            document.getElementsByClassName("close")[0].onclick = function () {
+                modal.style.display = "none";
+            }
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        })
+    </script>
 </body>
 
 </html>

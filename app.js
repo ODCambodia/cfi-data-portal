@@ -2,23 +2,18 @@ import express from 'express'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
+import documentUpload from './modules/document_upload.js';
 import fetch from 'node-fetch';
 
 const app = express();
 const port = process.env.PORT || 3000;
 const dirName = path.dirname(fileURLToPath(import.meta.url));
 
-// const koboApiProxy = createProxyMiddleware({
-//   target: 'https://kf.kobotoolbox.org/api',
-//   changeOrigin: true,
-// })
-
 app.use(express.static('assets'));
 
 app.use('/geoserver', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net', changeOrigin: true }));
 
-
-app.use('/api/template', createProxyMiddleware({
+app.use('/api/v2', createProxyMiddleware({
   target: `https://kf.kobotoolbox.org/api/v2/assets`,
   changeOrigin: true,
 }));
@@ -35,9 +30,9 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-// app.use('/api/cfi', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfi/wms', changeOrigin: true }));
-// app.use('/api/cfr', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net/geoserver/cfr/wms', changeOrigin: true }));
-
+app.get('/admin', function (req, res) {
+  res.sendFile(path.join(dirName, 'page/admin.html'));
+});
 
 app.get('/api/provinces', async function (req, res) {
   try {
@@ -74,8 +69,6 @@ app.get('/api/provinces/cfr', async function (req, res) {
       propertyname: 'ADM1_EN,ADM1_PCODE,ADM0_EN,ADM0_PCODE'
     }));
 
-    // console.log(await response.text());
-
     const data = await response.json();
 
     // success
@@ -110,6 +103,8 @@ app.get('/api/template', async function (req, res) {
 
   res.send('something went wrong');
 });
+
+app.post("/upload_files", documentUpload.upload.array("files"), documentUpload.handler);
 
 app.listen(port);
 

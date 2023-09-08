@@ -1,9 +1,10 @@
 # CFI Data portal
 ## Setup
 requires Node.js >= 0.10
-To Run the server
+To Run the server locally
 `npm install`
-`node app.js`
+`npm run dev`
 
-if any change is made to the server rerun `node app.js`
-(Add nodemon if hot reload is needed)
+To start sever on prod
+`npm install`
+`npm start`

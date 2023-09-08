@@ -29,6 +29,7 @@ span {
   padding: 6px 14px;
   z-index: 99;
   transition: all 0.5s ease;
+  overflow-y: auto;
 }
 
 .sidebar.open {
@@ -62,10 +63,10 @@ span {
   opacity: 1;
 }
 
-.sidebar .logo-details #btn {
+.sidebar .logo-details #sidebarBtn {
   position: absolute;
   top: 50%;
-  right: 22px;
+  right: 0;
   transform: translateY(-50%);
   font-size: 22px;
   transition: all 0.4s ease;
@@ -76,7 +77,7 @@ span {
   color: #fff;
 }
 
-.sidebar.open .logo-details #btn {
+.sidebar.open .logo-details #sidebarBtn {
   text-align: right;
 }
 
@@ -84,6 +85,8 @@ span {
   visibility: hidden;
   opacity: 0;
   margin-bottom: 25px;
+  padding-top: 0;
+  padding-left: 15px;
 
   -webkit-transition: opacity .5s ease;
   -o-transition: opacity .5s ease;
@@ -92,9 +95,9 @@ span {
 
 .sidebar .nav-header {
   color: #fff;
-  margin-top: 20px;
   padding-left: 10px;
   font-weight: 600;
+  border-bottom: 1px solid #fff;
 }
 
 .sidebar.open .nav-list {
@@ -153,17 +156,34 @@ span {
 }
 
 .about__wrapper {
-  flex: 0 0 200px;
   background: #101010;
   color: #fff;
   padding: 1rem;
   display: flex;
   flex-direction: column;
+  position: absolute;
+  right: -9999px;
+  min-width: 200px;
+  top: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.about__wrapper.active {
+  right: 0;
 }
 
 .about__header {
   margin-bottom: 0.5rem;
   flex: 0 0 auto;
+  display: inline;
+  border: 1px dashed;
+  text-align: center;
+  font-size: 20px;
+  background: lightgray;
+  color: #000;
+  border-top: 5px;
+  margin: 0;
 }
 
 .about__body {
@@ -174,7 +194,63 @@ span {
   font-size: 14px;
   padding: 5px;
   max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-bottom: 5px;
+}
+
+.about__table__wrapper,
+.contact__table__wrapper {
+  border-bottom: 1.5px solid #000;
+  line-height: 20px;
+}
+
+.contact__table__wrapper {
+  text-align: center;
+  flex: 0 1 100px;
+}
+
+.about__table__wrapper,
+.contact__table__wrapper,
+.chart__wrapper {
+  flex: 1;
   overflow-y: auto;
+}
+
+.document__body ul {
+  padding: 0;
+  padding-top: 0;
+}
+
+.document__body ul li {
+  width: 100%;
+  padding: 10px 0;
+  cursor: pointer;
+  border: 1px solid #000;
+  margin: 0;
+  padding-left: 5px;
+}
+
+/* refactor */
+#relatedDocuments.document__body ul li {
+  padding: 0;
+}
+
+.document__body ul li a {
+  padding: 10px;
+  display: block;
+  color: #000;
+}
+
+.document__body ul li:hover {
+  background-color: lightslategray;
+  color: #fff;
+}
+
+.document__body ul li.active {
+  background-color: darkgray;
+  color: #fff;
 }
 
 .leaflet-pane.leaflet-popup-pane {
@@ -204,8 +280,8 @@ span {
 .form-label {
   display: block;
   color: #fff;
-  padding-left: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 4px;
+  padding-left: 0;
 }
 
 .form-inline-wrapper {
@@ -230,13 +306,42 @@ span {
   background-color: transparent;
 }
 
-/* Modal Content/Box */
+/* Modal Content Box */
 .modal-content {
   background-color: #fefefe;
   margin-top: 2%;
-  padding: 20px;
+  padding: 8px 12px;
+  padding-top: 36px;
   border: 1px solid #888;
-  width: calc(100% - 320px);
+  max-width: 90%;
+  min-height: 280px;
+  max-height: 95vh;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal__table__wrapper {
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.modal__table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.modal__table th,
+.modal__table td {
+  padding: 0 5px;
+  border: 1px solid #000;
 }
 
 .close {
@@ -246,6 +351,7 @@ span {
   color: white;
   padding: 0 4px;
   line-height: 25px;
+  margin-bottom: 8px;
 }
 
 .close:hover,
@@ -266,7 +372,7 @@ table {
 table,
 th,
 td {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 hr {
@@ -361,4 +467,10 @@ h3 {
   margin: 0;
   padding: 0 4px;
   text-align: center;
+}
+
+.document__body {
+  min-height: 150px;
+  background-color: #fff;
+  margin-top: 10px;
 }
