@@ -121,7 +121,6 @@ async function handleRelatedLayerClick(e) {
 }
 
 async function loadRelatedLayers(cfiId) {
-  document.getElementById('relatedLayers').innerHTML = '';
   const cfiRelatedLayers = await Utils.fetchXml({
     baseUrl: '/geoserver/cfi/wfs',
     data: { request: 'GetCapabilities' },
@@ -129,26 +128,7 @@ async function loadRelatedLayers(cfiId) {
   const featureTypes = [
     ...cfiRelatedLayers.getElementsByTagName('FeatureType'),
   ].map((item) => item.childNodes);
-  const relatedFeatureTypes = featureTypes.filter(
-    (item) =>
-      REGEX_YEAR.test(item[1].innerHTML) &&
-      !item[1].innerHTML.includes('profile') &&
-      !item[1].innerHTML.includes('contact')
-  );
 
-  const ul = document.createElement('ul');
-  relatedFeatureTypes.forEach((item) => {
-    const name = item[0];
-    const titleXml = item[1];
-    const li = document.createElement('li');
-    li.textContent = titleXml.textContent;
-    li.dataset.name = name.textContent;
-    li.dataset.cfiId = cfiId;
-    li.addEventListener('click', handleRelatedLayerClick);
-    ul.append(li);
-  });
-
-  document.getElementById('relatedLayers').append(ul);
   return featureTypes
     .find((item) => item[1].textContent.includes('profile'))[4]
     .textContent.split('::')[1];
