@@ -44,13 +44,21 @@ function drawAboutSection() {
   chartWrapper.classList.add('chart__wrapper');
 
   /* Draw chart */
-  const pieChart = document.createElement('canvas');
-  pieChart.id = 'pieChart';
+  const memberPieChart = document.createElement('canvas');
+  memberPieChart.id = 'memberPieChart';
+
+  const comitteePieChart = document.createElement('canvas');
+  comitteePieChart.id = 'comitteePieChart';
+
+  const populationPieChart = document.createElement('canvas');
+  populationPieChart.id = 'populationPieChart';
 
   const barChart = document.createElement('canvas');
   barChart.id = 'barChart';
 
-  chartWrapper.append(pieChart);
+  chartWrapper.append(memberPieChart);
+  chartWrapper.append(comitteePieChart);
+  chartWrapper.append(populationPieChart);
   chartWrapper.append(barChart);
 
   // Appending everything
@@ -58,7 +66,9 @@ function drawAboutSection() {
   body.append(tableWrapper);
   body.append(chartWrapper);
 
-  CustomCharts.pieChart(pieChart.id);
+  CustomCharts.pieChart(memberPieChart.id, 'ចំនួនសមាជិក');
+  CustomCharts.pieChart(comitteePieChart.id, 'គណៈកម្មការ');
+  CustomCharts.pieChart(populationPieChart.id, 'ចំនួនប្រជាសហគមន៍');
   CustomCharts.barChart(barChart.id);
 }
 
@@ -141,7 +151,15 @@ async function loadRelatedDocuments(cfiId) {
       typeName: '	cfi:documents',
       CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
     },
+
   });
+
+  const relatedDocumentsDOM = document.getElementById('relatedDocuments');
+
+  if (!releatedDocuments.features.length > 0) {
+    relatedDocumentsDOM.parentElement.classList.add('d-none');
+    return;
+  }
 
   const ul = document.createElement('ul');
   releatedDocuments.features.forEach((item) => {
@@ -156,8 +174,8 @@ async function loadRelatedDocuments(cfiId) {
     ul.append(li);
   });
 
-  const relatedDocWrapper = document.getElementById('relatedDocuments');
-  relatedDocWrapper.append(ul);
+  relatedDocumentsDOM.append(ul);
+  relatedDocumentsDOM.parentElement.classList.remove('d-none');
 }
 
 async function showCFI_B(data, defaultCrs) {
@@ -184,20 +202,25 @@ async function showCFI_B(data, defaultCrs) {
   const tbody = document.createElement('tbody');
 
   cfi_b['ប្រព័ន្ធនិយាមកា'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
-  cfi_b['និយាមការយោង'] = `${x_coordinate} ${y_coordinate}`;
+  cfi_b['និយាមកាយោង'] = `${x_coordinate} ${y_coordinate}`;
+
+  // modify without affecting other translation
+  const translate = { ...TRANSLATE };
+  translate['province'] = 'ស្ថិតក្នុងខេត្ត';
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
-    const translate = TRANSLATE;
-    translate['province'] = 'ស្ថិតក្នុងខែត្រ';
+
+    if (key === 'creation_date' || key === 'registration_date') {
+      cfi_b[key] = Utils.formatDate(cfi_b[key]);
+    }
 
     [translate[key] || key, cfi_b[key]].forEach((x, i) => {
       const td = document.createElement('td');
+      td.innerText = x;
 
       if (i > 0 && !x) {
         td.innerText = 'មិនមានព័ត៌មាន';
-      } else {
-        td.innerText = x;
       }
 
       tr.append(td);
@@ -231,7 +254,7 @@ function handleBoundaryFilter() {
       },
     });
     const defaultCrs = await loadRelatedLayers(e.layer.feature.id);
-    showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
+    await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
 
     await loadRelatedDocuments(e.layer.feature.id)
     toggleLoading(false);
@@ -253,7 +276,7 @@ async function handleCfiSelect(e) {
 
   if (cfiProfile.features.length > 0) {
     const defaultCrs = await loadRelatedLayers(cfiId);
-    showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
+    await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
   }
 
   await loadRelatedDocuments(cfiId)

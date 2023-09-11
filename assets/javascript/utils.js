@@ -88,15 +88,23 @@ const Utils = {
     })
 
     return this.getLayer(data, key);
+  },
+  formatDate: function (dateStr, separator = '-') {
+    const d = new Date(dateStr);
+    const day = ("0" + d.getDate()).slice(-2);;
+    const month = d.toLocaleString('default', { month: 'short' });
+    const year = d.getFullYear();
+
+    return day + separator + month + separator + year;
   }
 };
 
 const CustomCharts = {
-  pieChart: function (selectorId) {
+  pieChart: function (selectorId, label) {
     const pieData = {
       labels: ['ស្រី', 'ប្រុស'],
       datasets: [{
-        label: 'សមភាពយេនឌ័រនៃសហគមន៍',
+        label: label,
         data: [Utils.getRandom(), Utils.getRandom()],
         backgroundColor: [
           'rgb(255, 99, 132)',
@@ -107,12 +115,13 @@ const CustomCharts = {
     };
 
     const pieHeader = document.createElement('p');
-    pieHeader.innerText = 'សមភាពយេនឌ័រនៃសហគមន៍';
+    // pieHeader.innerText = 'សមភាពយេនឌ័រនៃសហគមន៍';
+    pieHeader.innerText = label;
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';
 
     const canvas = document.getElementById(selectorId);
-    canvas.parentNode.prepend(pieHeader);
+    canvas.parentNode.insertBefore(pieHeader, canvas);
 
     return new Chart(canvas, { type: 'pie', data: pieData });
   },

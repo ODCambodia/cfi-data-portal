@@ -84,9 +84,9 @@ span {
 .sidebar .nav-list {
   visibility: hidden;
   opacity: 0;
-  margin-bottom: 25px;
+  margin-bottom: 15px;
   padding-top: 0;
-  padding-left: 15px;
+  padding-left: 10px;
 
   -webkit-transition: opacity .5s ease;
   -o-transition: opacity .5s ease;
@@ -177,13 +177,15 @@ span {
   margin-bottom: 0.5rem;
   flex: 0 0 auto;
   display: inline;
-  border: 1px dashed;
+  border: none;
+  border-bottom: 1px dashed;
   text-align: center;
   font-size: 20px;
   background: lightgray;
   color: #000;
-  border-top: 5px;
   margin: 0;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .about__body {
@@ -197,7 +199,8 @@ span {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-bottom: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 .about__table__wrapper,
@@ -218,6 +221,16 @@ span {
   overflow-y: auto;
 }
 
+.about__table__wrapper {
+  flex: 0 1 auto;
+  max-height: 50%;
+  min-height: 180px;
+}
+
+.document__body {
+  border-radius: 5px;
+}
+
 .document__body ul {
   padding: 0;
   padding-top: 0;
@@ -229,12 +242,8 @@ span {
   cursor: pointer;
   border: 1px solid #000;
   margin: 0;
-  padding-left: 5px;
-}
-
-/* refactor */
-#relatedDocuments.document__body ul li {
   padding: 0;
+  padding-left: 5px;
 }
 
 .document__body ul li a {
@@ -470,7 +479,10 @@ h3 {
 }
 
 .document__body {
-  min-height: 150px;
   background-color: #fff;
   margin-top: 10px;
+}
+
+.d-none {
+  display: none !important;
 }
