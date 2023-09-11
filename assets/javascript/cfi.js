@@ -40,15 +40,6 @@ function drawAboutSection() {
   tableWrapper.append(tableProfile);
   tableWrapper.classList.add('about__table__wrapper');
 
-  const tableContact = tableProfile.cloneNode(true);
-  const contactTblWrapper = document.createElement('div');
-  const contactHeader = document.createElement('strong');
-  contactHeader.innerText = 'ព័ត៌មានទំនាក់ទំនង';
-
-  contactTblWrapper.append(contactHeader);
-  contactTblWrapper.append(tableContact);
-  contactTblWrapper.classList.add('contact__table__wrapper');
-
   const chartWrapper = document.createElement('div');
   chartWrapper.classList.add('chart__wrapper');
 
@@ -65,7 +56,6 @@ function drawAboutSection() {
   // Appending everything
   const body = document.querySelector('.about__body');
   body.append(tableWrapper);
-  body.append(contactTblWrapper);
   body.append(chartWrapper);
 
   CustomCharts.pieChart(pieChart.id);
@@ -190,56 +180,6 @@ async function loadRelatedDocuments(cfiId) {
   relatedDocWrapper.append(ul);
 }
 
-async function loadCfiContactBody(data) {
-  const tbody = document.createElement('tbody');
-  const thead = document.createElement('thead');
-  const trHead = document.createElement('tr');
-  const cols = {
-    cmte_name: 'ឈ្មោះ',
-    cmte_phone: 'លេខទូរសព្ទ',
-    cmte_position: 'តំណែង'
-  };
-
-  const allContacts = data.features.map((item) => item.properties);
-  let contacts = allContacts.filter((item) => !!item.cmte_phone);
-
-  if (contacts.length < 2) {
-    contacts = allContacts.slice(0, 2);
-  } else {
-    contacts = contacts.slice(0, 2);
-  }
-
-  const tempCols = Object.keys(contacts[0]).filter((key) => cols[key] !== undefined);
-
-  // Table header
-  tempCols.map((key) => {
-    const th = document.createElement('th');
-    th.innerText = cols[key];
-    trHead.append(th);
-  });
-  thead.append(trHead);
-
-  contacts.forEach((contact) => {
-    const tr = document.createElement('tr');
-
-    for (let key in contact) {
-      if (typeof cols[key] === 'undefined') {
-        continue;
-      }
-
-      const td = document.createElement('td');
-      td.innerText = contact[key] || 'មិនមានព័ត៌មាន';
-      tr.append(td);
-    }
-
-    tbody.append(tr);
-  });
-
-  const table = document.querySelector('.contact__table__wrapper table');
-  table.append(thead);
-  table.append(tbody);
-}
-
 async function showCFI_B(data, defaultCrs) {
   document.body.querySelector('.about__wrapper').classList.add('active');
   const espg = await Utils.fetchGeoJson(
@@ -263,7 +203,7 @@ async function showCFI_B(data, defaultCrs) {
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
-  cfi_b['ប្រព័ន្ធនិយាមការ'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
+  cfi_b['ប្រព័ន្ធនិយាមកា'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
   cfi_b['និយាមការយោង'] = `${x_coordinate} ${y_coordinate}`;
 
   for (const key in cfi_b) {
@@ -313,22 +253,6 @@ function handleBoundaryFilter() {
     const defaultCrs = await loadRelatedLayers(e.layer.feature.id);
     showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
 
-    const cfiCommitee = await Utils.fetchGeoJson({
-      data: {
-        typeName: 'cfi:cfi_committee_2018',
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${e.layer.feature.id}'')')), 0, meters)`,
-      },
-    });
-
-    if (cfiCommitee.features.length > 0) {
-      loadCfiContactBody(cfiCommitee);
-    } else {
-      const contactHeader = document.querySelector(
-        '.contact__table__wrapper strong',
-      );
-      contactHeader.innerText = 'មិន​មានព័ត៌មានទំនាក់ទំនង';
-    }
-
     await loadRelatedDocuments(e.layer.feature.id)
     toggleLoading(false);
   });
@@ -350,22 +274,6 @@ async function handleCfiSelect(e) {
   if (cfiProfile.features.length > 0) {
     const defaultCrs = await loadRelatedLayers(cfiId);
     showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
-  }
-
-  const cfiCommitee = await Utils.fetchGeoJson({
-    data: {
-      maxFeatures: 2,
-      typeName: 'cfi:cfi_committee_2018',
-      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
-    },
-  });
-  if (cfiCommitee.features.length > 0) {
-    loadCfiContactBody(cfiCommitee);
-  } else {
-    const contactHeader = document.querySelector(
-      '.contact__table__wrapper strong',
-    );
-    contactHeader.innerText = 'មិន​មានព័ត៌មានទំនាក់ទំនង';
   }
 
   await loadRelatedDocuments(cfiId)
