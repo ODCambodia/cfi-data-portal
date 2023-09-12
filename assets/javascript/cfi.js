@@ -130,7 +130,7 @@ async function handleRelatedLayerClick(e) {
   modal.style.display = 'block';
 }
 
-async function loadRelatedLayers(cfiId) {
+async function loadRelatedLayers() {
   const cfiRelatedLayers = await Utils.fetchXml({
     baseUrl: '/geoserver/cfi/wfs',
     data: { request: 'GetCapabilities' },
@@ -151,7 +151,6 @@ async function loadRelatedDocuments(cfiId) {
       typeName: '	cfi:documents',
       CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
     },
-
   });
 
   const relatedDocumentsDOM = document.getElementById('relatedDocuments');
@@ -244,12 +243,13 @@ function addBoundaryClickEvent() {
     map.setView(e.latlng);
     document.querySelector('.about__body').innerHTML = '';
 
-    document.getElementById('cfiSelect').value = '';
+    document.getElementById('cfiSelect').value = e.layer.feature.id;
     drawAboutSection();
 
     const cfiProfile = await Utils.fetchGeoJson({
       data: {
         typeName: 'cfi:cfi_profiles_2023',
+        SORTBY: 'name ASC',
         CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${e.layer.feature.id}'')')), 0, meters)`,
       },
     });
@@ -294,7 +294,7 @@ async function loadCfiSelect(cfiBoundary) {
     ...new Map(
       cfiBoundary.features.map((item) => [item.properties.name, item]),
     ).values(),
-  ];
+  ].sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
 
   const cfiSelect = document.getElementById('cfiSelect');
   cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
@@ -312,13 +312,17 @@ async function loadCfiSelect(cfiBoundary) {
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   const selectedProvinceId = e.currentTarget.value;
-  OVERLAY_MAP[KEYS.CFI_B].remove();
-  toggleLoading(true);
 
+  if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
+    OVERLAY_MAP[KEYS.CFI_B].remove();
+  }
+
+  toggleLoading(true);
+  const CQL_FILTER = selectedProvinceId ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${selectedProvinceId}'')')))` : '';
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
       typeName: TYPENAME[KEYS.CFI_B],
-      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${selectedProvinceId}'')')))`,
+      CQL_FILTER,
     },
   });
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
@@ -333,14 +337,22 @@ async function handleProvinceSelect(e) {
 
 async function loadProvince() {
   try {
-    const res = await fetch('/api/provinces');
-    const data = await res.json();
+    const res = await Utils.fetchGeoJson({
+      data: {
+        typeName: 'cfi:cambodian_provincial',
+        srsname: 'EPSG:32648',
+        outputFormat: 'application/json',
+        propertyname: 'pro_name_k,hrname,pro_code',
+        SORTBY: 'pro_code ASC',
+      },
+    });
 
     const provinceSelect = document.getElementById('provinceSelect');
 
     // append options to select
-    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
-    data.features.forEach((item) => {
+    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង', { disabled: true, selected: true }));
+    provinceSelect.append(Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }));
+    res.features.forEach((item) => {
       const option = document.createElement('option');
       option.text = item.properties.pro_name_k;
       option.value = item.id;
@@ -353,50 +365,10 @@ async function loadProvince() {
   }
 }
 
-// function showCFR_A(data) {
-//   const { cfr_name, sub_name, name_en, ...cfr_a } = data.properties;
-//   const tbody = document.createElement('tbody');
-//   Utils.omitFromObject(cfr_a, ['_validation_status', 'Remark', 'cfr_image_URL', 'cfr_image', 'total_men', 'total_women', '_id', '_uuid'])
-//   for (const key in cfr_a) {
-//     // terrible code
-
-//     const tr = document.createElement('tr');
-
-//     [TRANSLATE[key] || key, cfr_a[key]].forEach(x => {
-//       const td = document.createElement('td');
-//       td.innerText = x;
-//       tr.append(td);
-//     })
-
-//     tbody.append(tr);
-//   }
-//   const table = document.createElement('table');
-//   table.append(tbody);
-//   table.style.display = 'block';
-//   table.style.marginBottom = '5px';
-
-//   const header = document.createElement('strong');
-//   header.innerText = `ឈ្មោះ​សហគមន៍៖ ${cfr_name}`;
-
-//   const body = document.querySelector('.about__body');
-//   body.innerHTML = '';
-//   body.append(header);
-//   body.append(table);
-
-//   // CustomCharts.pieChart();
-//   // CustomCharts.barChart();
-// }
-
-async function loadCFIMap() {
-  OVERLAY_MAP[KEYS.CFI_B] = await Utils.getGeoJsonLayer(KEYS.CFI_B);
-  OVERLAY_MAP[KEYS.CFI_B].addTo(map);
-}
-
 async function init() {
-  await loadCFIMap();
+  await loadProvince();
   toggleLoading(false);
   document.getElementById('provinceSelect').removeAttribute('disabled');
-  loadProvince();
 }
 
 if (document.readyState !== 'loading') {

@@ -60,8 +60,13 @@ async function loadCFRSelect(options) {
 
 async function loadProvinceCFR() {
   try {
-    const res = await fetch('/api/provinces/cfr');
-    const data = await res.json();
+    const data = await Utils.fetchGeoJson({
+      data: {
+        typeName: 'cfr:cambodian_provincial',
+        outputFormat: 'application/json',
+        propertyname: 'ADM1_EN,ADM1_PCODE,ADM0_EN,ADM0_PCODE'
+      }
+    })
     const provinceSelect = document.getElementById('provinceSelect');
 
     // append options to select

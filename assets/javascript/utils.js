@@ -48,11 +48,11 @@ const Utils = {
   getRandom: function (min = 1, max = 100) {
     return Math.floor(Math.random() * (max - min) + min);
   },
-  defaultOptionDOM: function (text = '', isDisabled) {
+  defaultOptionDOM: function (text = '', attr = {}) {
     const option = document.createElement('option');
     option.text = text;
     option.value = '';
-    option.disabled = !!isDisabled;
+    Object.assign(option, attr);
     return option;
   },
   pickFromObject: function (obj, keyArr) {
