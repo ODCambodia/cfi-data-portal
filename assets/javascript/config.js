@@ -13,6 +13,23 @@ const TYPENAME = {
   [KEYS.CFI_B]: 'cfi:cfi',
 }
 
+const POLYGON_STYLE = {
+  default: {
+    color: "black",
+    fillColor: "purple",
+    weight: 1,
+    fillOpacity: 0.5,
+    opacity: 0.5,
+  },
+  active: {
+    color: "black",
+    fillColor: '#6F2DA8',
+    weight: 2,
+    fillOpacity: 1,
+    opacity: 1,
+  }
+}
+
 // CONFIG OVERLAY STYLES
 const STYLES = {
   [KEYS.CFI_A]: (feature) => {
@@ -47,15 +64,7 @@ const STYLES = {
       }
     }
   },
-  [KEYS.CFI_B]: () => {
-    return {
-      color: "black",
-      fillColor: "purple",
-      weight: 1,
-      fillOpacity: 0.5,
-      opacity: 0.5,
-    }
-  },
+  [KEYS.CFI_B]: () => POLYGON_STYLE.default,
   [KEYS.CFR_A]: (feature) => {
     switch (feature.properties.is_qualified_cfr) {
       case 'បាទ/ចាស៎': return {

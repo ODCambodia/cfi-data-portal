@@ -16,6 +16,18 @@ const BASE_MAP = {
 };
 const OVERLAY_MAP = {};
 const REGEX_YEAR = /(_(20)\d{2})$/s;
+let activePolygon = null;
+
+function showActivePolygon(layer) {
+  if (activePolygon !== null) {
+    // Reset style|
+    activePolygon.setStyle(POLYGON_STYLE.default);
+    activePolygon = null;
+  }
+
+  activePolygon = layer;
+  layer.setStyle(POLYGON_STYLE.active);
+}
 
 function toggleLoading(shouldShow) {
   document
@@ -241,8 +253,8 @@ function addBoundaryClickEvent() {
   OVERLAY_MAP[KEYS.CFI_B].on('click', async function (e) {
     toggleLoading(true);
     map.setView(e.latlng);
+    showActivePolygon(e.layer);
     document.querySelector('.about__body').innerHTML = '';
-
     document.getElementById('cfiSelect').value = e.layer.feature.id;
     drawAboutSection();
 
@@ -273,6 +285,12 @@ async function handleCfiSelect(e) {
   });
 
   drawAboutSection();
+
+  if (OVERLAY_MAP[KEYS.CFI_B]) {
+    const polygonsLayers = OVERLAY_MAP[KEYS.CFI_B].getLayers();
+    const activeLayer = polygonsLayers.find((layer) => layer.feature.id === cfiId);
+    showActivePolygon(activeLayer);
+  }
 
   if (cfiProfile.features.length > 0) {
     const defaultCrs = await loadRelatedLayers(cfiId);
