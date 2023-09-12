@@ -47,22 +47,13 @@ const STYLES = {
       }
     }
   },
-  [KEYS.CFI_B]: (feature) => {
-    switch (feature.properties.registration_date) {
-      case null: return {
-        color: "black",
-        fillColor: "yellow",
-        weight: 1,
-        fillOpacity: 0.5,
-        opacity: 0.5,
-      };
-      default: return {
-        color: "black",
-        fillColor: "purple",
-        weight: 1,
-        fillOpacity: 0.5,
-        opacity: 0.5,
-      }
+  [KEYS.CFI_B]: () => {
+    return {
+      color: "black",
+      fillColor: "purple",
+      weight: 1,
+      fillOpacity: 0.5,
+      opacity: 0.5,
     }
   },
   [KEYS.CFR_A]: (feature) => {
@@ -346,4 +337,16 @@ const TRANSLATE = {
   '_submitted_by': 'ដាក់​ជូន​ដោយ',
   '_tags': ' ស្លាក',
   '_index': 'សន្ទស្សន៍',
+  'Jan': 'មករា',
+  'Feb': 'កុម្ភៈ',
+  'Mar': 'មីនា',
+  'Apr': 'មេសា',
+  'May': 'ឧសភា',
+  'Jun': 'មិថុនា',
+  'Jul': 'កក្កដា',
+  'Aug': 'សីហា',
+  'Sep': 'កញ្ញា',
+  'Oct': 'តុលា',
+  'Nov': 'វិច្ឆិកា',
+  'Dec': 'ធ្នូ'
 }

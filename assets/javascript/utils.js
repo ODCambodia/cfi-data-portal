@@ -89,13 +89,16 @@ const Utils = {
 
     return this.getLayer(data, key);
   },
-  formatDate: function (dateStr, separator = '-') {
+  formatDate: function (dateStr, separator = ' ') {
+    if (!dateStr) {
+      return 'មិនមានព័ត៌មាន';
+    }
     const d = new Date(dateStr);
     const day = ("0" + d.getDate()).slice(-2);;
     const month = d.toLocaleString('default', { month: 'short' });
     const year = d.getFullYear();
 
-    return day + separator + month + separator + year;
+    return day + separator + (TRANSLATE[month] || month) + separator + year;
   }
 };
 
@@ -115,7 +118,6 @@ const CustomCharts = {
     };
 
     const pieHeader = document.createElement('p');
-    // pieHeader.innerText = 'សមភាពយេនឌ័រនៃសហគមន៍';
     pieHeader.innerText = label;
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';

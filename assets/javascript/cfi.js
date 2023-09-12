@@ -236,7 +236,7 @@ async function showCFI_B(data, defaultCrs) {
   profileTable.append(tbody);
 }
 
-function handleBoundaryFilter() {
+function addBoundaryClickEvent() {
   OVERLAY_MAP[KEYS.CFI_B].off('click');
 
   OVERLAY_MAP[KEYS.CFI_B].on('click', async function (e) {
@@ -313,6 +313,7 @@ async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   const selectedProvinceId = e.currentTarget.value;
   OVERLAY_MAP[KEYS.CFI_B].remove();
+  toggleLoading(true);
 
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
@@ -323,9 +324,10 @@ async function handleProvinceSelect(e) {
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
 
-  loadCfiSelect(cfiBoundary);
+  await loadCfiSelect(cfiBoundary);
 
-  handleBoundaryFilter();
+  addBoundaryClickEvent();
+  toggleLoading(false);
   map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
 }
 
