@@ -188,8 +188,13 @@
     }
 
     async function loadProvincesSelect() {
-      const res = await fetch('/api/provinces');
-      const data = await res.json();
+      const data = await Utils.fetchGeoJson({
+        data: {
+          typeName: 'cfi:cambodian_provincial',
+          outputFormat: 'application/json',
+          propertyname: 'pro_name_k,hrname,pro_code',
+        },
+      });
       const provinceSelect = document.getElementById('provinceSelect');
 
       // append options to select

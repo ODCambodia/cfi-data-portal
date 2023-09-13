@@ -2,14 +2,25 @@ import express from 'express'
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import documentUpload from './modules/document_upload.js';
-import fetch from 'node-fetch';
+import cookieSession from 'cookie-session';
+import 'dotenv/config';
+import DocumentUpload from './modules/document_upload.js';
+import Auth from './modules/auth.js';
+
 
 const app = express();
 const port = process.env.PORT || 3000;
 const dirName = path.dirname(fileURLToPath(import.meta.url));
 
+app.set('trust proxy', 1) // trust first proxy
 app.use(express.static('assets'));
+app.use(cookieSession({
+  name: 'session',
+  keys: [process.env.SECRET],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
+app.use(Auth.appendUserToken);
+
 
 app.use('/geoserver', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net', changeOrigin: true }));
 
@@ -30,7 +41,7 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/admin', function (req, res) {
+app.get('/admin', Auth.validate, function (req, res) {
   res.sendFile(path.join(dirName, 'page/admin.html'));
 });
 
@@ -57,7 +68,13 @@ app.get('/api/template', async function (req, res) {
   res.send('something went wrong');
 });
 
-app.post("/upload_files", documentUpload.upload.array("files"), documentUpload.handler);
+app.post("/upload_files", DocumentUpload.upload.array("files"), DocumentUpload.handler);
+app.post("/login", DocumentUpload.upload.array("files"), Auth.handleLogin);
+
+app.get("/login", function (req, res) {
+  res.sendFile(path.join(dirName, 'page/login.html'));
+});
+
 
 app.listen(port);
 
