@@ -1,26 +1,42 @@
 import express from 'express'
 import path from 'path';
+import 'dotenv/config';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import cookieSession from 'cookie-session';
-import 'dotenv/config';
 import DocumentUpload from './modules/document_upload.js';
 import Auth from './modules/auth.js';
-
+import { rateLimit } from 'express-rate-limit'
+import bodyParser from 'body-parser';
 
 const app = express();
 const port = process.env.PORT || 3000;
 const dirName = path.dirname(fileURLToPath(import.meta.url));
+const PUBLIC_PATHS = ['/login'];
+const jsonParser = bodyParser.json();
+const rateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 50, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
+  standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
 app.set('trust proxy', 1) // trust first proxy
 app.use(express.static('assets'));
 app.use(cookieSession({
   name: 'session',
   keys: [process.env.SECRET],
-  maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
+
 app.use(Auth.appendUserToken);
 
+app.all('/*', function (req, res, next) {
+  if (PUBLIC_PATHS.includes(req.path)) {
+    return next();
+  }
+
+  return Auth.validate(req, res, next);
+});
 
 app.use('/geoserver', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net', changeOrigin: true }));
 
@@ -41,7 +57,7 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/admin', Auth.validate, function (req, res) {
+app.get('/admin', function (req, res) {
   res.sendFile(path.join(dirName, 'page/admin.html'));
 });
 
@@ -68,15 +84,14 @@ app.get('/api/template', async function (req, res) {
   res.send('something went wrong');
 });
 
-app.post("/upload_files", DocumentUpload.upload.array("files"), DocumentUpload.handler);
-app.post("/login", DocumentUpload.upload.array("files"), Auth.handleLogin);
+app.post('/upload_files', DocumentUpload.upload.array('files'), DocumentUpload.handler);
 
-app.get("/login", function (req, res) {
+app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
+
+app.get('/login', function (req, res) {
   res.sendFile(path.join(dirName, 'page/login.html'));
 });
 
-
 app.listen(port);
-
 
 console.log('Server started at http://localhost:' + port);

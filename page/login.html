@@ -20,15 +20,15 @@
           <div class="card-body">
             <form id="formLogin">
               <div class="mb-4">
-                <label for="username" class="form-label">Username/Email</label>
+                <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" />
               </div>
               <div class="mb-4">
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" />
               </div>
-              <div class="text-right">
-                <button type="submit" class="btn d-inline-block text-light main-bg">Login</button>
+              <div class="text-end">
+                <button type="submit" class="btn d-inline-block btn-primary">Login</button>
               </div>
             </form>
           </div>
@@ -47,23 +47,40 @@
       const usernameInput = document.getElementById('username');
       const passwordInput = document.getElementById('password');
 
-      const formData = new FormData();
-      formData.append('username', usernameInput.value);
-      formData.append('password', passwordInput.value);
+      const requestBody = {};
+      requestBody.username = usernameInput.value;
+      requestBody.password = passwordInput.value;
 
       const submitBtn = document.querySelector('.btn');
       submitBtn.setAttribute('disabled', true);
       fetch("/login", {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody),
       })
-        .then((res) => {
-          setTimeout(() => { alert('Success'); })
+        .then(response => response.text()) // Parse the response as text
+        .then(text => {
+          let data = null;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            throw new Error(text);
+          }
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          setTimeout(() => { alert('Success'); });
+          setTimeout(() => { window.location.href = '/admin'; }, 500);
         })
         .catch((err) => {
-          setTimeout(() => { alert('something went wrong'); })
+          console.log(err);
+          setTimeout(() => { alert(err.message); })
         }).finally(() => {
-          setTimeout(() => { window.location.href = '/admin'; }, 500)
+          submitBtn.removeAttribute('disabled');
         });
     }
   </script>

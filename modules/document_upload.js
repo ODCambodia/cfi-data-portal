@@ -56,7 +56,7 @@ const handler = async function (req, res) {
     const builder = new xml2js.Builder();
     const xml = builder.buildObject(xmlData);
 
-    const response = await fetch('https://staging.fia.db.opendevcam.net/geoserver/wfs', {
+    const uploadResponse = await fetch('https://staging.fia.db.opendevcam.net/geoserver/wfs', {
       method: 'POST',
       headers: {
         'Authorization': 'Basic ' + btoa(GEOSERVER_AUTH.user + ':' + GEOSERVER_AUTH.password)
@@ -64,13 +64,15 @@ const handler = async function (req, res) {
       body: xml
     });
 
+    if (uploadResponse.status === 200) {
+      return res.json({ message: "Successfully uploaded files", status: 201 });
+    }
 
-    return res.json({ message: "Successfully uploaded files", status: 201 });
   } catch (e) {
     console.warn(e);
   }
 
-  return res.json({ message: "Something went wrong", status: 500 });
+  return res.status(500).json({ message: "Something went wrong" });
 }
 
 const DocumentUpload = {
