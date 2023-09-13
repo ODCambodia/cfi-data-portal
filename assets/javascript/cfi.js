@@ -59,8 +59,8 @@ function drawAboutSection() {
   const memberPieChart = document.createElement('canvas');
   memberPieChart.id = 'memberPieChart';
 
-  const comitteePieChart = document.createElement('canvas');
-  comitteePieChart.id = 'comitteePieChart';
+  const committeePieChart = document.createElement('canvas');
+  committeePieChart.id = 'committeePieChart';
 
   const populationPieChart = document.createElement('canvas');
   populationPieChart.id = 'populationPieChart';
@@ -69,7 +69,7 @@ function drawAboutSection() {
   barChart.id = 'barChart';
 
   chartWrapper.append(memberPieChart);
-  chartWrapper.append(comitteePieChart);
+  chartWrapper.append(committeePieChart);
   chartWrapper.append(populationPieChart);
   chartWrapper.append(barChart);
 
@@ -77,12 +77,81 @@ function drawAboutSection() {
   const body = document.querySelector('.about__body');
   body.append(tableWrapper);
   body.append(chartWrapper);
-
-  CustomCharts.pieChart(memberPieChart.id, 'ចំនួនសមាជិក');
-  CustomCharts.pieChart(comitteePieChart.id, 'គណៈកម្មការ');
-  CustomCharts.pieChart(populationPieChart.id, 'ចំនួនប្រជាសហគមន៍');
-  CustomCharts.barChart(barChart.id);
 }
+
+const DemoGraphyChart = (function () {
+  const CHARTS_CONF = {
+    committee: {
+      typeName: 'cfi:cfi_status_assessment_2018',
+      id: 'committeePieChart',
+      title: 'ចំនួនគណៈកម្មការ',
+      labels: ['ស្រី', 'ប្រុស'],
+      propertyKeys: {
+        female: 'cfi_cmte_female',
+        total: 'cfi_cmte_total',
+      },
+    },
+    member: {
+      typeName: 'cfi:cfi_status_assessment_2018',
+      id: 'memberPieChart',
+      title: 'ចំនួនសមាជិក',
+      labels: ['ស្រី', 'ប្រុស'],
+      propertyKeys: {
+        female: 'cfi_member_female',
+        total: 'cfi_member_total',
+      },
+    },
+    population: {
+      typeName: 'cfi:cfi_demography_2018',
+      id: 'populationPieChart',
+      title: 'ចំនួនប្រជាសហគមន៍',
+      labels: ['ស្រី', 'ប្រុស'],
+      propertyKeys: {
+        female: 'population_female',
+        total: 'population_total',
+      },
+    }
+  };
+
+  async function loadChart(cfiId, chartConfig) {
+    const response = await Utils.fetchGeoJson({
+      data: {
+        typeName: chartConfig.typeName,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+      },
+    });
+
+    if (!response.features.length > 0) {
+      return;
+    }
+
+    const data = response.features[0];
+    // maybe a callback to calculate chould be better (more dynamic code)
+    const femaleCount = data.properties[chartConfig.propertyKeys.female];
+    const maleCount = data.properties[chartConfig.propertyKeys.total] - femaleCount;
+
+    CustomCharts.pieChart(
+      chartConfig.id,
+      chartConfig.title,
+      chartConfig.labels,
+      [femaleCount, maleCount],
+    );
+  }
+
+  function loadAllChart(cfiId) {
+    return Promise.all([
+      loadChart(cfiId, CHARTS_CONF.committee),
+      loadChart(cfiId, CHARTS_CONF.member),
+      loadChart(cfiId, CHARTS_CONF.population),
+      CustomCharts.barChart('barChart'),
+    ]);
+  }
+
+  return {
+    loadAllChart,
+    loadChart,
+  };
+})();
 
 async function handleRelatedLayerClick(e) {
   e.currentTarget.parentNode.childNodes.forEach((item) =>
@@ -101,7 +170,9 @@ async function handleRelatedLayerClick(e) {
   });
 
   if (!layerData.features.length > 0) {
-    setTimeout(function () { alert('មិនមានព័ត៌មាន'); }, 1);
+    setTimeout(function () {
+      alert('មិនមានព័ត៌មាន');
+    }, 1);
     return;
   }
 
@@ -110,7 +181,9 @@ async function handleRelatedLayerClick(e) {
   const tbody = document.createElement('tbody');
   table.innerHTML = '';
 
-  const headers = Object.keys(layerData.features[0].properties).map((key) => TRANSLATE[key] || key);
+  const headers = Object.keys(layerData.features[0].properties).map(
+    (key) => TRANSLATE[key] || key,
+  );
   const trHead = document.createElement('tr');
 
   headers.push('ទាញយក');
@@ -124,12 +197,16 @@ async function handleRelatedLayerClick(e) {
     const contents = Object.values(layer.properties);
     const tr = document.createElement('tr');
 
-    contents.push(getDownloadDom(`/geoserver/cfi/wfs?service=WFS&version=1.1.0&request=GetFeature&outputFormat=text/csv&typeName=${typeName}&featureId=${layer.id}`));
+    contents.push(
+      getDownloadDom(
+        `/geoserver/cfi/wfs?service=WFS&version=1.1.0&request=GetFeature&outputFormat=text/csv&typeName=${typeName}&featureId=${layer.id}`,
+      ),
+    );
     contents.forEach((item) => {
       const td = document.createElement('td');
       td.append(item);
       tr.append(td);
-    })
+    });
 
     tbody.append(tr);
   });
@@ -179,7 +256,7 @@ async function loadRelatedDocuments(cfiId) {
     a.href = item.properties.url;
     a.innerText = item.properties.title;
     a.style.color = '#000';
-    a.target = "_blank";
+    a.target = '_blank';
 
     li.append(a);
     ul.append(li);
@@ -252,23 +329,28 @@ function addBoundaryClickEvent() {
 
   OVERLAY_MAP[KEYS.CFI_B].on('click', async function (e) {
     toggleLoading(true);
+
     map.setView(e.latlng);
     showActivePolygon(e.layer);
+
+    const cfiId = e.layer.feature.id;
     document.querySelector('.about__body').innerHTML = '';
-    document.getElementById('cfiSelect').value = e.layer.feature.id;
+    document.getElementById('cfiSelect').value = cfiId;
+
     drawAboutSection();
+    await DemoGraphyChart.loadAllChart(cfiId);
 
     const cfiProfile = await Utils.fetchGeoJson({
       data: {
         typeName: 'cfi:cfi_profiles_2023',
         SORTBY: 'name ASC',
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${e.layer.feature.id}'')')), 0, meters)`,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
       },
     });
-    const defaultCrs = await loadRelatedLayers(e.layer.feature.id);
+    const defaultCrs = await loadRelatedLayers(cfiId);
     await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
 
-    await loadRelatedDocuments(e.layer.feature.id)
+    await loadRelatedDocuments(cfiId);
     toggleLoading(false);
   });
 }
@@ -285,10 +367,13 @@ async function handleCfiSelect(e) {
   });
 
   drawAboutSection();
+  await DemoGraphyChart.loadAllChart(cfiId);
 
   if (OVERLAY_MAP[KEYS.CFI_B]) {
     const polygonsLayers = OVERLAY_MAP[KEYS.CFI_B].getLayers();
-    const activeLayer = polygonsLayers.find((layer) => layer.feature.id === cfiId);
+    const activeLayer = polygonsLayers.find(
+      (layer) => layer.feature.id === cfiId,
+    );
     showActivePolygon(activeLayer);
   }
 
@@ -297,7 +382,7 @@ async function handleCfiSelect(e) {
     await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
   }
 
-  await loadRelatedDocuments(cfiId)
+  await loadRelatedDocuments(cfiId);
   toggleLoading(false);
 }
 
@@ -336,7 +421,9 @@ async function handleProvinceSelect(e) {
   }
 
   toggleLoading(true);
-  const CQL_FILTER = selectedProvinceId ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${selectedProvinceId}'')')))` : '';
+  const CQL_FILTER = selectedProvinceId
+    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${selectedProvinceId}'')')))`
+    : '';
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
       typeName: TYPENAME[KEYS.CFI_B],
@@ -368,8 +455,15 @@ async function loadProvince() {
     const provinceSelect = document.getElementById('provinceSelect');
 
     // append options to select
-    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង', { disabled: true, selected: true }));
-    provinceSelect.append(Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }));
+    provinceSelect.append(
+      Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង', {
+        disabled: true,
+        selected: true,
+      }),
+    );
+    provinceSelect.append(
+      Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }),
+    );
     res.features.forEach((item) => {
       const option = document.createElement('option');
       option.text = item.properties.pro_name_k;

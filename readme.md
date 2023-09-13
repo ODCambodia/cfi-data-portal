@@ -1,10 +1,9 @@
 # CFI Data portal
+
 ## Setup
-requires Node.js >= 0.10
+
+requires Node.js >= 0.18
 To Run the server locally
 `npm install`
-`npm run dev`
-
-To start sever on prod
-`npm install`
+`cp .env.example .env` (modify the .env variable)
 `npm start`

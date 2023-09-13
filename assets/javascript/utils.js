@@ -103,22 +103,23 @@ const Utils = {
 };
 
 const CustomCharts = {
-  pieChart: function (selectorId, label) {
+  pieChart: function (selectorId, title, labels, data) {
     const pieData = {
-      labels: ['ស្រី', 'ប្រុស'],
+      labels,
       datasets: [{
-        label: label,
-        data: [Utils.getRandom(), Utils.getRandom()],
+        data,
+        label: title,
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
         ],
-        hoverOffset: 4
+        hoverOffset: 4,
+        borderWidth: 0,
       }]
     };
 
     const pieHeader = document.createElement('p');
-    pieHeader.innerText = label;
+    pieHeader.innerText = title;
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';
 

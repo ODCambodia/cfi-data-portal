@@ -30,14 +30,6 @@ app.use(cookieSession({
 
 app.use(Auth.appendUserToken);
 
-app.all('/*', function (req, res, next) {
-  if (PUBLIC_PATHS.includes(req.path)) {
-    return next();
-  }
-
-  return Auth.validate(req, res, next);
-});
-
 app.use('/geoserver', createProxyMiddleware({ target: 'https://staging.fia.db.opendevcam.net', changeOrigin: true }));
 
 app.use('/api/v2', createProxyMiddleware({
@@ -57,7 +49,7 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/admin', function (req, res) {
+app.get('/admin', Auth.validate, function (req, res) {
   res.sendFile(path.join(dirName, 'page/admin.html'));
 });
 

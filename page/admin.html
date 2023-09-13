@@ -235,9 +235,15 @@
       });
     }
 
+    function clearModalInputs() {
+      const inputs = document.querySelectorAll('#addDocumentModal form input');
+      for (let i = 0; i < inputs.length; i++) {
+        inputs[i].value = '';
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
-
 
       const modal = document.getElementById('addDocumentModal')
       modal.addEventListener('show.bs.modal', (e) => {
@@ -245,44 +251,46 @@
         const form = document.querySelector(`#addDocumentModal form`);
         form.dataset.x = btn.dataset.x;
         form.dataset.y = btn.dataset.y;
+
+        clearModalInputs();
       })
-    });
-  </script>
 
-  <script>
-    const form = document.getElementById('form');
-    form.addEventListener('submit', submitForm);
+      const form = document.getElementById('form');
+      form.addEventListener('submit', submitForm);
 
-    function submitForm(e) {
-      e.preventDefault();
-      const currentForm = e.currentTarget;
-      const fileInput = document.getElementById('formFile');
-      const title = document.getElementById('titleInput');
-      const titleEn = document.getElementById('titleEnInput');
-      const formData = new FormData();
-      formData.append('title', title.value);
-      formData.append('titleEn', titleEn.value);
-      formData.append('files', fileInput.files[0]);
-      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+      function submitForm(e) {
+        e.preventDefault();
+        const currentForm = e.currentTarget;
+        const fileInput = document.getElementById('formFile');
+        const title = document.getElementById('titleInput');
+        const titleEn = document.getElementById('titleEnInput');
+        const formData = new FormData();
+        formData.append('title', title.value);
+        formData.append('titleEn', titleEn.value);
+        formData.append('files', fileInput.files[0]);
+        formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
 
-      const modalEl = document.getElementById('addDocumentModal');
-      const modal = bootstrap.Modal.getInstance(modalEl);
-      const submitBtn = document.querySelector('#addFormBtn');
-      submitBtn.setAttribute('disabled', true);
-      fetch("/upload_files", {
-        method: 'POST',
-        body: formData,
-      })
-        .then((res) => {
-          setTimeout(() => { alert('Success'); })
+        const modalEl = document.getElementById('addDocumentModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        const submitBtn = document.querySelector('#addFormBtn');
+        submitBtn.setAttribute('disabled', true);
+
+        fetch("/upload_files", {
+          method: 'POST',
+          body: formData,
         })
-        .catch((err) => {
-          setTimeout(() => { alert('something went wrong'); })
-        }).finally(() => {
-          modal.hide();
-          submitBtn.removeAttribute('disabled');
-        });
-    }
+          .then((res) => {
+            setTimeout(() => { alert('Success'); })
+          })
+          .catch((err) => {
+            setTimeout(() => { alert('something went wrong'); })
+          }).finally(() => {
+            clearModalInputs();
+            modal.hide();
+            submitBtn.removeAttribute('disabled');
+          });
+      }
+    });
   </script>
 </body>
 
