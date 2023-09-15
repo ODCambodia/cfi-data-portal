@@ -1,4 +1,7 @@
 const Utils = {
+  fetchJson: function (options) {
+    return this.fetchGeoJson(options, false);
+  },
   fetchGeoJson: async function (options = {}, hasDefault = true) {
     const defaultSetting = hasDefault ? {
       service: 'WFS',
@@ -41,9 +44,41 @@ const Utils = {
 
     return xmlDoc;
   },
+  handleFetchPromise: function (promise, callback) {
+    return promise
+      .then(response => response.text())
+      .then(text => {
+        let data = null;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error(text);
+        }
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (typeof callback === 'function') {
+          callback();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setTimeout(() => { alert(err.message); })
+      })
+  },
   getQueryParam: function (key, isDisabled) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(key);
+  },
+  getServer: function () {
+    const server = window.location.href.split('/').slice(-1) || 'cfi';
+    if (server !== 'cfi' || server !== 'cfr') {
+      return 'cfi';
+    }
+
+    return server;
   },
   getRandom: function (min = 1, max = 100) {
     return Math.floor(Math.random() * (max - min) + min);

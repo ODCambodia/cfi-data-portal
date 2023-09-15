@@ -214,18 +214,52 @@ async function handleRelatedLayerClick(e) {
   modal.style.display = 'block';
 }
 
-async function loadRelatedLayers() {
-  const cfiRelatedLayers = await Utils.fetchXml({
-    baseUrl: '/geoserver/cfi/wfs',
-    data: { request: 'GetCapabilities' },
-  });
-  const featureTypes = [
-    ...cfiRelatedLayers.getElementsByTagName('FeatureType'),
-  ].map((item) => item.childNodes);
+async function loadRelatedLayers(cfiId) {
+  document.getElementById('relatedLayers').innerHTML = '';
 
-  return featureTypes
-    .find((item) => item[1].textContent.includes('profile'))[4]
-    .textContent.split('::')[1];
+  const [cfiRelatedLayers, layersToShow] = await Promise.all([
+    Utils.fetchXml({
+      baseUrl: '/geoserver/cfi/wfs',
+      data: { request: 'GetCapabilities' },
+    }),
+    Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
+  ]);
+
+
+
+  const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
+  const ul = document.createElement('ul');
+  let hasOneLayerShowing = false;
+
+  for (let i = 0; i < featureTypes.length; i++) {
+    const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
+    const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
+
+    if (
+      typeof layersToShow[name] === 'undefined' ||
+      !REGEX_YEAR.test(name) ||
+      name.includes('profile') ||
+      name.includes('contact')) {
+      continue;
+    }
+    hasOneLayerShowing = true;
+
+    const li = document.createElement('li');
+    li.textContent = title;
+    li.dataset.name = name;
+    li.dataset.cfiId = cfiId;
+    li.addEventListener('click', handleRelatedLayerClick);
+    ul.append(li);
+  }
+
+  if (hasOneLayerShowing) {
+    document.getElementById('relatedLayers').append(ul);
+    document.getElementById('relatedLayers').parentElement.classList.remove('d-none');
+  }
+
+  return [...featureTypes]
+    .find((item) => item.childNodes[0].textContent.includes('profile'))
+    .childNodes[4].textContent.split('::')[1];
 }
 
 async function loadRelatedDocuments(cfiId) {
@@ -409,6 +443,8 @@ async function loadCfiSelect(cfiBoundary) {
 
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
+  document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+
   const selectedProvinceId = e.currentTarget.value;
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {

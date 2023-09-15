@@ -22,7 +22,11 @@ const validate = async (req, res, next) => {
     console.log(error);
   }
 
-  res.redirect('/login');
+  if (req.param.key) {
+    res.redirect('/login/' + key);
+  }
+
+  res.redirect('/login/cfi');
 };
 
 /**

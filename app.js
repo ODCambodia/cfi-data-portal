@@ -4,15 +4,15 @@ import 'dotenv/config';
 import { fileURLToPath } from 'url';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import cookieSession from 'cookie-session';
-import DocumentUpload from './modules/document_upload.js';
-import Auth from './modules/auth.js';
 import { rateLimit } from 'express-rate-limit'
 import bodyParser from 'body-parser';
+import DocumentUpload from './modules/document_upload.js';
+import Auth from './modules/auth.js';
+import ToggleLayer from './modules/toggle_layer.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
 const dirName = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC_PATHS = ['/login'];
 const jsonParser = bodyParser.json();
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -49,7 +49,7 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/admin', Auth.validate, function (req, res) {
+app.get('/admin/:key', Auth.validate, function (req, res) {
   res.sendFile(path.join(dirName, 'page/admin.html'));
 });
 
@@ -80,9 +80,14 @@ app.post('/upload_files', DocumentUpload.upload.array('files'), DocumentUpload.h
 
 app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 
-app.get('/login', function (req, res) {
+app.get('/login/:key', function (req, res) {
   res.sendFile(path.join(dirName, 'page/login.html'));
 });
+
+app.get('/api/active-layers/:key', ToggleLayer.handleGetActiveLayers);
+
+app.post('/api/active-layers/:key', Auth.validate, jsonParser, ToggleLayer.handleSaveActiveLayers);
+
 
 app.listen(port);
 

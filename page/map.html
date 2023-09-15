@@ -32,7 +32,7 @@
     <div class="sidebar open">
         <div class="logo-details">
             <a href="/" class="logo_name">Data Portal</a>
-            <a href="/admin" class="logo_name icon">
+            <a id="adminLink" href="/admin/" class="logo_name icon">
                 <svg class="icon" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50" width="22"
                     height="22" fill="#fff">
                     <path
@@ -61,6 +61,11 @@
                 </select>
             </li>
         </ul>
+        <div>
+            <h3 class="document__header nav-header">ទិន្នន័យពាក់ព័ន្ធ</h3>
+            <div id="relatedLayers" class="document__body">
+            </div>
+        </div>
         <div class="d-none">
             <h3 class="document__header nav-header">ឯកសារ​ពាក់​ព​ន្ធ័</h3>
             <div id="relatedDocuments" class="document__body"></div>
@@ -118,6 +123,9 @@
                 const sidebar = document.querySelector('.sidebar');
                 sidebar.classList.toggle('open');
             });
+
+            const adminLink = document.getElementById('adminLink');
+            adminLink.href += SERVER;
         })
     </script>
 </body>

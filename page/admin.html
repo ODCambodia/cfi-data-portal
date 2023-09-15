@@ -20,10 +20,12 @@
           role="tab" aria-controls="nav-profile" aria-selected="false">Profile</button>
         <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button"
           role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
+        <button class="nav-link" id="nav-layer-tab" data-bs-toggle="tab" data-bs-target="#nav-layer" type="button"
+          role="tab" aria-controls="nav-contact" aria-selected="false">Layers</button>
       </div>
     </nav>
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
-      <!-- profile -->
+      <!-- Home -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="mb-2">
           <label class="d-inline-block" for="">ជ្រើសរើសខេត្តឬក្រុង</label>
@@ -48,9 +50,20 @@
         </div>
       </div>
 
-      <!-- Test -->
+      <!-- Profile -->
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <p><strong>This is some placeholder content the Profile tab's associated content.</strong></p>
+      </div>
+
+      <!-- Layer -->
+      <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
+        <form id="toggleLayerForm">
+          <div class="list-group mb-2">
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">Save Setting</button>
+          </div>
+        </form>
       </div>
 
     </div>
@@ -127,8 +140,8 @@
     crossorigin="anonymous"></script>
   <script src="/javascript/utils.js"></script>
   <script>
+    const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfi/ows`;
-
 
     function createActionBtns(coord) {
       const btn = document.createElement('button');
@@ -150,21 +163,22 @@
       return [btn];
     }
 
-    // function createCheckbox(index) {
-    //   const span = document.createElement('span');
-    //   span.classList.add('custom-checkbox')
-    //   const input = document.createElement('input');
-    //   input.type = 'checkbox';
-    //   input.id = 'checkbox' + index;
-    //   input.name = 'options';
-    //   input.value = index;
-    //   const label = document.createElement('label');
-    //   label.for = input.id;
+    function getCheckBoxDOM(isChecked, value, title, index) {
+      const checkBox = document.createElement('input');
+      checkBox.id = 'layerCheckBox' + index;
+      checkBox.setAttribute('type', 'checkbox');
+      checkBox.setAttribute('name', 'activeLayers[]');
+      checkBox.checked = isChecked;
+      checkBox.value = value;
+      checkBox.classList.add('layer-check-box');
 
-    //   span.append(input);
-    //   span.append(label);
-    //   return span;
-    // }
+      const label = document.createElement('label');
+      label.setAttribute('for', checkBox.id);
+      label.classList.add('list-group-item');
+      label.innerText = title;
+
+      return { input: checkBox, label };
+    }
 
     function createRow(cfi) {
       const rows = [];
@@ -242,54 +256,120 @@
       }
     }
 
+    function handleShowAddDocumentModal(e) {
+      const btn = e.relatedTarget;
+      const form = document.querySelector(`#addDocumentModal form`);
+      form.dataset.x = btn.dataset.x;
+      form.dataset.y = btn.dataset.y;
+
+      clearModalInputs();
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const currentForm = e.currentTarget;
+      const fileInput = document.getElementById('formFile');
+      const title = document.getElementById('titleInput');
+      const titleEn = document.getElementById('titleEnInput');
+      const formData = new FormData();
+      formData.append('title', title.value);
+      formData.append('titleEn', titleEn.value);
+      formData.append('files', fileInput.files[0]);
+      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      const modalEl = document.getElementById('addDocumentModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      const submitBtn = document.querySelector('#addFormBtn');
+      submitBtn.setAttribute('disabled', true);
+
+      fetch("/upload_files", {
+        method: 'POST',
+        body: formData,
+      })
+        .then((res) => {
+          setTimeout(() => { alert('Success'); })
+        })
+        .catch((err) => {
+          setTimeout(() => { alert('something went wrong'); })
+        }).finally(() => {
+          clearModalInputs();
+          modal.hide();
+          submitBtn.removeAttribute('disabled');
+        });
+    }
+
+    async function loadLayerSettings() {
+
+      const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
+        Utils.fetchXml({
+          baseUrl: '/geoserver/cfi/wfs',
+          data: { request: 'GetCapabilities' },
+        }),
+        Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
+      ]);
+
+      const REGEX_YEAR = /(_(20)\d{2})$/s;
+      const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
+      const checkBoxListDom = document.querySelector('#nav-layer .list-group');
+
+      for (let i = 0; i < featureTypes.length; i++) {
+        const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
+        const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
+        console.log(featureTypes[i]);
+        if (!REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact')) {
+          continue;
+        }
+
+        const isActiveLayer = typeof activeLayersObj[name] !== 'undefined'
+        const checkBox = getCheckBoxDOM(isActiveLayer, name, title, i);
+
+        checkBoxListDom.append(checkBox.input);
+        checkBoxListDom.append(checkBox.label);
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
 
       const modal = document.getElementById('addDocumentModal')
-      modal.addEventListener('show.bs.modal', (e) => {
-        const btn = e.relatedTarget;
-        const form = document.querySelector(`#addDocumentModal form`);
-        form.dataset.x = btn.dataset.x;
-        form.dataset.y = btn.dataset.y;
-
-        clearModalInputs();
-      })
+      modal.addEventListener('show.bs.modal', handleShowAddDocumentModal)
 
       const form = document.getElementById('form');
-      form.addEventListener('submit', submitForm);
+      form.addEventListener('submit', handleFormSubmit);
 
-      function submitForm(e) {
+      await loadLayerSettings();
+
+      const activeLayerForm = document.getElementById('toggleLayerForm');
+      activeLayerForm.addEventListener('submit', function (e) {
         e.preventDefault();
-        const currentForm = e.currentTarget;
-        const fileInput = document.getElementById('formFile');
-        const title = document.getElementById('titleInput');
-        const titleEn = document.getElementById('titleEnInput');
-        const formData = new FormData();
-        formData.append('title', title.value);
-        formData.append('titleEn', titleEn.value);
-        formData.append('files', fileInput.files[0]);
-        formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
-
-        const modalEl = document.getElementById('addDocumentModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        const submitBtn = document.querySelector('#addFormBtn');
+        const submitBtn = document.querySelector('#nav-layer form button[type="submit"]');
+        const prevBtnText = submitBtn.textContent;
         submitBtn.setAttribute('disabled', true);
+        submitBtn.innerText = 'Saving...';
 
-        fetch("/upload_files", {
+        const selectedActiveLayers = document.querySelectorAll('.layer-check-box:checked');
+        const reqBody = {}
+        for (let i = 0; i < selectedActiveLayers.length; i++) {
+          reqBody[selectedActiveLayers[i].value] = true;
+        }
+
+        const jsonBody = JSON.stringify(reqBody);
+        console.log(jsonBody);
+        const res = fetch("/api/active-layers/" + SERVER, {
           method: 'POST',
-          body: formData,
-        })
-          .then((res) => {
-            setTimeout(() => { alert('Success'); })
-          })
-          .catch((err) => {
-            setTimeout(() => { alert('something went wrong'); })
-          }).finally(() => {
-            clearModalInputs();
-            modal.hide();
-            submitBtn.removeAttribute('disabled');
-          });
-      }
+          body: jsonBody,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        });
+
+        Utils.handleFetchPromise(res, () => {
+          submitBtn.removeAttribute('disabled');
+          submitBtn.innerText = prevBtnText;
+
+          alert('Success');
+        });
+      });
     });
   </script>
 </body>
