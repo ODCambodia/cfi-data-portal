@@ -65,13 +65,9 @@ function drawAboutSection() {
   const populationPieChart = document.createElement('canvas');
   populationPieChart.id = 'populationPieChart';
 
-  const barChart = document.createElement('canvas');
-  barChart.id = 'barChart';
-
   chartWrapper.append(memberPieChart);
   chartWrapper.append(committeePieChart);
   chartWrapper.append(populationPieChart);
-  chartWrapper.append(barChart);
 
   // Appending everything
   const body = document.querySelector('.about__body');
@@ -143,7 +139,6 @@ const DemoGraphyChart = (function () {
       loadChart(cfiId, CHARTS_CONF.committee),
       loadChart(cfiId, CHARTS_CONF.member),
       loadChart(cfiId, CHARTS_CONF.population),
-      CustomCharts.barChart('barChart'),
     ]);
   }
 
