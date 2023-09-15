@@ -19,6 +19,16 @@ span {
   background-color: gray;
 }
 
+.sidebar.open>h3 {
+  visibility: visible;
+  opacity: 1;
+}
+
+.sidebar>h3 {
+  visibility: hidden;
+  opacity: 0;
+}
+
 .sidebar {
   position: fixed;
   left: 0;
@@ -48,6 +58,7 @@ span {
 .sidebar .logo-details .icon {
   opacity: 0;
   transition: all 0.5s ease;
+  line-height: 16px;
 }
 
 .sidebar .logo-details .logo_name {
@@ -55,19 +66,21 @@ span {
   font-size: 20px;
   font-weight: 600;
   opacity: 0;
+  visibility: hidden;
   transition: all 0.5s ease;
 }
 
 .sidebar.open .logo-details .icon,
 .sidebar.open .logo-details .logo_name {
   opacity: 1;
+  visibility: visible;
 }
 
 .sidebar .logo-details #sidebarBtn {
   position: absolute;
+  left: 50%;
   top: 50%;
-  right: 0;
-  transform: translateY(-50%);
+  transform: translate(-50%, -50%);
   font-size: 22px;
   transition: all 0.4s ease;
   font-size: 23px;
@@ -79,6 +92,8 @@ span {
 
 .sidebar.open .logo-details #sidebarBtn {
   text-align: right;
+  left: unset;
+  right: 0;
 }
 
 .sidebar .nav-list {
