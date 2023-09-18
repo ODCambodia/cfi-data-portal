@@ -25,6 +25,12 @@ function showActivePolygon(layer) {
     activePolygon = null;
   }
 
+  // set active in view with offset
+  const center = { ...layer.getBounds().getCenter() };
+  const offsetCenter = new L.Point(200, 0);
+  map.panTo(center, { animate: false });
+  map.panBy(offsetCenter, { animate: false });
+
   activePolygon = layer;
   layer.setStyle(POLYGON_STYLE.active);
 }
@@ -397,12 +403,12 @@ async function handleCfiSelect(e) {
 
   drawAboutSection();
   await DemoGraphyChart.loadAllChart(cfiId);
-
   if (OVERLAY_MAP[KEYS.CFI_B]) {
     const polygonsLayers = OVERLAY_MAP[KEYS.CFI_B].getLayers();
     const activeLayer = polygonsLayers.find(
       (layer) => layer.feature.id === cfiId,
     );
+
     showActivePolygon(activeLayer);
   }
 
@@ -413,6 +419,7 @@ async function handleCfiSelect(e) {
 
   await loadRelatedDocuments(cfiId);
   toggleLoading(false);
+
 }
 
 async function loadCfiSelect(cfiBoundary) {
