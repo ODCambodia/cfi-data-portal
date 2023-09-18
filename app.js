@@ -26,6 +26,7 @@ app.use(express.static('assets'));
 app.use(cookieSession({
   name: 'session',
   keys: [process.env.SECRET],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
 app.use(Auth.appendUserToken);
@@ -83,6 +84,8 @@ app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 app.get('/login/:key', function (req, res) {
   res.sendFile(path.join(dirName, 'page/login.html'));
 });
+
+app.post('/logout', Auth.handleLogout);
 
 app.get('/api/active-layers/:key', ToggleLayer.handleGetActiveLayers);
 

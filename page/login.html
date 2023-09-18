@@ -36,7 +36,7 @@
       </div>
     </div>
   </div>
-
+  <script src="/javascript/utils.js"></script>
   <script>
     const form = document.getElementById('formLogin');
     form.addEventListener('submit', submitForm);
@@ -75,13 +75,7 @@
 
           setTimeout(() => { alert('Success'); });
           setTimeout(() => {
-            const server = window.location.href.split('/').slice(-1);
-
-            if (server === 'cfi' || server === 'cfr') {
-              window.location.href = '/admin/' + server;
-            } else {
-              window.location.href = '/admin/cfi';
-            }
+            window.location.href = '/admin/' + Utils.getServer();
           }, 500);
         })
         .catch((err) => {

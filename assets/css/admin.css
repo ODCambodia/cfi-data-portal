@@ -12,6 +12,13 @@ input:focus {
   box-shadow: none;
 }
 
+#btnLogout {
+  position: absolute;
+  align-self: end;
+  top: 1.25rem;
+  display: inline-block;
+}
+
 a,
 a:hover {
   text-decoration: none;
@@ -243,27 +250,27 @@ body {
   display: none;
 }
 
-.list-group input[type="checkbox"] + .list-group-item {
+.list-group input[type="checkbox"]+.list-group-item {
   cursor: pointer;
 }
 
-.list-group input[type="checkbox"] + .list-group-item:before {
+.list-group input[type="checkbox"]+.list-group-item:before {
   content: "\2610";
   color: #000;
   font-weight: bold;
   margin-right: 1em;
 }
 
-.list-group input[type="checkbox"]:checked + .list-group-item:before {
+.list-group input[type="checkbox"]:checked+.list-group-item:before {
   content: "\2611";
   font-weight: normal;
 }
 
-.list-group input[type="checkbox"]:checked + .list-group-item {
+.list-group input[type="checkbox"]:checked+.list-group-item {
   background-color: #0275D8;
   color: #FFF;
 }
 
-.list-group input[type="checkbox"]:checked + .list-group-item:before {
+.list-group input[type="checkbox"]:checked+.list-group-item:before {
   color: inherit;
 }

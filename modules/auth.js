@@ -2,28 +2,24 @@ import jwt from 'jsonwebtoken';
 
 // MIDDLEWARE FOR AUTHORIZATION 
 const validate = async (req, res, next) => {
-  try {
-    if (!req.headers.authorization) {
-      throw new Error('Missing Auth Header');
-    }
-
+  if (req.headers.authorization) {
     // validate token
     const token = req.headers.authorization.split(' ')[1];
-    if (!token) {
-      throw new Error('malformed auth header');
+    if (token) {
+      try {
+        const payload = await jwt.verify(token, process.env.SECRET);
+        if (payload) {
+          req.user = payload;
+          return next();
+        }
+      } catch (error) {
+        console.log(error);
+      }
     }
-
-    const payload = await jwt.verify(token, process.env.SECRET);
-    if (payload) {
-      req.user = payload;
-      return next();
-    }
-  } catch (error) {
-    console.log(error);
   }
 
-  if (req.param.key) {
-    res.redirect('/login/' + key);
+  if (req.params.key) {
+    return res.redirect('/login/' + req.params.key);
   }
 
   res.redirect('/login/cfi');
@@ -57,10 +53,16 @@ const appendUserToken = function (req, res, next) {
   next();
 }
 
+const handleLogout = function (req, res) {
+  res.clearCookie('session');
+  res.status(200).json({ message: 'Success' });
+}
+
 const Auth = {
   validate,
   handleLogin,
   appendUserToken,
+  handleLogout
 }
 
 // export custom middleware

@@ -73,12 +73,13 @@ const Utils = {
     return urlParams.get(key);
   },
   getServer: function () {
-    const server = window.location.href.split('/').slice(-1) || 'cfi';
-    if (server !== 'cfi' || server !== 'cfr') {
-      return 'cfi';
+    const server = window.location.href.split('/').slice(-1)[0];
+
+    if (server === 'cfi' || server === 'cfr') {
+      return server;
     }
 
-    return server;
+    return 'cfi';
   },
   getRandom: function (min = 1, max = 100) {
     return Math.floor(Math.random() * (max - min) + min);

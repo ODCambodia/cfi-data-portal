@@ -12,6 +12,7 @@
 
 <body>
   <div class="card p-3 shadow w-100 h-100">
+    <button id="btnLogout" class="btn btn-sm btn-primary" type="button">Logout</button>
     <nav>
       <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
@@ -297,8 +298,54 @@
         });
     }
 
-    async function loadLayerSettings() {
+    function handleSubmitActiveLayerForm(e) {
+      e.preventDefault();
+      const submitBtn = document.querySelector('#nav-layer form button[type="submit"]');
+      const prevBtnText = submitBtn.textContent;
+      submitBtn.setAttribute('disabled', true);
+      submitBtn.innerText = 'Saving...';
 
+      const selectedActiveLayers = document.querySelectorAll('.layer-check-box:checked');
+      const reqBody = {}
+      for (let i = 0; i < selectedActiveLayers.length; i++) {
+        reqBody[selectedActiveLayers[i].value] = true;
+      }
+
+      const jsonBody = JSON.stringify(reqBody);
+      const res = fetch("/api/active-layers/" + SERVER, {
+        method: 'POST',
+        body: jsonBody,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      Utils.handleFetchPromise(res, () => {
+        submitBtn.removeAttribute('disabled');
+        submitBtn.innerText = prevBtnText;
+
+        alert('Success');
+      });
+    }
+
+    function handleLogout() {
+      const res = fetch('/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      const btnLogout = document.getElementById('btnLogout');
+
+      btnLogout.setAttribute('disabled', true);
+      Utils.handleFetchPromise(res, () => {
+        btnLogout.removeAttribute('disabled');
+        window.location.href = '/map?map=' + SERVER;
+      });
+    }
+
+    async function loadLayerSettings() {
       const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
         Utils.fetchXml({
           baseUrl: '/geoserver/cfi/wfs',
@@ -314,7 +361,6 @@
       for (let i = 0; i < featureTypes.length; i++) {
         const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
         const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
-        console.log(featureTypes[i]);
         if (!REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact')) {
           continue;
         }
@@ -339,36 +385,10 @@
       await loadLayerSettings();
 
       const activeLayerForm = document.getElementById('toggleLayerForm');
-      activeLayerForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const submitBtn = document.querySelector('#nav-layer form button[type="submit"]');
-        const prevBtnText = submitBtn.textContent;
-        submitBtn.setAttribute('disabled', true);
-        submitBtn.innerText = 'Saving...';
+      activeLayerForm.addEventListener('submit', handleSubmitActiveLayerForm);
 
-        const selectedActiveLayers = document.querySelectorAll('.layer-check-box:checked');
-        const reqBody = {}
-        for (let i = 0; i < selectedActiveLayers.length; i++) {
-          reqBody[selectedActiveLayers[i].value] = true;
-        }
-
-        const jsonBody = JSON.stringify(reqBody);
-        console.log(jsonBody);
-        const res = fetch("/api/active-layers/" + SERVER, {
-          method: 'POST',
-          body: jsonBody,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        });
-
-        Utils.handleFetchPromise(res, () => {
-          submitBtn.removeAttribute('disabled');
-          submitBtn.innerText = prevBtnText;
-
-          alert('Success');
-        });
-      });
+      const btnLogout = document.getElementById('btnLogout');
+      btnLogout.addEventListener('click', handleLogout)
     });
   </script>
 </body>
