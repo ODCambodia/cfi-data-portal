@@ -1,5 +1,6 @@
 import multer from 'multer';
 import xml2js from 'xml2js';
+import fs from 'fs';
 
 const GEOSERVER_AUTH = {
   user: process.env.GEOSERVER_USERNAME || 'admin',
@@ -17,7 +18,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const handler = async function (req, res) {
+const handleCreate = async function (req, res) {
   try {
     const template = `<wfs:Transaction
       version="2.0.0"
@@ -43,7 +44,6 @@ const handler = async function (req, res) {
         </cfi:documents>
       </wfs:Insert>
     </wfs:Transaction>`;
-
 
     const xmlData = await xml2js.parseStringPromise(template);
     const cfiDocuments = xmlData['wfs:Transaction']['wfs:Insert'][0]['cfi:documents'][0];
@@ -75,9 +75,66 @@ const handler = async function (req, res) {
   return res.status(500).json({ message: "Something went wrong" });
 }
 
-const DocumentUpload = {
-  upload,
-  handler,
+const handleDelete = async function (req, res) {
+  if (!req.params.id || Number.isNaN(Number(req.params.id))) {
+    return res.status(400).json({ error: 'Invalid or no documents ID passed' });
+  }
+
+  if (typeof req.body.fileName === 'string' && req.body.fileName) {
+    return res.status(400).json({ error: 'Invalid FileName' });
+  }
+
+  const id = Number(req.params.id);
+  const xml = `<wfs:Transaction
+    version="2.0.0"
+    service="WFS"
+    xmlns:cfi="cfi"
+    xmlns:fes="http://www.opengis.net/fes/2.0"
+    xmlns:gml="http://www.opengis.net/gml/3.2"
+    xmlns:wfs="http://www.opengis.net/wfs/2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd
+                        http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd">
+    <wfs:Delete typeName="cfi:documents">
+      <fes:Filter>
+        <fes:ResourceId rid="documents.${id}"/>
+      </fes:Filter>
+    </wfs:Delete>
+  </wfs:Transaction>`;
+
+  try {
+    const uploadResponse = await fetch('https://staging.fia.db.opendevcam.net/geoserver/wfs', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(GEOSERVER_AUTH.user + ':' + GEOSERVER_AUTH.password)
+      },
+      body: xml
+    });
+
+    console.log(uploadResponse);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ error: 'Something went wrong when trying to delete documents!' })
+  }
+
+  const fileName = req.body.fileName;
+  const directoryPath = process.env.NODE_PATH + '/assets/documents/';
+  console.log(fileName);
+  console.log(directoryPath);
+  try {
+    fs.unlinkSync(directoryPath + fileName);
+
+    return res.status(200).send({ message: 'Document is deleted.' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ error: 'Could not delete the document.' });
+  }
 }
 
-export default DocumentUpload;
+const Document = {
+  upload,
+  handleCreate,
+  handleDelete,
+}
+
+export default Document;

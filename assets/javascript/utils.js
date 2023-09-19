@@ -54,7 +54,7 @@ const Utils = {
         } catch (e) {
           throw new Error(text);
         }
-
+        console.log(data);
         if (data.error) {
           throw new Error(data.error);
         }

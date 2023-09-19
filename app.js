@@ -6,7 +6,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import cookieSession from 'cookie-session';
 import { rateLimit } from 'express-rate-limit'
 import bodyParser from 'body-parser';
-import DocumentUpload from './modules/document_upload.js';
+import Document from './modules/document.js';
 import Auth from './modules/auth.js';
 import ToggleLayer from './modules/toggle_layer.js';
 
@@ -77,7 +77,10 @@ app.get('/api/template', async function (req, res) {
   res.send('something went wrong');
 });
 
-app.post('/upload_files', DocumentUpload.upload.array('files'), DocumentUpload.handler);
+app.post('/admin/documents', Auth.validate, Document.upload.array('files'), Document.handleCreate);
+app.patch('/admin/documents/:id', Auth.validate, jsonParser, function (req, res) { });
+app.delete('/admin/documents/:id', Auth.validate, jsonParser, Document.handleDelete);
+
 
 app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 

@@ -274,3 +274,86 @@ body {
 .list-group input[type="checkbox"]:checked+.list-group-item:before {
   color: inherit;
 }
+
+.document-list {
+  display: flex;
+  list-style: none;
+  padding: 0;
+}
+
+.document-list-item {
+  margin: 5px;
+}
+
+.document-list-item a {
+  border: 1px solid;
+  text-align: left;
+  margin-bottom: 5px;
+  min-height: 180px;
+  width: 150px;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  color: #000;
+}
+
+.document-list-item a:hover {
+  color: darkgray;
+}
+
+.ribbon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  text-align: right;
+  display: inline-block;
+}
+
+.ribbon span {
+  font-size: 10px;
+  font-weight: bold;
+  color: #FFF;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 12px;
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+  width: 60px;
+  display: block;
+  background: #79A70A;
+  background: linear-gradient(#F70505 0%, #8F0808 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 12px;
+  right: -12px;
+}
+
+.ribbon span::before {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid #8F0808;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8F0808;
+}
+
+.ribbon span::after {
+  content: "";
+  position: absolute;
+  right: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #8F0808;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8F0808;
+}
