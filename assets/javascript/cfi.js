@@ -4,16 +4,17 @@ const map = L.map('map', {
 });
 
 L.control.scale().addTo(map);
+const mapLink = '<a href="http://www.esri.com/">Esri</a>';
+const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
 const BASE_MAP = {
   'Open Street Map': L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    },
-  ).addTo(map),
+    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
+    maxZoom: 20,
+  }).addTo(map),
 };
+
 const OVERLAY_MAP = {};
 const REGEX_YEAR = /(_(20)\d{2})$/s;
 let activePolygon = null;

@@ -49,7 +49,7 @@ const handleCreate = async function (req, res) {
     const cfiDocuments = xmlData['wfs:Transaction']['wfs:Insert'][0]['cfi:documents'][0];
     cfiDocuments['cfi:geom'][0]['gml:Point'][0]['gml:pos'] = req.body.pos;
     cfiDocuments['cfi:title'] = req.body.title;
-    cfiDocuments['cfi:title_en'] = req.body.titleEn;
+    cfiDocuments['cfi:title_en'] = req.body.title_en;
     cfiDocuments['cfi:contentType'] = req.files[0].mimetype;
     cfiDocuments['cfi:url'] = req.files[0].path.replace('assets', '');
 
@@ -80,7 +80,7 @@ const handleDelete = async function (req, res) {
     return res.status(400).json({ error: 'Invalid or no documents ID passed' });
   }
 
-  if (typeof req.body.fileName === 'string' && req.body.fileName) {
+  if (typeof req.body.fileName !== 'string' || !req.body.fileName) {
     return res.status(400).json({ error: 'Invalid FileName' });
   }
 
@@ -111,7 +111,6 @@ const handleDelete = async function (req, res) {
       body: xml
     });
 
-    console.log(uploadResponse);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ error: 'Something went wrong when trying to delete documents!' })
@@ -120,7 +119,7 @@ const handleDelete = async function (req, res) {
   const fileName = req.body.fileName;
   const directoryPath = process.env.NODE_PATH + '/assets/documents/';
   console.log(fileName);
-  console.log(directoryPath);
+  console.log(directoryPath + fileName);
   try {
     fs.unlinkSync(directoryPath + fileName);
 

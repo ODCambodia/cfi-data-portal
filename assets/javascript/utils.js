@@ -54,7 +54,7 @@ const Utils = {
         } catch (e) {
           throw new Error(text);
         }
-        console.log(data);
+
         if (data.error) {
           throw new Error(data.error);
         }
@@ -66,7 +66,7 @@ const Utils = {
       .catch((err) => {
         console.log(err);
         setTimeout(() => { alert(err.message); })
-      })
+      });
   },
   getQueryParam: function (key, isDisabled) {
     const urlParams = new URLSearchParams(window.location.search);

@@ -80,28 +80,30 @@
           </div>
           <div class="modal-body ">
             <div class="row g-3 mb-3">
-              <div class="col-6">
+              <div class="col-12">
                 <label for="titleInput" class="form-label">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
               </div>
-              <div class="col-6">
-                <label for="titleEnInput" class="form-label">អត្ថបទសង្ខេបអំពីឯកសារ</label>
-                <input type="text" cols="40" rows="5" class="form-control" id="titleEnInput">
+              <div class="col-12">
+                <label for="descriptionInput" class="form-label">អត្ថបទសង្ខេបអំពីឯកសារ</label>
+                <textarea id="descriptionInput" class="form-control" rows="3"></textarea>
               </div>
             </div>
-            <div class="text-center">
+            <div>
               <label for="formFile" class="d-block form-label text-start">ឯកសារ</label>
-              <label for="formFile" class="form-label text-center mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
-                  class="bi bi-file-earmark-arrow-up" role="button" viewBox="0 0 16 16">
-                  <path
-                    d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z" />
-                  <path
-                    d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
-                </svg>
-              </label>
-              <label for="formFile" class="btn">ជ្រើសរើសឯកសារ</label>
-              <input style="visibility:hidden;" type="file" id="formFile" name="fileUpload">
+              <div class="d-flex flex-column justify-content-center align-items-center text-center">
+                <label for="formFile" class="form-label text-center mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                    class="bi bi-file-earmark-arrow-up" role="button" viewBox="0 0 16 16">
+                    <path
+                      d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z" />
+                    <path
+                      d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                  </svg>
+                </label>
+                <label for="formFile" class="btn">ជ្រើសរើសឯកសារ</label>
+                <input class="visually-hidden" type="file" id="formFile" name="fileUpload" required>
+              </div>
             </div>
             <input type="hidden" name="positionInput" id="positionInput">
           </div>
@@ -129,20 +131,6 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
           <button type="submit" class="btn btn-primary">រក្សាទុក</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="editDocumentModal" tabindex="-1" aria-labelledby="editDocumentModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editDocumentModalLabel">កែឯកសារ</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
         </div>
       </div>
     </div>
@@ -262,26 +250,21 @@
       });
     }
 
-    function clearModalInputs() {
-      const inputs = document.querySelectorAll('#addDocumentModal form input');
-      for (let i = 0; i < inputs.length; i++) {
-        inputs[i].value = '';
-      }
-    }
-
     function handleShowAddDocumentModal(e) {
       const btn = e.relatedTarget;
       const form = document.querySelector(`#addDocumentModal form`);
+      form.reset();
       form.dataset.x = btn.dataset.x;
       form.dataset.y = btn.dataset.y;
 
-      clearModalInputs();
+      const label = form.querySelector('.btn[for="formFile"]');
+      label.innerText = 'ជ្រើសរើសឯកសារ';
     }
 
     function handleDeleteDocument(e) {
       const btnDel = e.currentTarget;
       const id = btnDel.value.split('.')[1];
-      const fileName = btnDel.dataset.url.split('/').slice(-1);
+      const fileName = btnDel.dataset.url.split('/').slice(-1)[0];
 
       if (!id) {
         return alert('No Document ID!');
@@ -302,7 +285,12 @@
       })
 
       Utils.handleFetchPromise(res, () => {
-        btnDel.parentNode.outerHTML = '';
+        if (btnDel.parentNode.parentNode.childNodes.length === 1) {
+          btnDel.parentNode.parentNode.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
+        } else {
+          btnDel.parentNode.outerHTML = '';
+        }
+
         alert('Success');
       });
     }
@@ -357,11 +345,6 @@
         a.href = doc.url;
         a.append(ribbon);
 
-        const btnEdit = document.createElement('button');
-        btnEdit.dataset.bsTarget = '#editDocumentModal';
-        btnEdit.classList.add('btn', 'btn-sm', 'btn-primary', 'float-start');
-        btnEdit.innerText = 'កែ';
-
         const btnDel = document.createElement('button');
         btnDel.value = item.id;
         btnDel.dataset.url = doc.url;
@@ -372,7 +355,6 @@
         const li = document.createElement('li');
         li.classList.add('document-list-item');
         li.append(a);
-        li.append(btnEdit);
         li.append(btnDel);
 
         ul.append(li);
@@ -385,10 +367,10 @@
       const currentForm = e.currentTarget;
       const fileInput = document.getElementById('formFile');
       const title = document.getElementById('titleInput');
-      const titleEn = document.getElementById('titleEnInput');
+      const description = document.getElementById('descriptionInput');
       const formData = new FormData();
       formData.append('title', title.value);
-      formData.append('titleEn', titleEn.value);
+      formData.append('title_en', description.value);
       formData.append('files', fileInput.files[0]);
       formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
 
@@ -407,7 +389,9 @@
         .catch((err) => {
           setTimeout(() => { alert('something went wrong'); })
         }).finally(() => {
-          clearModalInputs();
+          const label = document.querySelector('.btn[for="formFile"]');
+          label.innerText = 'ជ្រើសរើសឯកសារ';
+          currentForm.reset();
           modal.hide();
           submitBtn.removeAttribute('disabled');
         });
@@ -492,8 +476,8 @@
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
 
-      const createModal = document.getElementById('addDocumentModal');
-      createModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
+      const addModal = document.getElementById('addDocumentModal');
+      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
 
       const listModal = document.getElementById('listDocumentModal');
       listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
@@ -510,7 +494,22 @@
       activeLayerForm.addEventListener('submit', handleSubmitActiveLayerForm);
 
       const btnLogout = document.getElementById('btnLogout');
-      btnLogout.addEventListener('click', handleLogout)
+      btnLogout.addEventListener('click', handleLogout);
+
+      const formInput = document.getElementById('formFile');
+      formInput.addEventListener('change', function () {
+        if (formInput.files && formInput.files[0]) {
+          const label = document.querySelector('.btn[for="formFile"]');
+          label.innerText = 'កំពុងដំណើរការ';
+
+          const reader = new FileReader();
+          reader.readAsDataURL(formInput.files[0]);
+          reader.onload = function (e) {
+            const fileName = formInput.value.split("\\").slice('-1') || 'ឯកសារ';
+            label.innerText = fileName;
+          }
+        }
+      })
     });
   </script>
 </body>
