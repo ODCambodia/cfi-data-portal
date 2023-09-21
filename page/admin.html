@@ -209,6 +209,7 @@
           typeName: 'cfi:cambodian_provincial',
           outputFormat: 'application/json',
           propertyname: 'pro_name_k,hrname,pro_code',
+          SORTBY: 'pro_code ASC',
         },
       });
       const provinceSelect = document.getElementById('provinceSelect');
@@ -229,19 +230,30 @@
         const tbody = document.querySelector('#tableProfile table tbody');
         tbody.innerHTML = 'កំពុងដំណើរការ...';
 
-        const cfiResponse = await Utils.fetchGeoJson({
+        // refactor this into 1 fetch with better CQL filter
+        // fetching CFR directly would show cfi_reference in excluded cfi_boundary
+        const cfiBoundary = await Utils.fetchGeoJson({
+          data: {
+            typeName: 'cfi:cfi',
+            CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${val}'')')))`,
+            propertyname: 'name',
+          }
+        });
+
+        const cfisId = cfiBoundary.features.map((item) => item.id.split('.')[1]).join(`'',''`);
+        const cfiRefResponse = await Utils.fetchGeoJson({
           data: {
             typeName: 'cfi:cfi_reference',
-            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)`,
+            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfisId}'')')), 0, meters)`,
             propertyname: 'name,x,y',
           }
         });
-        const cfi = cfiResponse.features;
 
-        if (cfi.length > 0) {
+        const cfiReference = cfiRefResponse.features;
+        if (cfiReference.length > 0) {
+          cfiReference.sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
           tbody.innerHTML = '';
-
-          createRow(cfi).forEach((tr) => {
+          createRow(cfiReference).forEach((tr) => {
             tbody.append(tr);
           });
         } else {
@@ -311,7 +323,6 @@
         documentModalBody.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
         return;
       }
-
       const documentLayer = await Utils.fetchGeoJson({
         data: {
           typeName: '	cfi:documents',
