@@ -20,15 +20,15 @@
           <div class="card-body">
             <form id="formLogin">
               <div class="mb-4">
-                <label for="username" class="form-label">Username</label>
+                <label for="username" class="form-label">ឈ្មោះគណនី</label>
                 <input type="text" class="form-control" id="username" />
               </div>
               <div class="mb-4">
-                <label for="password" class="form-label">Password</label>
+                <label for="password" class="form-label">កូដសម្ងាត់</label>
                 <input type="password" class="form-control" id="password" />
               </div>
               <div class="text-end">
-                <button type="submit" class="btn d-inline-block btn-primary">Login</button>
+                <button type="submit" class="btn d-inline-block btn-primary">ចូល</button>
               </div>
             </form>
           </div>
@@ -73,7 +73,7 @@
             throw new Error(data.error);
           }
 
-          setTimeout(() => { alert('Success'); });
+          setTimeout(() => { alert('ជោគជ័យ'); });
           setTimeout(() => {
             window.location.href = '/admin/' + Utils.getServer();
           }, 500);
