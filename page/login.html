@@ -80,7 +80,9 @@
         })
         .catch((err) => {
           console.log(err);
-          setTimeout(() => { alert(err.message); })
+          setTimeout(() => { //alert(err.message); 
+          alert('ពត៌មានមិនត្រឹមត្រូវ សូមពិនិត្យមើលឈ្មោះគណនីឬកូដសម្ងាត់អោយបានត្រឹមត្រូវ រូចព្យាយាមម្តងទៀត។');
+          })
         }).finally(() => {
           submitBtn.removeAttribute('disabled');
         });
