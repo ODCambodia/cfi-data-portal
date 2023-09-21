@@ -94,12 +94,23 @@ async function loadProvinceCFR() {
   }
 }
 
-function init() {
-  loadProvinceCFR();
-  loadCFRMap().then(() => {
-    document.getElementById('loadingOverlay').classList.remove('is-active');
-    document.getElementById('provinceSelect').removeAttribute('disabled');
-  });
+async function loadSettings() {
+  const settings = await Promise.all([
+    Utils.fetchJson({ baseUrl: 'api/default-profile-layer/cfi' }),
+    Utils.fetchJson({ baseUrl: 'api/default-chart-layer/cfi' }),
+  ]);
+
+  defaultProfileTypeName = Object.keys(settings[0])[0];
+  defaultChartTypeName = Object.keys(settings[1])[0];
+}
+
+async function init() {
+  await Promise.all([
+    loadProvinceCFR(),
+    loadCFRMap(),
+    loadSettings(),
+  ]);
+  toggleLoading(false);
 }
 
 if (document.readyState !== 'loading') {

@@ -29,8 +29,7 @@ function writeJsonFileSync(fileName, content, encoding = 'utf8') {
   return isSucess;
 }
 
-function handleSaveActiveLayers(req, res) {
-  const key = req.param.key || 'cfi';
+function saveLayer(req, res, key) {
   const jsonBody = req.body;
 
   try {
@@ -50,8 +49,7 @@ function handleSaveActiveLayers(req, res) {
   }
 }
 
-function handleGetActiveLayers(req, res) {
-  const key = req.param.key || 'cfi';
+function getLayer(req, res, key) {
   let obj = null;
 
   try {
@@ -68,11 +66,32 @@ function handleGetActiveLayers(req, res) {
   return res.status(200).json(obj);
 }
 
+function handleSaveLayer(req, res, key) {
+  const jsonKey = (req.param.key || 'cfi') + key;
+
+  if (key) {
+    return saveLayer(req, res, jsonKey);
+  }
+
+  return res.end();
+}
+
+function handleGetLayer(req, res, key) {
+  const jsonKey = (req.param.key || 'cfi') + key;
+
+  if (key) {
+    return getLayer(req, res, jsonKey);
+  }
+
+  return res.end();
+}
+
+
 const ToggleLayer = {
   readJsonFileSync,
   writeJsonFileSync,
-  handleGetActiveLayers,
-  handleSaveActiveLayers
+  handleGetLayer,
+  handleSaveLayer,
 }
 
 // export custom middleware

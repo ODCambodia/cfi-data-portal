@@ -103,7 +103,26 @@
         const script = document.createElement("script");
         script.type = "text/javascript";
         script.src = SERVER === 'cfi' ? '/javascript/cfi.js' : '/javascript/cfr.js';
-        document.body.appendChild(script);
+        let defaultProfileTypeName = 'cfi:cfi_profiles_2023';
+        let defaultChartTypeName = 'cfi:cfi_demography_2018';
+
+        (async function loadSettings() {
+            const settings = await Promise.all([
+                Utils.fetchJson({ baseUrl: 'api/default-profile-layer/' + SERVER }),
+                Utils.fetchJson({ baseUrl: 'api/default-chart-layer/' + SERVER }),
+            ]);
+
+            defaultProfileTypeName = Object.keys(settings[0])[0];
+            defaultChartTypeName = Object.keys(settings[1])[0];
+        })().then(() => {
+            document.body.appendChild(script);
+        })
+
+        function toggleLoading(shouldShow) {
+            document
+                .getElementById('loadingOverlay')
+                .classList.toggle('is-active', shouldShow);
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
             const modal = document.getElementById('cfiModal');

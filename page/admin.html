@@ -38,7 +38,6 @@
           <table class="table table-striped table-hover">
             <thead>
               <tr>
-
                 <th>ឈ្មោះសហគមន៍</th>
                 <th>សកម្មភាព</th>
               </tr>
@@ -51,16 +50,35 @@
 
       <!-- Profile -->
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <p><strong>This is some placeholder content the Profile tab's associated content.</strong></p>
+        <form action="/api/default-profile-layer" id="defaultProfileForm"
+          class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <div class="list-group my-2">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form>
+
+        <form action="/api/default-chart-layer" id="defaultChartForm"
+          class="shadow border border-opacity-50 border-black rounded-3 p-3">
+          <div class="list-group my-2">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form>
       </div>
 
       <!-- Layer -->
       <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
-        <form id="toggleLayerForm">
+        <form action="/api/active-layers" id="toggleLayerForm">
           <div class="list-group mb-2">
+            កំពុងដំណើរការ...
           </div>
           <div class="text-end">
-            <button type="submit" class="btn btn-primary">Save Setting</button>
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
           </div>
         </form>
       </div>
@@ -141,8 +159,11 @@
     crossorigin="anonymous"></script>
   <script src="/javascript/utils.js"></script>
   <script>
+    const REGEX_YEAR = /(_(20)\d{2})$/s;
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfi/ows`;
+    let hasLoadedActiveLayerTab = false;
+    let hasLoadedProfileTab = false;
 
     function createActionBtns(cfi) {
       const btn = document.createElement('button');
@@ -151,7 +172,6 @@
       btn.innerText = 'បន្ថែមឯកសារ';
       btn.dataset.bsToggle = 'modal';
       btn.dataset.bsTarget = '#addDocumentModal';
-      console.log(cfi);
       btn.dataset.x = cfi.properties.x;
       btn.dataset.y = cfi.properties.y;
 
@@ -166,14 +186,14 @@
       return [btn, btnList];
     }
 
-    function getCheckBoxDOM(isChecked, value, title, index) {
+    function getCheckBoxDOM(isChecked, value, title, index, typeName, inputType) {
       const checkBox = document.createElement('input');
-      checkBox.id = 'layerCheckBox' + index;
-      checkBox.setAttribute('type', 'checkbox');
-      checkBox.setAttribute('name', 'activeLayers[]');
-      checkBox.checked = isChecked;
+      checkBox.id = 'layer' + typeName + index;
+      checkBox.setAttribute('type', inputType);
+      checkBox.setAttribute('name', `layer${typeName}[]`);
       checkBox.value = value;
-      checkBox.classList.add('layer-check-box');
+      checkBox.classList.add('list-group-input');
+      checkBox.checked = isChecked;
 
       const label = document.createElement('label');
       label.setAttribute('for', checkBox.id);
@@ -408,21 +428,22 @@
         });
     }
 
-    function handleSubmitActiveLayerForm(e) {
+    function handleSubmitLayerForm(e) {
       e.preventDefault();
-      const submitBtn = document.querySelector('#nav-layer form button[type="submit"]');
+      const form = e.currentTarget;
+      const submitBtn = form.querySelector(`button[type="submit"]`);
       const prevBtnText = submitBtn.textContent;
       submitBtn.setAttribute('disabled', true);
-      submitBtn.innerText = 'Saving...';
+      submitBtn.innerText = 'កំពុងដំណើរការ...';
 
-      const selectedActiveLayers = document.querySelectorAll('.layer-check-box:checked');
+      const selectedActiveLayers = form.querySelectorAll(`input.list-group-input:checked`);
       const reqBody = {}
       for (let i = 0; i < selectedActiveLayers.length; i++) {
         reqBody[selectedActiveLayers[i].value] = true;
       }
-
       const jsonBody = JSON.stringify(reqBody);
-      const res = fetch("/api/active-layers/" + SERVER, {
+      const url = form.getAttribute('action') + '/' + SERVER
+      const res = fetch(url, {
         method: 'POST',
         body: jsonBody,
         headers: {
@@ -455,31 +476,31 @@
       });
     }
 
-    async function loadLayerSettings() {
+    async function loadSettings(baseUrl, formId, listDomType, validateNameCallBack) {
       const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
         Utils.fetchXml({
           baseUrl: '/geoserver/cfi/wfs',
           data: { request: 'GetCapabilities' },
         }),
-        Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
+        Utils.fetchJson({ baseUrl })
       ]);
 
-      const REGEX_YEAR = /(_(20)\d{2})$/s;
       const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
-      const checkBoxListDom = document.querySelector('#nav-layer .list-group');
+      const listGroupDom = document.querySelector(`#${formId} .list-group`);
+      listGroupDom.innerHTML = '';
 
       for (let i = 0; i < featureTypes.length; i++) {
         const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
         const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
-        if (!REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact')) {
+        if (validateNameCallBack(name)) {
           continue;
         }
 
-        const isActiveLayer = typeof activeLayersObj[name] !== 'undefined'
-        const checkBox = getCheckBoxDOM(isActiveLayer, name, title, i);
+        const isActiveLayer = typeof activeLayersObj[name] !== 'undefined';
+        const listInput = getCheckBoxDOM(isActiveLayer, name, title, i, formId, listDomType);
 
-        checkBoxListDom.append(checkBox.input);
-        checkBoxListDom.append(checkBox.label);
+        listGroupDom.append(listInput.input);
+        listGroupDom.append(listInput.label);
       }
     }
 
@@ -499,10 +520,48 @@
       const form = document.getElementById('form');
       form.addEventListener('submit', handleFormSubmit);
 
-      await loadLayerSettings();
 
+      // set active layers
       const activeLayerForm = document.getElementById('toggleLayerForm');
-      activeLayerForm.addEventListener('submit', handleSubmitActiveLayerForm);
+      const activeLayerTabBtn = document.getElementById('nav-layer-tab');
+      activeLayerForm.addEventListener('submit', handleSubmitLayerForm);
+      activeLayerTabBtn.addEventListener('click', function (e) {
+        if (!hasLoadedActiveLayerTab) {
+          hasLoadedActiveLayerTab = true;
+          const header = document.createTextNode('ជ្រើសរើសសំន៉ំទិន្នន័យពាក់ព័ន្ធដើម្បីបង្ហាញ');
+          const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
+          listGroupDom.parentElement.prepend(header);
+          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'));
+        }
+      })
+
+      // set default profile layer
+      const defaultProfileForm = document.getElementById('defaultProfileForm');
+      const defaultProfileTab = document.getElementById('nav-profile-tab');
+      defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
+      defaultProfileTab.addEventListener('click', function (e) {
+        if (!hasLoadedProfileTab) {
+          // jesus this is terrible code
+          // no time though
+          // refactor later
+          hasLoadedProfileTab = true;
+          const profileHeader = document.createTextNode('ជ្រើសរើសProfileដើម្បីបង្ហាញ');
+          const profileList = document.querySelector(`#defaultProfileForm .list-group`);
+          profileList.parentElement.prepend(profileHeader);
+          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('profile'));
+
+          const defaultProfileForm = document.getElementById('defaultProfileForm');
+          defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
+
+          const demographyHeader = document.createTextNode('ជ្រើសរើសChartដើម្បីបង្ហាញ');
+          const demographyList = document.querySelector(`#defaultChartForm .list-group`);
+          demographyList.parentElement.prepend(demographyHeader);
+          loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('demography'));
+
+          const defaultChartForm = document.getElementById('defaultChartForm');
+          defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
+        }
+      });
 
       const btnLogout = document.getElementById('btnLogout');
       btnLogout.addEventListener('click', handleLogout);

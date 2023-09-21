@@ -8,7 +8,7 @@ import { rateLimit } from 'express-rate-limit'
 import bodyParser from 'body-parser';
 import Document from './modules/document.js';
 import Auth from './modules/auth.js';
-import ToggleLayer from './modules/toggle_layer.js';
+import LayerSettings from './modules/toggle_layer.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,14 +20,15 @@ const rateLimiter = rateLimit({
   standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
-
-app.set('trust proxy', 1) // trust first proxy
-app.use(express.static('assets'));
-app.use(cookieSession({
+const COOKIE_SESSION = {
   name: 'session',
   keys: [process.env.SECRET],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}));
+};
+
+app.set('trust proxy', 1) // trust first proxy
+app.use(express.static('assets'));
+app.use(cookieSession(COOKIE_SESSION));
 
 app.use(Auth.appendUserToken);
 
@@ -90,10 +91,14 @@ app.get('/login/:key', function (req, res) {
 
 app.post('/logout', Auth.handleLogout);
 
-app.get('/api/active-layers/:key', ToggleLayer.handleGetActiveLayers);
+app.get('/api/active-layers/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_related_layers'));
+app.post('/api/active-layers/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_related_layers'));
 
-app.post('/api/active-layers/:key', Auth.validate, jsonParser, ToggleLayer.handleSaveActiveLayers);
+app.get('/api/default-profile-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_profile'));
+app.post('/api/default-profile-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_profile'));
 
+app.get('/api/default-chart-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_chart'));
+app.post('/api/default-chart-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_chart'));
 
 app.listen(port);
 

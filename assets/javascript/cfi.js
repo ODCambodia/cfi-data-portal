@@ -36,12 +36,6 @@ function showActivePolygon(layer) {
   layer.setStyle(POLYGON_STYLE.active);
 }
 
-function toggleLoading(shouldShow) {
-  document
-    .getElementById('loadingOverlay')
-    .classList.toggle('is-active', shouldShow);
-}
-
 function getDownloadDom(href) {
   const a = document.createElement('a');
   a.href = href;
@@ -105,7 +99,7 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: 'cfi:cfi_demography_2018',
+      typeName: defaultProfileTypeName,
       id: 'populationPieChart',
       title: 'ចំនួនប្រជាសហគមន៍',
       labels: ['ស្រី', 'ប្រុស'],
@@ -378,7 +372,7 @@ function addBoundaryClickEvent() {
 
     const cfiProfile = await Utils.fetchGeoJson({
       data: {
-        typeName: 'cfi:cfi_profiles_2023',
+        typeName: defaultProfileTypeName,
         SORTBY: 'name ASC',
         CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
       },
@@ -397,7 +391,7 @@ async function handleCfiSelect(e) {
   document.querySelector('.about__body').innerHTML = '';
   const cfiProfile = await Utils.fetchGeoJson({
     data: {
-      typeName: 'cfi:cfi_profiles_2023',
+      typeName: defaultProfileTypeName,
       CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
     },
   });

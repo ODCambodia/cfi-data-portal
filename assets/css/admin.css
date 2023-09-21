@@ -246,11 +246,18 @@ body {
   user-select: none;
 }
 
-.list-group input[type="checkbox"] {
+.list-group-item:first-of-type {
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.list-group input[type="checkbox"],
+.list-group input[type="radio"] {
   display: none;
 }
 
-.list-group input[type="checkbox"]+.list-group-item {
+.list-group input[type="checkbox"]+.list-group-item,
+.list-group input[type="radio"]+.list-group-item {
   cursor: pointer;
 }
 
@@ -261,12 +268,21 @@ body {
   margin-right: 1em;
 }
 
+.list-group input[type="radio"]:checked+.list-group-item:before {
+  content: "\25CF";
+  font-weight: normal;
+  color: #fff;
+  font-weight: bold;
+  margin-right: 1em;
+}
+
 .list-group input[type="checkbox"]:checked+.list-group-item:before {
   content: "\2611";
   font-weight: normal;
 }
 
-.list-group input[type="checkbox"]:checked+.list-group-item {
+.list-group input[type="checkbox"]:checked+.list-group-item,
+.list-group input[type="radio"]:checked+.list-group-item {
   background-color: #0275D8;
   color: #FFF;
 }
