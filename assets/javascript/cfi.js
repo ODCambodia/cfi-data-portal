@@ -16,7 +16,7 @@ const BASE_MAP = {
 };
 
 const OVERLAY_MAP = {};
-const REGEX_YEAR = /(_(20)\d{2})$/s;
+const REGEX_YEAR = /(_(20)\d{2})/s;
 let activePolygon = null;
 
 function showActivePolygon(layer) {
