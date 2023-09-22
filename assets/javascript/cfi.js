@@ -99,7 +99,7 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: defaultProfileTypeName,
+      typeName: 'cfi:cfi_demography_2018',
       id: 'populationPieChart',
       title: 'ចំនួនប្រជាសហគមន៍',
       labels: ['ស្រី', 'ប្រុស'],
@@ -119,6 +119,7 @@ const DemoGraphyChart = (function () {
     });
 
     if (!response.features.length > 0) {
+      document.getElementById(chartConfig.id).remove();
       return;
     }
 
@@ -127,12 +128,16 @@ const DemoGraphyChart = (function () {
     const femaleCount = data.properties[chartConfig.propertyKeys.female];
     const maleCount = data.properties[chartConfig.propertyKeys.total] - femaleCount;
 
-    CustomCharts.pieChart(
-      chartConfig.id,
-      chartConfig.title,
-      chartConfig.labels,
-      [femaleCount, maleCount],
-    );
+    if (femaleCount && maleCount) {
+      CustomCharts.pieChart(
+        chartConfig.id,
+        chartConfig.title,
+        chartConfig.labels,
+        [femaleCount, maleCount],
+      );
+    } else {
+      document.getElementById(chartConfig.id).remove();
+    }
   }
 
   function loadAllChart(cfiId) {

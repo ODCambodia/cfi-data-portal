@@ -158,10 +158,13 @@ const CustomCharts = {
     pieHeader.innerText = title;
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';
-
+    pieHeader.style.paddingTop = '5px';
+    
     const canvas = document.getElementById(selectorId);
     canvas.parentNode.insertBefore(pieHeader, canvas);
-
+    canvas.style.paddingBottom = '10px';
+    canvas.style.borderBottom = '1px dashed #000';
+    
     return new Chart(canvas, { type: 'pie', data: pieData });
   },
   barChart: function (selectorId) {
