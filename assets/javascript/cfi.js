@@ -99,7 +99,7 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: 'cfi:cfi_demography_2018',
+      typeName: defaultChartTypeName,
       id: 'populationPieChart',
       title: 'ចំនួនប្រជាសហគមន៍',
       labels: ['ស្រី', 'ប្រុស'],
@@ -231,36 +231,50 @@ async function loadRelatedLayers(cfiId) {
     Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
   ]);
 
-
-
-  const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
   const ul = document.createElement('ul');
-  let hasOneLayerShowing = false;
+  const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
+  const relatedFeatureTypes = Array.from(featureTypes).filter(featureType => {
+    const name = featureType.getElementsByTagName('Name')[0].textContent;
 
-  for (let i = 0; i < featureTypes.length; i++) {
-    const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
-    const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
-
-    if (
-      typeof layersToShow[name] === 'undefined' ||
+    return !(layersToShow[name] === undefined ||
       !REGEX_YEAR.test(name) ||
       name.includes('profile') ||
-      name.includes('contact')) {
-      continue;
-    }
-    hasOneLayerShowing = true;
+      name.includes('contact'))
+  });
 
-    const li = document.createElement('li');
-    li.textContent = title;
-    li.dataset.name = name;
-    li.dataset.cfiId = cfiId;
-    li.addEventListener('click', handleRelatedLayerClick);
-    ul.append(li);
-  }
+  const relatedTypeName = relatedFeatureTypes.map((item => {
+    const typeName = item.getElementsByTagName('Name')[0].textContent;
+    return Utils.fetchXml({
+      baseUrl: '/geoserver/cfi/wfs',
+      data: {
+        typeName,
+        version: '1.1.0',
+        request: 'GetFeature',
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+        resultType: 'hits',
+      },
+    });
+  }));
 
-  if (hasOneLayerShowing) {
+  const featureCountArr = await Promise.all(relatedTypeName);
+  const hasLayerToShow = featureCountArr.some(item => Number(item.childNodes[0].getAttribute('numberOfFeatures')) > 0);
+  if (hasLayerToShow) {
     document.getElementById('relatedLayers').append(ul);
     document.getElementById('relatedLayers').parentElement.classList.remove('d-none');
+
+    relatedFeatureTypes.forEach((featureType, i) => {
+      const hasRelatedData = Number(featureCountArr[i].childNodes[0].getAttribute('numberOfFeatures')) > 0;
+      if (hasRelatedData) {
+        const name = featureType.getElementsByTagName('Name')[0].textContent;
+        const title = featureType.getElementsByTagName('Title')[0].textContent;
+        const li = document.createElement('li');
+        li.textContent = title;
+        li.dataset.name = name;
+        li.dataset.cfiId = cfiId;
+        li.addEventListener('click', handleRelatedLayerClick);
+        ul.append(li);
+      }
+    });
   }
 
   return [...featureTypes]

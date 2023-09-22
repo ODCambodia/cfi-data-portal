@@ -110,6 +110,7 @@ async function init() {
     loadCFRMap(),
     loadSettings(),
   ]);
+  document.getElementById('provinceSelect').removeAttribute('disabled');
   toggleLoading(false);
 }
 
