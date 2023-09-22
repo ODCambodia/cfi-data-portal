@@ -299,11 +299,11 @@
       const fileName = btnDel.dataset.url.split('/').slice(-1)[0];
 
       if (!id) {
-        return alert('No Document ID!');
+        return alert('មិនអាចលុបបាន រកមិនឃើញអត្តសញ្ញាណរបស់ឯកសារ។');
       }
 
       if (!fileName) {
-        return alert('No Filename!');
+        return alert('មិនអាចលុបបាន ឈ្មោះឯកសារមិនត្រឹមត្រូវ។');
       }
 
       btnDel.setAttribute('disabled', true);
@@ -323,7 +323,7 @@
           btnDel.parentNode.outerHTML = '';
         }
 
-        alert('Success');
+        alert('ទិន្នន័យត្រូវការរក្សាទុកដោយជោគជ័យ');
       });
     }
 
@@ -415,10 +415,10 @@
         body: formData,
       })
         .then((res) => {
-          setTimeout(() => { alert('Success'); })
+          setTimeout(() => { alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ'); })
         })
         .catch((err) => {
-          setTimeout(() => { alert('something went wrong'); })
+          setTimeout(() => { alert('ការរក្សាទុកមានបញ្ញា សូមពិនិត្យទិន្នន័យរូចធ្វើការព្យាយាមម្តងទៀត។'); })
         }).finally(() => {
           const label = document.querySelector('.btn[for="formFile"]');
           label.innerText = 'ជ្រើសរើសឯកសារ';
@@ -452,7 +452,7 @@
       });
 
       Utils.handleFetchPromise(res, () => {
-        alert('Success');
+        alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ');
       }).finally(() => {
         submitBtn.removeAttribute('disabled');
         submitBtn.innerText = prevBtnText;
