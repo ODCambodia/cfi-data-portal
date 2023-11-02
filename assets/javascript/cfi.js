@@ -466,6 +466,7 @@ async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
 
+
   const selectedProvinceId = e.currentTarget.value;
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
@@ -490,6 +491,10 @@ async function handleProvinceSelect(e) {
   addBoundaryClickEvent();
   toggleLoading(false);
   map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
+
+  // load number of CFI
+  const label = document.getElementById('cfiCount');
+  label.textContent = `(#${cfiBoundary.numberReturned})`;
 }
 
 async function loadProvince() {

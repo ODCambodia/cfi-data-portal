@@ -239,6 +239,10 @@ async function loadCFRSelect(options) {
     showCFR_A(e.layer);
   });
 
+  // load number of CFR
+  const label = document.getElementById('cfiCount');
+  label.textContent = `(#${cfr_data.numberReturned})`;
+
   const cfiSelect = document.getElementById('cfiSelect');
 
   cfr_data.features.forEach((item) => {
@@ -286,6 +290,9 @@ async function loadProvinceCFR() {
     });
 
     provinceSelect.addEventListener('change', async function (e) {
+      document.body.querySelector('.about__wrapper').classList.remove('active');
+      document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+
       const val = e.currentTarget.value;
       OVERLAY_MAP[KEYS.CFR_A].remove();
 
