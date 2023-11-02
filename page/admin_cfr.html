@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+  <div class="card p-3 shadow w-100 h-100">
+    <button id="btnLogout" class="btn btn-sm btn-primary" type="button">ចេញពីទំព័រគ្រប់គ្រង</button>
+    <nav>
+      <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
+          role="tab" aria-controls="nav-home" aria-selected="true">កំណត់ឯកសារពាក់ព័ន្ធ</button>
+        <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
+          role="tab" aria-controls="nav-profile" aria-selected="false">កំណត់ផ្ទំាងពត៌មានសហគមន៍</button>
+        <button class="nav-link" id="nav-layer-tab" data-bs-toggle="tab" data-bs-target="#nav-layer" type="button"
+          role="tab" aria-controls="nav-contact" aria-selected="false">កំណត់សំន៉ំទិន្នន័យពាក់ព័ន្ធ</button>
+      </div>
+    </nav>
+    <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
+      <!-- Home -->
+      <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+        <div class="mb-2">
+          <label class="d-inline-block" for="">ជ្រើសរើសខេត្តឬក្រុង</label>
+          <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
+        </div>
+
+        <div id="tableProfile" class="table-wrapper d-none">
+          <div class="table-title mb-2">
+            <h2>សហគមន៍នេសាទ</h2>
+          </div>
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>ឈ្មោះសហគមន៍</th>
+                <th>សកម្មភាព</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Profile -->
+      <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <form action="/api/default-profile-layer" id="defaultProfileForm"
+          class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <div class="list-group my-2">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form>
+
+        <!-- <form action="/api/default-chart-layer" id="defaultChartForm"
+          class="shadow border border-opacity-50 border-black rounded-3 p-3">
+          <div class="list-group my-2">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form> -->
+      </div>
+
+      <!-- Layer -->
+      <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
+        <form action="/api/active-layers" id="toggleLayerForm">
+          <div class="list-group mb-2">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add Modal -->
+  <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="form">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addDocumentModalLabel">ឯកសារពាក់ព័ន្ធ</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body ">
+            <div class="row g-3 mb-3">
+              <div class="col-12">
+                <label for="titleInput" class="form-label">ចំណងជើងឯកសារ</label>
+                <input type="text" class="form-control" id="titleInput" required>
+              </div>
+              <div class="col-12">
+                <label for="descriptionInput" class="form-label">អត្ថបទសង្ខេបអំពីឯកសារ</label>
+                <textarea id="descriptionInput" class="form-control" rows="3"></textarea>
+              </div>
+            </div>
+            <div>
+              <label for="formFile" class="d-block form-label text-start">ឯកសារ</label>
+              <div class="d-flex flex-column justify-content-center align-items-center text-center">
+                <label for="formFile" class="form-label text-center mb-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
+                    class="bi bi-file-earmark-arrow-up" role="button" viewBox="0 0 16 16">
+                    <path
+                      d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z" />
+                    <path
+                      d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                  </svg>
+                </label>
+                <label for="formFile" class="btn">ជ្រើសរើសឯកសារ</label>
+                <input class="visually-hidden" type="file" id="formFile" name="fileUpload" required>
+              </div>
+            </div>
+            <input type="hidden" name="positionInput" id="positionInput">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
+            <button id="addFormBtn" type="submit" class="btn btn-primary">រក្សាទុក</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- List Modal -->
+  <div class="modal fade" id="listDocumentModal" tabindex="-1" aria-labelledby="listDocumentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="listDocumentModalLabel">ឯកសារពាក់ព័ន្ធ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
+          <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+  <script src="/javascript/utils.js"></script>
+  <script>
+    const REGEX_YEAR = /(_(20)\d{2})/s;
+    const SERVER = Utils.getServer();
+    const GEOSERVER = `/geoserver/cfr/ows`;
+    let hasLoadedActiveLayerTab = false;
+    let hasLoadedProfileTab = false;
+
+    function createActionBtns(cfi) {
+      const btn = document.createElement('button');
+      btn.type = "button";
+      btn.classList.add('btn', 'btn-primary');
+      btn.innerText = 'បន្ថែមឯកសារ';
+      btn.dataset.bsToggle = 'modal';
+      btn.dataset.bsTarget = '#addDocumentModal';
+      btn.dataset.val = encodeURIComponent(JSON.stringify(cfi));
+      btn.dataset.x = cfi.geometry.coordinates[0];
+      btn.dataset.y = cfi.geometry.coordinates[1];
+
+      const btnList = btn.cloneNode();
+      btnList.innerText = 'កែសម្រួលឯកសារ';
+      btnList.dataset.bsTarget = '#listDocumentModal';
+      btnList.dataset.id = cfi.id;
+
+      btn.classList.add('btn-primary', 'me-2');
+      btnList.classList.add('btn-warning');
+
+      return [btn, btnList];
+    }
+
+    function getCheckBoxDOM(isChecked, value, title, index, typeName, inputType) {
+      const checkBox = document.createElement('input');
+      checkBox.id = 'layer' + typeName + index;
+      checkBox.setAttribute('type', inputType);
+      checkBox.setAttribute('name', `layer${typeName}[]`);
+      checkBox.value = value;
+      checkBox.classList.add('list-group-input');
+      checkBox.checked = isChecked;
+
+      const label = document.createElement('label');
+      label.setAttribute('for', checkBox.id);
+      label.classList.add('list-group-item');
+      label.innerText = title;
+
+      return { input: checkBox, label };
+    }
+
+    function createRow(cfi) {
+      const rows = [];
+      for (let i = 0; i < cfi.length; i++) {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.innerText = cfi[i].properties.cfr_name;
+
+        const tdBtns = document.createElement('td');
+        const btns = createActionBtns(cfi[i]);
+        btns.forEach((btn) => tdBtns.append(btn));
+
+        tr.append(tdName);
+        tr.append(tdBtns);
+        rows.push(tr);
+      }
+
+      return rows;
+    }
+
+    async function loadProvincesSelect() {
+      const data = await Utils.fetchGeoJson({
+        data: {
+          typeName: 'cfr:cambodian_provincial',
+          outputFormat: 'application/json',
+          propertyname: 'ADM1_EN,ADM1_PCODE',
+          SORTBY: 'ADM1_PCODE ASC',
+        },
+      });
+      const provinceSelect = document.getElementById('provinceSelect');
+
+      // append options to select
+      provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+      data.features.forEach((item) => {
+        const option = document.createElement('option');
+        option.text = item.properties.ADM1_EN;
+        option.value = item.id;
+        provinceSelect.append(option);
+      });
+
+      provinceSelect.addEventListener('change', async function (e) {
+        const val = e.currentTarget.value;
+        document.getElementById('tableProfile').classList.remove('d-none');
+
+        const tbody = document.querySelector('#tableProfile table tbody');
+        tbody.innerHTML = 'កំពុងដំណើរការ...';
+
+        const cfrResponse = await Utils.fetchGeoJson({
+          data: {
+            srsname: 'EPSG:32648',
+            typeName: 'cfr:cfr_wf_assessment_2022',
+            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)`,
+          }
+        });
+
+        const cfrReference = cfrResponse.features;
+        if (cfrReference.length > 0) {
+          cfrReference.sort((a, b) => a.properties.cfr_name.localeCompare(b.properties.name, 'km-KH'));
+          tbody.innerHTML = '';
+          createRow(cfrReference).forEach((tr) => {
+            tbody.append(tr);
+          });
+        } else {
+          tbody.innerHTML = 'ខេត្តនេះមិនមានសហគមន៍នេសាទ។';
+        }
+      });
+    }
+
+    function handleShowAddDocumentModal(e) {
+      const btn = e.relatedTarget;
+      console.log(JSON.parse(decodeURIComponent(btn.dataset.val)));
+      const form = document.querySelector(`#addDocumentModal form`);
+      form.reset();
+      form.dataset.x = btn.dataset.x;
+      form.dataset.y = btn.dataset.y;
+
+      const label = form.querySelector('.btn[for="formFile"]');
+      label.innerText = 'ជ្រើសរើសឯកសារ';
+    }
+
+    function handleDeleteDocument(e) {
+      const btnDel = e.currentTarget;
+      const id = btnDel.value.split('.')[1];
+      const fileName = btnDel.dataset.url.split('/').slice(-1)[0];
+
+      if (!id) {
+        return alert('មិនអាចលុបបាន រកមិនឃើញអត្តសញ្ញាណរបស់ឯកសារ។');
+      }
+
+      if (!fileName) {
+        return alert('មិនអាចលុបបាន ឈ្មោះឯកសារមិនត្រឹមត្រូវ។');
+      }
+
+      btnDel.setAttribute('disabled', true);
+      btnDel.innerText = 'កំពុងដំណើរការ...';
+      const res = fetch(`/admin/documents/cfr/${id}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ fileName }),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      })
+
+      Utils.handleFetchPromise(res, () => {
+        if (btnDel.parentNode.parentNode.childNodes.length === 1) {
+          btnDel.parentNode.parentNode.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
+        } else {
+          btnDel.parentNode.outerHTML = '';
+        }
+
+        alert('ឯកសារត្រូវលុបបានដោយជោគជ័យ');
+      });
+    }
+
+    async function handleShownListDocumentModal(e) {
+      const btn = e.relatedTarget;
+      const documentModalBody = document.querySelector('#listDocumentModal .modal-body');
+      // There should be a better way to do this
+      console.log(btn);
+      const documentLayer = await Utils.fetchGeoJson({
+        data: {
+          typeName: '	cfr:documents',
+          CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_wf_assessment_2022','geom','IN(''${btn.dataset.id}'')')), 1, meters)`,
+        }
+      });
+
+      if (!documentLayer.features.length > 0) {
+        documentModalBody.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
+        return;
+      }
+
+      // show list of documents
+      documentModalBody.innerHTML = '';
+      const ul = document.createElement('ul');
+      ul.classList.add('document-list')
+
+      documentLayer.features.forEach((item) => {
+        const doc = item.properties;
+        const ext = '.' + doc.url.split('.')[1];
+
+        const span = document.createElement('span');
+        span.innerText = ext;
+
+        const ribbon = document.createElement('div');
+        ribbon.classList.add('ribbon');
+        ribbon.append(span);
+
+        const a = document.createElement('a');
+        a.innerText = doc.title + (ext || '');
+        a.href = doc.url;
+        a.append(ribbon);
+
+        const btnDel = document.createElement('button');
+        btnDel.value = item.id;
+        btnDel.dataset.url = doc.url;
+        btnDel.addEventListener('click', handleDeleteDocument);
+        btnDel.classList.add('btn', 'btn-sm', 'btn-danger', 'float-end');
+        btnDel.innerText = 'លុប';
+
+        const li = document.createElement('li');
+        li.classList.add('document-list-item');
+        li.append(a);
+        li.append(btnDel);
+
+        ul.append(li);
+      })
+      documentModalBody.append(ul);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const currentForm = e.currentTarget;
+      const fileInput = document.getElementById('formFile');
+      const title = document.getElementById('titleInput');
+      const description = document.getElementById('descriptionInput');
+      const formData = new FormData();
+      formData.append('title', title.value);
+      formData.append('title_en', description.value);
+      formData.append('files', fileInput.files[0]);
+      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      const modalEl = document.getElementById('addDocumentModal');
+      const modal = bootstrap.Modal.getInstance(modalEl);
+      const submitBtn = document.querySelector('#addFormBtn');
+      submitBtn.setAttribute('disabled', true);
+
+      fetch("/admin/documents/cfr", {
+        method: 'POST',
+        body: formData,
+      })
+        .then(function (response) {
+          if (response.ok) {
+            setTimeout(() => { alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ'); }, 0)
+            return response.text();
+          }
+
+          throw new Error('Something went wrong.');
+        })
+        .catch((err) => {
+          setTimeout(() => { alert('ការរក្សាទុកមានបញ្ញា សូមពិនិត្យទិន្នន័យរូចធ្វើការព្យាយាមម្តងទៀត។'); }, 0)
+        }).finally(() => {
+          const label = document.querySelector('.btn[for="formFile"]');
+          label.innerText = 'ជ្រើសរើសឯកសារ';
+          currentForm.reset();
+          modal.hide();
+          submitBtn.removeAttribute('disabled');
+        });
+    }
+
+    function handleSubmitLayerForm(e) {
+      e.preventDefault();
+      const form = e.currentTarget;
+      const submitBtn = form.querySelector(`button[type="submit"]`);
+      const prevBtnText = submitBtn.textContent;
+      submitBtn.setAttribute('disabled', true);
+      submitBtn.innerText = 'កំពុងដំណើរការ...';
+
+      const selectedActiveLayers = form.querySelectorAll(`input.list-group-input:checked`);
+      const reqBody = {}
+      for (let i = 0; i < selectedActiveLayers.length; i++) {
+        reqBody[selectedActiveLayers[i].value] = true;
+      }
+      const jsonBody = JSON.stringify(reqBody);
+      const url = form.getAttribute('action') + '/' + SERVER
+      const res = fetch(url, {
+        method: 'POST',
+        body: jsonBody,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      Utils.handleFetchPromise(res, () => {
+        alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ');
+      }).finally(() => {
+        submitBtn.removeAttribute('disabled');
+        submitBtn.innerText = prevBtnText;
+      });
+    }
+
+    function handleLogout() {
+      const res = fetch('/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
+
+      const btnLogout = document.getElementById('btnLogout');
+
+      btnLogout.setAttribute('disabled', true);
+      Utils.handleFetchPromise(res, () => {
+        btnLogout.removeAttribute('disabled');
+        window.location.href = '/map?map=' + SERVER;
+      });
+    }
+
+    async function loadSettings(baseUrl, formId, listDomType, validateNameCallBack) {
+      const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
+        Utils.fetchXml({
+          baseUrl: '/geoserver/cfr/wfs',
+          data: { request: 'GetCapabilities' },
+        }),
+        Utils.fetchJson({ baseUrl })
+      ]);
+
+      const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
+      const listGroupDom = document.querySelector(`#${formId} .list-group`);
+      listGroupDom.innerHTML = '';
+
+      for (let i = 0; i < featureTypes.length; i++) {
+        const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
+        const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
+        if (validateNameCallBack(name)) {
+          continue;
+        }
+
+        const isActiveLayer = typeof activeLayersObj[name] !== 'undefined';
+        const listInput = getCheckBoxDOM(isActiveLayer, name, title, i, formId, listDomType);
+
+        listGroupDom.append(listInput.input);
+        listGroupDom.append(listInput.label);
+      }
+    }
+
+    // main
+    document.addEventListener('DOMContentLoaded', async function () {
+      await loadProvincesSelect();
+
+      const addModal = document.getElementById('addDocumentModal');
+      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
+
+      const listModal = document.getElementById('listDocumentModal');
+      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
+      listModal.addEventListener('shown.bs.modal', function (e) {
+        document.querySelector('#listDocumentModal .modal-body').innerHTML = 'កំពុងដំណើរការ...';
+      })
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleFormSubmit);
+
+
+      // set active layers
+      const activeLayerForm = document.getElementById('toggleLayerForm');
+      const activeLayerTabBtn = document.getElementById('nav-layer-tab');
+      activeLayerForm.addEventListener('submit', handleSubmitLayerForm);
+      activeLayerTabBtn.addEventListener('click', function (e) {
+        if (!hasLoadedActiveLayerTab) {
+          hasLoadedActiveLayerTab = true;
+          const header = document.createTextNode('ជ្រើសរើសសំន៉ំទិន្នន័យពាក់ព័ន្ធដើម្បីបង្ហាញ');
+          const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
+          listGroupDom.parentElement.prepend(header);
+          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'));
+        }
+      })
+
+      // set default profile layer
+      const defaultProfileForm = document.getElementById('defaultProfileForm');
+      const defaultProfileTab = document.getElementById('nav-profile-tab');
+      defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
+      defaultProfileTab.addEventListener('click', function (e) {
+        if (!hasLoadedProfileTab) {
+          hasLoadedProfileTab = true;
+          const profileHeader = document.createTextNode('ជ្រើសរើសProfileដើម្បីបង្ហាញ');
+          const profileList = document.querySelector(`#defaultProfileForm .list-group`);
+          profileList.parentElement.prepend(profileHeader);
+          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
+
+          const defaultProfileForm = document.getElementById('defaultProfileForm');
+          defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
+
+          // const demographyHeader = document.createTextNode('ជ្រើសរើសChartដើម្បីបង្ហាញ');
+          // const demographyList = document.querySelector(`#defaultChartForm .list-group`);
+          // demographyList.parentElement.prepend(demographyHeader);
+          // loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
+
+          // const defaultChartForm = document.getElementById('defaultChartForm');
+          // defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
+        }
+      });
+
+      const btnLogout = document.getElementById('btnLogout');
+      btnLogout.addEventListener('click', handleLogout);
+
+      const formInput = document.getElementById('formFile');
+      formInput.addEventListener('change', function () {
+        if (formInput.files && formInput.files[0]) {
+          const label = document.querySelector('.btn[for="formFile"]');
+          label.innerText = 'កំពុងដំណើរការ';
+
+          const reader = new FileReader();
+          reader.readAsDataURL(formInput.files[0]);
+          reader.onload = function (e) {
+            const fileName = formInput.value.split("\\").slice('-1') || 'ឯកសារ';
+            label.innerText = fileName;
+          }
+        }
+      })
+    });
+  </script>
+</body>
+
+</html>

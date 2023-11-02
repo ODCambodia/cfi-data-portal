@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm test",
     "dev": "nodemon NODE_PATH=. node app.js",
-    "start": "NODE_PATH=. node app.js"
+    "start": "node app.js NODE_PATH=."
   },
   "repository": {
     "type": "git",

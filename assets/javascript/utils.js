@@ -5,7 +5,7 @@ const Utils = {
   fetchGeoJson: async function (options = {}, hasDefault = true) {
     const defaultSetting = hasDefault ? {
       service: 'WFS',
-      version: '1.1.0',
+      version: '1.0.0',
       request: 'GetFeature',
       outputFormat: 'application/json',
       srsname: 'EPSG:4326',

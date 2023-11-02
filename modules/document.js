@@ -19,11 +19,18 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const handleCreate = async function (req, res) {
+  let server = ''
+  if (req.params.server === 'cfi' || req.params.server === 'cfr') {
+    server = req.params.server;
+  } else {
+    return res.status(400).json({ error: 'Invalid Server Param' });
+  }
+
   try {
     const template = `<wfs:Transaction
       version="2.0.0"
       service="WFS"
-      xmlns:cfi="cfi"
+      xmlns:${server}="${server}"
       xmlns:fes="http://www.opengis.net/fes/2.0"
       xmlns:gml="http://www.opengis.net/gml/3.2"
       xmlns:wfs="http://www.opengis.net/wfs/2.0"
@@ -31,27 +38,27 @@ const handleCreate = async function (req, res) {
       xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd
                           http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd">
       <wfs:Insert>
-        <cfi:documents>
-          <cfi:geom>
+        <${server}:documents>
+          <${server}:geom>
             <gml:Point srsName="http://www.opengis.net/def/crs/epsg/0/32648">
               <gml:pos>random</gml:pos>
             </gml:Point>
-          </cfi:geom>
-          <cfi:title>Title</cfi:title>
-          <cfi:title_en>Title_en</cfi:title_en>
-          <cfi:contentType>application/pdf</cfi:contentType>
-          <cfi:url>random</cfi:url>
-        </cfi:documents>
+          </${server}:geom>
+          <${server}:title>Title</${server}:title>
+          <${server}:title_en>Title_en</${server}:title_en>
+          <${server}:contentType>application/pdf</${server}:contentType>
+          <${server}:url>random</${server}:url>
+        </${server}:documents>
       </wfs:Insert>
     </wfs:Transaction>`;
 
     const xmlData = await xml2js.parseStringPromise(template);
-    const cfiDocuments = xmlData['wfs:Transaction']['wfs:Insert'][0]['cfi:documents'][0];
-    cfiDocuments['cfi:geom'][0]['gml:Point'][0]['gml:pos'] = req.body.pos;
-    cfiDocuments['cfi:title'] = req.body.title;
-    cfiDocuments['cfi:title_en'] = req.body.title_en;
-    cfiDocuments['cfi:contentType'] = req.files[0].mimetype;
-    cfiDocuments['cfi:url'] = req.files[0].path.replace('assets', '');
+    const cfiDocuments = xmlData['wfs:Transaction']['wfs:Insert'][0][`${server}:documents`][0];
+    cfiDocuments[`${server}:geom`][0]['gml:Point'][0]['gml:pos'] = req.body.pos;
+    cfiDocuments[`${server}:title`] = req.body.title;
+    cfiDocuments[`${server}:title_en`] = req.body.title_en;
+    cfiDocuments[`${server}:contentType`] = req.files[0].mimetype;
+    cfiDocuments[`${server}:url`] = req.files[0].path.replace('assets', '').replaceAll('\\','/');
 
     const builder = new xml2js.Builder();
     const xml = builder.buildObject(xmlData);
@@ -84,18 +91,25 @@ const handleDelete = async function (req, res) {
     return res.status(400).json({ error: 'Invalid FileName' });
   }
 
+  let server = ''
+  if (req.params.server === 'cfi' || req.params.server === 'cfr') {
+    server = req.params.server;
+  } else {
+    return res.status(400).json({ error: 'Invalid Server Param' });
+  }
+
   const id = Number(req.params.id);
   const xml = `<wfs:Transaction
     version="2.0.0"
     service="WFS"
-    xmlns:cfi="cfi"
+    xmlns:${server}="${server}"
     xmlns:fes="http://www.opengis.net/fes/2.0"
     xmlns:gml="http://www.opengis.net/gml/3.2"
     xmlns:wfs="http://www.opengis.net/wfs/2.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.opengis.net/wfs/2.0 http://schemas.opengis.net/wfs/2.0/wfs.xsd
                         http://www.opengis.net/gml/3.2 http://schemas.opengis.net/gml/3.2.1/gml.xsd">
-    <wfs:Delete typeName="cfi:documents">
+    <wfs:Delete typeName="${server}:documents">
       <fes:Filter>
         <fes:ResourceId rid="documents.${id}"/>
       </fes:Filter>
@@ -118,8 +132,6 @@ const handleDelete = async function (req, res) {
 
   const fileName = req.body.fileName;
   const directoryPath = process.env.NODE_PATH + '/assets/documents/';
-  console.log(fileName);
-  console.log(directoryPath + fileName);
   try {
     fs.unlinkSync(directoryPath + fileName);
 

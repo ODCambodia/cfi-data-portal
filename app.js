@@ -52,7 +52,12 @@ app.get('/template', function (req, res) {
 });
 
 app.get('/admin/:key', Auth.validate, function (req, res) {
-  res.sendFile(path.join(dirName, 'page/admin.html'));
+  let templatePath = 'page/admin.html';
+  if (req.params.key === 'cfr') {
+    templatePath = 'page/admin_cfr.html';
+  }
+
+  res.sendFile(path.join(dirName, templatePath));
 });
 
 app.get('/api/template', async function (req, res) {
@@ -78,9 +83,9 @@ app.get('/api/template', async function (req, res) {
   res.send('something went wrong');
 });
 
-app.post('/admin/documents', Auth.validate, Document.upload.array('files'), Document.handleCreate);
-app.patch('/admin/documents/:id', Auth.validate, jsonParser, function (req, res) { });
-app.delete('/admin/documents/:id', Auth.validate, jsonParser, Document.handleDelete);
+app.post('/admin/documents/:server', Auth.validate, Document.upload.array('files'), Document.handleCreate);
+app.delete('/admin/documents/:server/:id', Auth.validate, jsonParser, Document.handleDelete);
+// app.patch('/admin/documents/:server/:id', Auth.validate, jsonParser, function (req, res) { });
 
 
 app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
@@ -101,5 +106,5 @@ app.get('/api/default-chart-layer/:key', (req, res) => LayerSettings.handleGetLa
 app.post('/api/default-chart-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_chart'));
 
 app.listen(port);
-
+console.log("NODE_PATH=" + process.env.NODE_PATH);
 console.log('Server started at http://localhost:' + port);

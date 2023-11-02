@@ -308,7 +308,7 @@
 
       btnDel.setAttribute('disabled', true);
       btnDel.innerText = 'កំពុងដំណើរការ...';
-      const res = fetch('/admin/documents/' + id, {
+      const res = fetch(`/admin/documents/cfi/${id}`, {
         method: 'DELETE',
         body: JSON.stringify({ fileName }),
         headers: {
@@ -323,7 +323,7 @@
           btnDel.parentNode.outerHTML = '';
         }
 
-        alert('ទិន្នន័យត្រូវការរក្សាទុកដោយជោគជ័យ');
+        alert('ឯកសារត្រូវលុបបានដោយជោគជ័យ');
       });
     }
 
@@ -410,7 +410,7 @@
       const submitBtn = document.querySelector('#addFormBtn');
       submitBtn.setAttribute('disabled', true);
 
-      fetch("/admin/documents", {
+      fetch("/admin/documents/cfi", {
         method: 'POST',
         body: formData,
       })
