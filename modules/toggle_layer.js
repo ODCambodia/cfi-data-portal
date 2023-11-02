@@ -67,8 +67,8 @@ function getLayer(req, res, key) {
 }
 
 function handleSaveLayer(req, res, key) {
-  const jsonKey = (req.param.key || 'cfi') + key;
-
+  const jsonKey = (req.params.key || 'cfi') + key;
+  
   if (key) {
     return saveLayer(req, res, jsonKey);
   }
@@ -77,7 +77,7 @@ function handleSaveLayer(req, res, key) {
 }
 
 function handleGetLayer(req, res, key) {
-  const jsonKey = (req.param.key || 'cfi') + key;
+  const jsonKey = (req.params.key || 'cfi') + key;
 
   if (key) {
     return getLayer(req, res, jsonKey);
