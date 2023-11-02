@@ -241,7 +241,7 @@ async function loadCFRSelect(options) {
 
   // load number of CFR
   const label = document.getElementById('cfiCount');
-  label.textContent = `(#${cfr_data.numberReturned})`;
+  label.textContent = `[${cfr_data.numberReturned}]`;
 
   const cfiSelect = document.getElementById('cfiSelect');
 

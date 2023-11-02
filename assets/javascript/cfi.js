@@ -494,7 +494,7 @@ async function handleProvinceSelect(e) {
 
   // load number of CFI
   const label = document.getElementById('cfiCount');
-  label.textContent = `(#${cfiBoundary.numberReturned})`;
+  label.textContent = `[${cfiBoundary.numberReturned}]`;
 }
 
 async function loadProvince() {
