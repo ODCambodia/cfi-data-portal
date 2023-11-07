@@ -59,13 +59,11 @@ function switchCRS() {
     newCorrdinate = proj4(gCRS, lCRS, currentCoord); // but it take function as x,y ???
     decimalsPos = 2;
   } else {
-    console.log('else')
     newCorrdinate = proj4(lCRS, gCRS, currentCoord); // return as long, lat for some reason ???
     newCorrdinate.reverse();
     decimalsPos = 6;
   }
 
-  console.log({ newCorrdinate });
   document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(decimalsPos)).join(' ');
 }
 
