@@ -44,6 +44,45 @@ function getDownloadDom(href) {
   return a;
 }
 
+function switchCRS() {
+  const currentCRS = document.getElementById('espgToggleBtn').textContent;
+  const gCRS = '+proj=longlat +datum=WGS84 +no_defs +type=crs'  //WGS 84
+  const lCRS = "+proj=utm +zone=48 +datum=WGS84 +units=m +no_defs +type=crs"; //WGS 84/UTM Zone 48N
+  let currentCoord = document.getElementById('espgCoordDOM').textContent;
+  let newCorrdinate = '';
+  if (!currentCoord) { return }
+
+  currentCoord = currentCoord.split(' ').map(x => Number(x));
+
+  if (currentCRS === 'WGS 84') {
+    console.log('hello');
+    newCorrdinate = proj4(gCRS, lCRS, currentCoord);
+  } else {
+    newCorrdinate = proj4(lCRS, gCRS, currentCoord);
+  }
+  console.log(newCorrdinate);
+  document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(2)).join(' ');
+}
+
+function getESPGToggleBtn(text, coordinateDOM) {
+  const btn = document.createElement('button');
+  btn.innerHTML = text;
+  btn.id = 'espgToggleBtn';
+  btn.addEventListener('click', function (e) {
+    let text = e.currentTarget.textContent;
+    if (text === 'WGS 84') {
+      text = 'WGS 84 / UTM zone 48N'
+    } else if (text === 'WGS 84 / UTM zone 48N') {
+      text = 'WGS 84';
+    }
+
+    switchCRS();
+    e.currentTarget.innerText = text;
+  });
+
+  return btn;
+}
+
 function drawAboutSection() {
   const tableProfile = document.createElement('table');
   tableProfile.style.marginBottom = '5px';
@@ -338,6 +377,8 @@ async function showCFI_B(data, defaultCrs) {
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
+  // careful about changing key
+  // change the listener as well
   cfi_b['ប្រព័ន្ធនិយាមកា'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
   cfi_b['និយាមកាយោង'] = `${x_coordinate} ${y_coordinate}`;
 
@@ -350,11 +391,23 @@ async function showCFI_B(data, defaultCrs) {
 
     if (key === 'creation_date' || key === 'registration_date') {
       cfi_b[key] = Utils.formatDate(cfi_b[key]);
+    } else if (key === 'ប្រព័ន្ធនិយាមកា') {
+      cfi_b[key] = getESPGToggleBtn(cfi_b[key]);
+    } else if (key === 'និយាមកាយោង') {
+      const span = document.createElement('span');
+      span.id = 'espgCoordDOM'
+      span.innerText = cfi_b[key];
+      cfi_b[key] = span;
     }
 
     [translate[key] || key, cfi_b[key]].forEach((x, i) => {
       const td = document.createElement('td');
-      td.innerText = x;
+
+      if (x instanceof Element) {
+        td.append(x);
+      } else {
+        td.innerText = x;
+      }
 
       if (i > 0 && !x) {
         td.innerText = 'មិនមានព័ត៌មាន';

@@ -321,12 +321,12 @@ async function loadSettings() {
 
 async function init() {
   await Promise.all([
-    loadProvinceCFR(),
+    // loadProvinceCFR(),
     loadCFRMap(),
-    loadSettings(),
+    // loadSettings(),
   ]);
-  document.getElementById('provinceSelect').removeAttribute('disabled');
-  toggleLoading(false);
+  // document.getElementById('provinceSelect').removeAttribute('disabled');
+  // toggleLoading(false);
 }
 
 if (document.readyState !== 'loading') {

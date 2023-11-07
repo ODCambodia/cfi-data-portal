@@ -19,6 +19,10 @@ span {
   background-color: gray;
 }
 
+td span {
+  background-color: unset;
+}
+
 .sidebar.open>h3 {
   visibility: visible;
   opacity: 1;
