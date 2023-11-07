@@ -50,18 +50,23 @@ function switchCRS() {
   const lCRS = "+proj=utm +zone=48 +datum=WGS84 +units=m +no_defs +type=crs"; //WGS 84/UTM Zone 48N
   let currentCoord = document.getElementById('espgCoordDOM').textContent;
   let newCorrdinate = '';
+  let decimalsPos = 2;
   if (!currentCoord) { return }
 
   currentCoord = currentCoord.split(' ').map(x => Number(x));
-
   if (currentCRS === 'WGS 84') {
-    console.log('hello');
-    newCorrdinate = proj4(gCRS, lCRS, currentCoord);
+    currentCoord.reverse();
+    newCorrdinate = proj4(gCRS, lCRS, currentCoord); // but it take function as x,y ???
+    decimalsPos = 2;
   } else {
-    newCorrdinate = proj4(lCRS, gCRS, currentCoord);
+    console.log('else')
+    newCorrdinate = proj4(lCRS, gCRS, currentCoord); // return as long, lat for some reason ???
+    newCorrdinate.reverse();
+    decimalsPos = 6;
   }
-  console.log(newCorrdinate);
-  document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(2)).join(' ');
+
+  console.log({ newCorrdinate });
+  document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(decimalsPos)).join(' ');
 }
 
 function getESPGToggleBtn(text, coordinateDOM) {
