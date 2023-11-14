@@ -275,17 +275,24 @@ async function loadProvinceCFR() {
       data: {
         typeName: 'cfr:cambodian_provincial',
         outputFormat: 'application/json',
-        propertyname: 'ADM1_EN,ADM1_PCODE,ADM0_EN,ADM0_PCODE'
+        propertyname: 'pro_name_k,hrname,pro_code',
+        SORTBY: 'pro_code ASC'
       }
     })
     const provinceSelect = document.getElementById('provinceSelect');
 
     // append options to select
     provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+
+    provinceSelect.append(
+      Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }),
+    );
+
     data.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = item.properties.ADM1_EN || item.properties.province;
+      option.text = item.properties.pro_name_k;
       option.value = item.id;
+      option.dataset.name= item.properties.pro_name_k;
       provinceSelect.append(option);
     });
 
