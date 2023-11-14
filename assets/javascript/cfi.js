@@ -522,8 +522,9 @@ async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
 
-
-  const selectedProvinceId = e.currentTarget.value;
+  const provinceSelect = e.currentTarget;
+  const selectedProvinceId = provinceSelect.value;
+  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name.toLowerCase().trim();
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
@@ -539,6 +540,8 @@ async function handleProvinceSelect(e) {
       CQL_FILTER,
     },
   });
+
+  cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
 
@@ -550,7 +553,7 @@ async function handleProvinceSelect(e) {
 
   // load number of CFI
   const label = document.getElementById('cfiCount');
-  label.textContent = `[${cfiBoundary.numberReturned}]`;
+  label.textContent = `[${cfiBoundary.features.length || 0}]`;
 }
 
 async function loadProvince() {
@@ -581,6 +584,7 @@ async function loadProvince() {
       const option = document.createElement('option');
       option.text = item.properties.pro_name_k;
       option.value = item.id;
+      option.dataset.name = item.properties.pro_name_k;
       provinceSelect.append(option);
     });
 
