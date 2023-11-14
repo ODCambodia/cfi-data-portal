@@ -16,80 +16,39 @@ const TYPENAME = {
 const POLYGON_STYLE = {
   default: {
     color: "black",
-    fillColor: "purple",
-    weight: 1,
+    fillColor: "#FFD04B",
+    weight: 1.5,
     fillOpacity: 0.5,
     opacity: 0.5,
   },
   active: {
     color: "black",
-    fillColor: '#6F2DA8',
+    fillColor: '#FFD04B',
     weight: 2,
-    fillOpacity: 1,
+    fillOpacity: 0.7,
     opacity: 1,
   }
 }
 
 // CONFIG OVERLAY STYLES
 const STYLES = {
-  [KEYS.CFI_A]: (feature) => {
-    switch (feature.properties.fiac_score) {
-      case 'Strong': return {
-        color: "green",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      };
-      case 'Average': return {
-        color: "orange",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      };
-      case 'Weak': return {
-        color: "red",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      };
-      default: return {
-        color: "blue",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      }
-    }
-  },
+  [KEYS.CFI_A]: () => ({
+    color: '#000',
+    fillColor: "#FFD04B",
+    radius: 5,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  }),
   [KEYS.CFI_B]: () => POLYGON_STYLE.default,
-  [KEYS.CFR_A]: (feature) => {
-    switch (feature.properties.is_qualified_cfr) {
-      case 'បាទ/ចាស៎': return {
-        color: "green",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      };
-      case 'ទេ': return {
-        color: "red",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      };
-      default: return {
-        color: "blue",
-        radius: 4,
-        weight: 1,
-        opacity: 1,
-        fillOpacity: 0.7
-      }
-    }
-  }
+  [KEYS.CFR_A]: () => ({
+    color: '#000',
+    fillColor: "#FFD04B",
+    radius: 5,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  })
 }
 
 // MAIN CONFIG
