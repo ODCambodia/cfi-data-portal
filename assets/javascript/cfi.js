@@ -524,7 +524,7 @@ async function handleProvinceSelect(e) {
 
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
-  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name.toLowerCase().trim();
+  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
@@ -541,7 +541,10 @@ async function handleProvinceSelect(e) {
     },
   });
 
-  cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
+  if (provinceName) {
+    cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
+  }
+
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
 
@@ -549,7 +552,10 @@ async function handleProvinceSelect(e) {
 
   addBoundaryClickEvent();
   toggleLoading(false);
-  map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
+
+  if (Object.keys(OVERLAY_MAP[KEYS.CFI_B].getBounds()).length > 0) {
+    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
+  }
 
   // load number of CFI
   const label = document.getElementById('cfiCount');
