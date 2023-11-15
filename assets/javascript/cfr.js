@@ -223,25 +223,29 @@ async function showCFR_A(data, defaultCrs) {
 
 async function loadCFRMap(options) {
   const cfr_data = await Utils.fetchGeoJson({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
-  OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
-  OVERLAY_MAP[KEYS.CFR_A].addTo(map);
-  OVERLAY_MAP[KEYS.CFR_A].off('popupopen');
-  OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
-    showCFR_A(e.layer);
-  });
-}
+  const provinceName = document.querySelector('#provinceSelect option:checked').dataset.name;
 
-async function loadCFRSelect(options) {
-  const cfr_data = await Utils.fetchGeoJson({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  if (provinceName) {
+    cfr_data.features = cfr_data.features.filter((item) => item.properties.province.trim() === provinceName);
+  }
+
   OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
-  OVERLAY_MAP[KEYS.CFR_A].on('popupopen', async function (e) {
+  OVERLAY_MAP[KEYS.CFR_A].off('click');
+  OVERLAY_MAP[KEYS.CFR_A].on('click', function (e) {
     showCFR_A(e.layer);
   });
 
   // load number of CFR
   const label = document.getElementById('cfiCount');
-  label.textContent = `[${cfr_data.numberReturned}]`;
+  label.textContent = `[${cfr_data.features.length || 0}]`;
+
+  return cfr_data;
+}
+
+async function loadCFRSelect(options) {
+  const cfr_data = await loadCFRMap(options);
+
 
   const cfiSelect = document.getElementById('cfiSelect');
 
@@ -292,7 +296,7 @@ async function loadProvinceCFR() {
       const option = document.createElement('option');
       option.text = item.properties.pro_name_k;
       option.value = item.id;
-      option.dataset.name= item.properties.pro_name_k;
+      option.dataset.name = item.properties.pro_name_k;
       provinceSelect.append(option);
     });
 
@@ -308,8 +312,17 @@ async function loadProvinceCFR() {
       cfiSelect.innerHTML = '';
       cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
 
-      const overlay = await loadCFRSelect({ CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` });
-      map.flyToBounds(overlay.getBounds(), { maxZoom: 9 });
+      toggleLoading(true);
+
+      const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
+      const overlay = await loadCFRSelect({ CQL_FILTER });
+      const bounds = overlay.getBounds();
+
+      if (Object.keys(bounds).length > 0) {
+        map.flyToBounds(bounds, { maxZoom: 9 });
+      }
+
+      toggleLoading(false);
     });
   } catch (e) {
     console.warn(e);
