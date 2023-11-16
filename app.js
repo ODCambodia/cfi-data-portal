@@ -43,8 +43,12 @@ app.get('/', function (req, res) {
   res.sendFile(path.join(dirName, 'page/index.html'));
 });
 
-app.get('/map', function (req, res) {
-  res.sendFile(path.join(dirName, 'page/map.html'));
+app.get('/map/cfi', function (req, res) {
+  res.sendFile(path.join(dirName, 'page/map_cfi.html'));
+});
+
+app.get('/map/cfr', function (req, res) {
+  res.sendFile(path.join(dirName, 'page/map_cfr.html'));
 });
 
 app.get('/template', function (req, res) {

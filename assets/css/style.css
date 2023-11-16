@@ -15,10 +15,6 @@ body,
   font-family: "Poppins", sans-serif;
 }
 
-span {
-  background-color: gray;
-}
-
 td span {
   background-color: unset;
 }
@@ -175,6 +171,7 @@ td span {
 }
 
 .about__wrapper {
+  text-transform: capitalize;
   background: #101010;
   color: #fff;
   padding: 1rem;

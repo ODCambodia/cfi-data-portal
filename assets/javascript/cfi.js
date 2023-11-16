@@ -123,8 +123,8 @@ const DemoGraphyChart = (function () {
     committee: {
       typeName: 'cfi:cfi_status_assessment_2018',
       id: 'committeePieChart',
-      title: 'ចំនួនគណៈកម្មការ',
-      labels: ['ស្រី', 'ប្រុស'],
+      title: I18n.translate('committees'),
+      labels: [I18n.translate('female'), I18n.translate('male')],
       propertyKeys: {
         female: 'cfi_cmte_female',
         total: 'cfi_cmte_total',
@@ -133,8 +133,8 @@ const DemoGraphyChart = (function () {
     member: {
       typeName: 'cfi:cfi_status_assessment_2018',
       id: 'memberPieChart',
-      title: 'ចំនួនសមាជិក',
-      labels: ['ស្រី', 'ប្រុស'],
+      title: I18n.translate('members'),
+      labels: [I18n.translate('female'), I18n.translate('male')],
       propertyKeys: {
         female: 'cfi_member_female',
         total: 'cfi_member_total',
@@ -143,8 +143,8 @@ const DemoGraphyChart = (function () {
     population: {
       typeName: defaultChartTypeName,
       id: 'populationPieChart',
-      title: 'ចំនួនប្រជាសហគមន៍',
-      labels: ['ស្រី', 'ប្រុស'],
+      title: I18n.translate('population'),
+      labels: [I18n.translate('female'), I18n.translate('male')],
       propertyKeys: {
         female: 'population_female',
         total: 'population_total',
@@ -374,36 +374,38 @@ async function showCFI_B(data, defaultCrs) {
     created_by,
     created_date,
     updated_date,
+    province,
     province_en,
     app,
     ...cfi_b
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
+
+
   // careful about changing key
   // change the listener as well
-  cfi_b['ប្រព័ន្ធនិយាមកា'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
-  cfi_b['និយាមកាយោង'] = `${x_coordinate} ${y_coordinate}`;
+  cfi_b['coordinate_system'] = (espg && espg.name) || I18n.translate('no_data');
+  cfi_b['referencing_coordinate'] = `${x_coordinate} ${y_coordinate}`;
+  cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
 
-  // modify without affecting other translation
-  const translate = { ...TRANSLATE };
-  translate['province'] = 'ស្ថិតក្នុងខេត្ត';
+  console.log(data.feature);
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
 
     if (key === 'creation_date' || key === 'registration_date') {
       cfi_b[key] = Utils.formatDate(cfi_b[key]);
-    } else if (key === 'ប្រព័ន្ធនិយាមកា') {
+    } else if (key === 'coordinate_system') {
       cfi_b[key] = getESPGToggleBtn(cfi_b[key]);
-    } else if (key === 'និយាមកាយោង') {
+    } else if (key === 'referencing_coordinate') {
       const span = document.createElement('span');
       span.id = 'espgCoordDOM'
       span.innerText = cfi_b[key];
       cfi_b[key] = span;
     }
 
-    [translate[key] || key, cfi_b[key]].forEach((x, i) => {
+    [I18n.translate(key), cfi_b[key]].forEach((x, i) => {
       const td = document.createElement('td');
 
       if (x instanceof Element) {
@@ -413,7 +415,7 @@ async function showCFI_B(data, defaultCrs) {
       }
 
       if (i > 0 && !x) {
-        td.innerText = 'មិនមានព័ត៌មាន';
+        td.innerText = I18n.translate('no_data');
       }
 
       tr.append(td);
@@ -422,8 +424,9 @@ async function showCFI_B(data, defaultCrs) {
     tbody.append(tr);
   }
 
+  const cfi_name = data.feature.properties[I18n.translate({ en: 'name_en', kh: 'name' })]
   const header = document.querySelector('.about__header');
-  header.innerText = `សហគមន៍នេសាទ${sub_name || name}`;
+  header.innerText = I18n.translate('fishing_community') + ` ${sub_name || cfi_name} `;
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
@@ -449,7 +452,7 @@ function addBoundaryClickEvent() {
       data: {
         typeName: defaultProfileTypeName,
         SORTBY: 'name ASC',
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
       },
     });
     const defaultCrs = await loadRelatedLayers(cfiId);
@@ -467,7 +470,7 @@ async function handleCfiSelect(e) {
   const cfiProfile = await Utils.fetchGeoJson({
     data: {
       typeName: defaultProfileTypeName,
-      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
     },
   });
 
@@ -506,10 +509,10 @@ async function loadCfiSelect(cfiBoundary) {
   ].sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
 
   const cfiSelect = document.getElementById('cfiSelect');
-  cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
+  cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fishing_community')));
   uniqueCfi.forEach((item) => {
     const option = document.createElement('option');
-    option.text = item.properties.name;
+    option.text = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })];
     option.value = item.id;
     cfiSelect.append(option);
   });
@@ -532,7 +535,7 @@ async function handleProvinceSelect(e) {
 
   toggleLoading(true);
   const CQL_FILTER = selectedProvinceId
-    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${selectedProvinceId}'')')))`
+    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial', 'geom', 'IN(''${selectedProvinceId}'')')))`
     : '';
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
@@ -578,17 +581,17 @@ async function loadProvince() {
 
     // append options to select
     provinceSelect.append(
-      Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង', {
+      Utils.defaultOptionDOM(I18n.translate('select_a_province'), {
         disabled: true,
         selected: true,
       }),
     );
     provinceSelect.append(
-      Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }),
+      Utils.defaultOptionDOM(I18n.translate('all_province'), { value: '' }),
     );
     res.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = item.properties.pro_name_k;
+      option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
       provinceSelect.append(option);
@@ -601,6 +604,7 @@ async function loadProvince() {
 }
 
 async function init() {
+  await I18n.init();
   await loadProvince();
   toggleLoading(false);
   document.getElementById('provinceSelect').removeAttribute('disabled');

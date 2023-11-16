@@ -159,10 +159,6 @@ function drawAboutSection() {
 async function showCFR_A(data, defaultCrs) {
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
-  // const espg = await Utils.fetchGeoJson(
-  //   { baseUrl: `https://epsg.io/${defaultCrs}.json` },
-  //   false,
-  // );
   const {
     x_coordinate,
     y_coordinate,
@@ -245,8 +241,6 @@ async function loadCFRMap(options) {
 
 async function loadCFRSelect(options) {
   const cfr_data = await loadCFRMap(options);
-
-
   const cfiSelect = document.getElementById('cfiSelect');
 
   cfr_data.features.forEach((item) => {
@@ -304,16 +298,18 @@ async function loadProvinceCFR() {
       document.body.querySelector('.about__wrapper').classList.remove('active');
       document.getElementById('relatedLayers').parentElement.classList.add('d-none');
 
-      const val = e.currentTarget.value;
-      OVERLAY_MAP[KEYS.CFR_A].remove();
-
       const cfiSelect = document.getElementById('cfiSelect');
       cfiSelect.value = '';
       cfiSelect.innerHTML = '';
       cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
 
+      if (typeof OVERLAY_MAP[KEYS.CFR_A] !== 'undefined') {
+        OVERLAY_MAP[KEYS.CFR_A].remove();
+      }
+
       toggleLoading(true);
 
+      const val = e.currentTarget.value;
       const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
       const overlay = await loadCFRSelect({ CQL_FILTER });
       const bounds = overlay.getBounds();
@@ -329,22 +325,8 @@ async function loadProvinceCFR() {
   }
 }
 
-async function loadSettings() {
-  const settings = await Promise.all([
-    Utils.fetchJson({ baseUrl: 'api/default-profile-layer/cfi' }),
-    Utils.fetchJson({ baseUrl: 'api/default-chart-layer/cfi' }),
-  ]);
-
-  defaultProfileTypeName = Object.keys(settings[0])[0];
-  defaultChartTypeName = Object.keys(settings[1])[0];
-}
-
 async function init() {
-  await Promise.all([
-    loadProvinceCFR(),
-    loadCFRMap(),
-    loadSettings(),
-  ]);
+  await loadProvinceCFR();
   document.getElementById('provinceSelect').removeAttribute('disabled');
   toggleLoading(false);
 }

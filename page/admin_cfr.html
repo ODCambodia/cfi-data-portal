@@ -457,7 +457,7 @@
       btnLogout.setAttribute('disabled', true);
       Utils.handleFetchPromise(res, () => {
         btnLogout.removeAttribute('disabled');
-        window.location.href = '/map?map=' + SERVER;
+        window.location.href = '/map/' + SERVER;
       });
     }
 

@@ -127,14 +127,14 @@ const Utils = {
   },
   formatDate: function (dateStr, separator = ' ') {
     if (!dateStr) {
-      return 'មិនមានព័ត៌មាន';
+      return I18n.translate('no_data');
     }
     const d = new Date(dateStr);
     const day = ("0" + d.getDate()).slice(-2);;
     const month = d.toLocaleString('default', { month: 'short' });
     const year = d.getFullYear();
 
-    return day + separator + (TRANSLATE[month] || month) + separator + year;
+    return day + separator + (I18n.translate(month)) + separator + year;
   }
 };
 
