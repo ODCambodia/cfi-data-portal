@@ -1,4 +1,5 @@
 {
+  "select_to_get_started": "Select an option to get started",
   "close": "Close",
   "save": "Save",
   "something_went_wrong_while_saving": "Something went wrong while saving content. Please re-submit the form.",

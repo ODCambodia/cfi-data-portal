@@ -6,11 +6,12 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.css">
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title data-i18n="fishing_community">សហគមន៍នេសាទ</title>
 </head>
 
@@ -55,8 +56,11 @@
         <ul class="nav-list">
             <li>
                 <label class="form-label" for="provinceSelect" data-i18n="province">ខេត្ត\ក្រុង</label>
-                <select id="provinceSelect" name="provinceSelect" disabled>
-                </select>
+                <div class="tooltip-wrapper province-tooltip">
+                    <span class="tooltip active" data-i18n="select_to_get_started">Tooltip text</span>
+                    <select id="provinceSelect" name="provinceSelect" disabled>
+                    </select>
+                </div>
             </li>
             <li>
                 <label class="form-label">
@@ -102,12 +106,13 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-    <script src="/javascript/translator.js"></script>
-    <script src="/javascript/utils.js"></script>
-    <script src="/javascript/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"
         integrity="sha512-S0ojOEysgB/TxIOyywNVRLJV0RlQR0PHT9nBxtjVziDz9smFvUQyiRD7RXwYlx5MJeJXJZ+cvqjHPWuReGfQIQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/javascript/translator.js"></script>
+    <script src="/javascript/utils.js"></script>
+    <script src="/javascript/config.js"></script>
     <script>
         const i18n = new I18n();
         const SERVER = 'cfi';

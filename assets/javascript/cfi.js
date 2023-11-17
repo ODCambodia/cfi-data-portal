@@ -1,19 +1,38 @@
+const DEFAULT_COORD = [12.5657, 104.991];
 const map = L.map('map', {
-  center: [12.5657, 104.991],
+  center: DEFAULT_COORD,
   zoom: 7,
+  minZoom: 7,
 });
 
-L.control.scale().addTo(map);
+map.setMaxBounds(map.getBounds());
+
 const mapLink = '<a href="http://www.esri.com/">Esri</a>';
 const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
 const BASE_MAP = {
-  'Open Street Map': L.tileLayer(
+  'ESRI WordImagery': L.tileLayer(
     'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
     maxZoom: 20,
   }).addTo(map),
+  'Open Street Map': L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    },
+  )
 };
+
+L.control.scale().addTo(map);
+L.control.layers(BASE_MAP).addTo(map);
+L.control.resetView({
+  position: "topleft",
+  title: "Reset view",
+  latlng: L.latLng(DEFAULT_COORD),
+  zoom: 7,
+}).addTo(map);
 
 const OVERLAY_MAP = {};
 const REGEX_YEAR = /(_(20)\d{2})/s;
@@ -524,6 +543,7 @@ async function loadCfiSelect(cfiBoundary) {
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+  document.querySelector('.province-tooltip .tooltip').classList.remove('active');
 
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
