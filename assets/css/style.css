@@ -302,7 +302,7 @@ td span {
 }
 
 @media (max-width: 420px) {
-  .sidebar li .tooltip {
+  .sidebar li .tooltip-wrapper {
     display: none;
   }
 }
@@ -509,4 +509,42 @@ h3 {
 
 .d-none {
   display: none !important;
+}
+
+.tooltip-wrapper {
+  position: relative;
+}
+
+.tooltip-wrapper .tooltip {
+  visibility: hidden;
+  font-size: 12px;
+  width: 120px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 3px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 80%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-wrapper .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-wrapper .tooltip.active {
+  visibility: visible;
+  opacity: 1;
 }

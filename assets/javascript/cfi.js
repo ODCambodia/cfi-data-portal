@@ -5,6 +5,7 @@ const map = L.map('map', {
   minZoom: 7,
 });
 
+map.setMaxBounds(map.getBounds());
 
 const mapLink = '<a href="http://www.esri.com/">Esri</a>';
 const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
@@ -542,6 +543,7 @@ async function loadCfiSelect(cfiBoundary) {
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+  document.querySelector('.province-tooltip .tooltip').classList.remove('active');
 
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
