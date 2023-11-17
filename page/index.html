@@ -30,7 +30,7 @@
 
   .box__wrapper {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     display: flex;
     justify-content: space-between;
   }
@@ -47,27 +47,28 @@
     cursor: pointer;
     display: inline-flex;
     font-family: "JetBrains Mono", monospace;
-    height: 180px;
-    width: 250px;
+    height: 200px;
+    width: 330px;
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center center;
     justify-content: center;
-    line-height: 1;
+    line-height: 1.3rem;
     list-style: none;
     overflow: hidden;
-    padding-left: 16px;
-    padding-right: 16px;
     position: relative;
-    text-align: left;
+    text-align: center;
     text-decoration: none;
     transition: box-shadow .3s, transform .3s;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
-    white-space: nowrap;
     will-change: box-shadow, transform;
-    font-size: 18px;
+    font-size: 17px;
+    font-weight: 600;
+    align-items: end;
+    padding-bottom: 0.5rem;
+    letter-spacing: 0.5px;
   }
 
   #cfi {
@@ -99,9 +100,11 @@
   </div>
   <div class="center" style="height: 80%;">
     <div class="box__wrapper">
-      <button type="button" value="map?map=cfi" class="box center" id="cfi">
+      <button type="button" value="/map/cfi" class="box center" id="cfi">
+        <span>Community Fishery Development Department</span>
       </button>
-      <button type="button" value="map?map=cfr" class="box center" id="cfr">
+      <button type="button" value="/map/cfr" class="box center" id="cfr">
+        <span>Department of Aquaculture Development</span>
       </button>
     </div>
   </div>

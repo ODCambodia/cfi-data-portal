@@ -19,30 +19,20 @@ const OVERLAY_MAP = {};
 const DemoGraphyChart = (function () {
   const CHARTS_CONF = {
     committee: {
-      typeName: 'cfi:cfi_status_assessment_2018',
+      typeName: defaultProfileTypeName,
       id: 'committeePieChart',
-      title: 'ចំនួនគណៈកម្មការ',
-      labels: ['ស្រី', 'ប្រុស'],
+      title: I18n.translate('committees'),
+      labels: [I18n.translate('female'), I18n.translate('male')],
       propertyKeys: {
         female: 'num_cmte_female',
         total: 'num_cmte_mem',
       },
     },
-    // member: {
-    //   typeName: 'cfi:cfi_status_assessment_2018',
-    //   id: 'memberPieChart',
-    //   title: 'ចំនួនសមាជិក',
-    //   labels: ['ស្រី', 'ប្រុស'],
-    //   propertyKeys: {
-    //     female: 'cfi_member_female',
-    //     total: 'cfi_member_total',
-    //   },
-    // },
     population: {
       typeName: defaultChartTypeName,
       id: 'populationPieChart',
-      title: 'ចំនួនប្រជាសហគមន៍',
-      labels: ['ស្រី', 'ប្រុស'],
+      title: I18n.translate('population'),
+      labels: [I18n.translate('female'), I18n.translate('male')],
       propertyKeys: {
         female: 'num_commune_women',
         total: 'num_commune_ppl',
@@ -156,13 +146,9 @@ function drawAboutSection() {
   body.append(chartWrapper);
 }
 
-async function showCFR_A(data, defaultCrs) {
+async function showCFR_A(data) {
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
-  // const espg = await Utils.fetchGeoJson(
-  //   { baseUrl: `https://epsg.io/${defaultCrs}.json` },
-  //   false,
-  // );
   const {
     x_coordinate,
     y_coordinate,
@@ -182,12 +168,8 @@ async function showCFR_A(data, defaultCrs) {
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
-  // cfi_b['ប្រព័ន្ធនិយាមកា'] = (espg && espg.name) || 'មិនមានព័ត៌មាន';
-  // cfi_b['និយាមកាយោង'] = `${x_coordinate} ${y_coordinate}`;
-
   // modify without affecting other translation
-  const translate = { ...TRANSLATE };
-  translate['province'] = 'ស្ថិតក្នុងខេត្ត';
+  cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
@@ -196,12 +178,12 @@ async function showCFR_A(data, defaultCrs) {
       cfi_b[key] = Utils.formatDate(cfi_b[key]);
     }
 
-    [translate[key] || key, cfi_b[key]].forEach((x, i) => {
+    [I18n.translate(key), cfi_b[key]].forEach((x, i) => {
       const td = document.createElement('td');
       td.innerText = x;
 
       if (i > 0 && !x) {
-        td.innerText = 'មិនមានព័ត៌មាន';
+        td.innerText = I18n.translate('no_data');
       }
 
       tr.append(td);
@@ -211,7 +193,7 @@ async function showCFR_A(data, defaultCrs) {
   }
 
   const header = document.querySelector('.about__header');
-  header.innerText = `សហគមន៍នេសាទ${cfr_name}`;
+  header.innerText = I18n.translate('fish_reservation_community') + ' ' + cfr_name;
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
@@ -245,8 +227,6 @@ async function loadCFRMap(options) {
 
 async function loadCFRSelect(options) {
   const cfr_data = await loadCFRMap(options);
-
-
   const cfiSelect = document.getElementById('cfiSelect');
 
   cfr_data.features.forEach((item) => {
@@ -286,15 +266,18 @@ async function loadProvinceCFR() {
     const provinceSelect = document.getElementById('provinceSelect');
 
     // append options to select
-    provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+    provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province'), {
+      disabled: true,
+      selected: true,
+    }));
 
     provinceSelect.append(
-      Utils.defaultOptionDOM('ខេត្តទាំងអស់', { value: '' }),
+      Utils.defaultOptionDOM(I18n.translate('all_province'), { value: '' }),
     );
 
     data.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = item.properties.pro_name_k;
+      option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
       provinceSelect.append(option);
@@ -304,16 +287,18 @@ async function loadProvinceCFR() {
       document.body.querySelector('.about__wrapper').classList.remove('active');
       document.getElementById('relatedLayers').parentElement.classList.add('d-none');
 
-      const val = e.currentTarget.value;
-      OVERLAY_MAP[KEYS.CFR_A].remove();
-
       const cfiSelect = document.getElementById('cfiSelect');
       cfiSelect.value = '';
       cfiSelect.innerHTML = '';
-      cfiSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសសហគមន៍នេសាទ'));
+      cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fish_reservation_community')));
+
+      if (typeof OVERLAY_MAP[KEYS.CFR_A] !== 'undefined') {
+        OVERLAY_MAP[KEYS.CFR_A].remove();
+      }
 
       toggleLoading(true);
 
+      const val = e.currentTarget.value;
       const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
       const overlay = await loadCFRSelect({ CQL_FILTER });
       const bounds = overlay.getBounds();
@@ -329,22 +314,9 @@ async function loadProvinceCFR() {
   }
 }
 
-async function loadSettings() {
-  const settings = await Promise.all([
-    Utils.fetchJson({ baseUrl: 'api/default-profile-layer/cfi' }),
-    Utils.fetchJson({ baseUrl: 'api/default-chart-layer/cfi' }),
-  ]);
-
-  defaultProfileTypeName = Object.keys(settings[0])[0];
-  defaultChartTypeName = Object.keys(settings[1])[0];
-}
-
 async function init() {
-  await Promise.all([
-    loadProvinceCFR(),
-    loadCFRMap(),
-    loadSettings(),
-  ]);
+  await I18n.init();
+  await loadProvinceCFR();
   document.getElementById('provinceSelect').removeAttribute('disabled');
   toggleLoading(false);
 }

@@ -15,16 +15,16 @@
       <div class="col-lg-4 col-md-6 col-sm-6">
         <div class="card shadow">
           <div class="card-title text-center border-bottom">
-            <h2 class="p-3">ច្រកចូលទៅកាន់ទំព័រគ្រប់គ្រង</h2>
+            <h2 class="p-3" data-i18n="login_portal">ច្រកចូលទៅកាន់ទំព័រគ្រប់គ្រង</h2>
           </div>
           <div class="card-body">
             <form id="formLogin">
               <div class="mb-4">
-                <label for="username" class="form-label">ឈ្មោះគណនី</label>
+                <label for="username" class="form-label" data-i18n="login_username">ឈ្មោះគណនី</label>
                 <input type="text" class="form-control" id="username" />
               </div>
               <div class="mb-4">
-                <label for="password" class="form-label">កូដសម្ងាត់</label>
+                <label for="password" class="form-label" data-i18n="password">កូដសម្ងាត់</label>
                 <input type="password" class="form-control" id="password" />
               </div>
               <div class="text-end">
@@ -36,8 +36,11 @@
       </div>
     </div>
   </div>
+  <script src="/javascript/translator.js"></script>
   <script src="/javascript/utils.js"></script>
   <script>
+    I18n.init();
+
     const form = document.getElementById('formLogin');
     form.addEventListener('submit', submitForm);
 
@@ -73,15 +76,15 @@
             throw new Error(data.error);
           }
 
-          setTimeout(() => { alert('ជោគជ័យ'); });
+          setTimeout(() => { alert(I18n.translate('success')); });
           setTimeout(() => {
             window.location.href = '/admin/' + Utils.getServer();
           }, 500);
         })
         .catch((err) => {
           console.log(err);
-          setTimeout(() => { //alert(err.message); 
-          alert('ពត៌មានមិនត្រឹមត្រូវ សូមពិនិត្យមើលឈ្មោះគណនីឬកូដសម្ងាត់អោយបានត្រឹមត្រូវ រូចព្យាយាមម្តងទៀត។');
+          setTimeout(() => {
+            alert(I18n.translate('incorrect_incredential_please_verify'));
           })
         }).finally(() => {
           submitBtn.removeAttribute('disabled');
