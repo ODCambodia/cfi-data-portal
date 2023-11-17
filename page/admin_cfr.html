@@ -12,34 +12,37 @@
 
 <body>
   <div class="card p-3 shadow w-100 h-100">
-    <button id="btnLogout" class="btn btn-sm btn-primary" type="button">ចេញពីទំព័រគ្រប់គ្រង</button>
+    <button id="btnLogout" class="btn btn-sm btn-primary" type="button" data-i18n="logout">ចេញពីទំព័រគ្រប់គ្រង</button>
     <nav>
       <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
         <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
-          role="tab" aria-controls="nav-home" aria-selected="true">កំណត់ឯកសារពាក់ព័ន្ធ</button>
+          role="tab" aria-controls="nav-home" aria-selected="true"
+          data-i18n="manage_related_file">កំណត់ឯកសារពាក់ព័ន្ធ</button>
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
-          role="tab" aria-controls="nav-profile" aria-selected="false">កំណត់ផ្ទំាងពត៌មានសហគមន៍</button>
+          role="tab" aria-controls="nav-profile" aria-selected="false"
+          data-i18n="manage_community_info">កំណត់ផ្ទំាងពត៌មានសហគមន៍</button>
         <button class="nav-link" id="nav-layer-tab" data-bs-toggle="tab" data-bs-target="#nav-layer" type="button"
-          role="tab" aria-controls="nav-contact" aria-selected="false">កំណត់សំន៉ំទិន្នន័យពាក់ព័ន្ធ</button>
+          role="tab" aria-controls="nav-contact" aria-selected="false"
+          data-i18n="manage_related_data">កំណត់សំន៉ំទិន្នន័យពាក់ព័ន្ធ</button>
       </div>
     </nav>
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
       <!-- Home -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="mb-2">
-          <label class="d-inline-block" for="">ជ្រើសរើសខេត្តឬក្រុង</label>
+          <label class="d-inline-block" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
           <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
         </div>
 
         <div id="tableProfile" class="table-wrapper d-none">
           <div class="table-title mb-2">
-            <h2>សហគមន៍នេសាទ</h2>
+            <h2 data-i18n="fish_reservation_community">សហគមន៍ស្រះជម្រកត្រី</h2>
           </div>
           <table class="table table-striped table-hover">
             <thead>
               <tr>
-                <th>ឈ្មោះសហគមន៍</th>
-                <th>សកម្មភាព</th>
+                <th data-i18n="community_name">ឈ្មោះសហគមន៍</th>
+                <th data-i18n="action">សកម្មភាព</th>
               </tr>
             </thead>
             <tbody>
@@ -52,11 +55,11 @@
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <form action="/api/default-profile-layer" id="defaultProfileForm"
           class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <div class="list-group my-2">
+          <div class="list-group my-2" data-i18n="loading">
             កំពុងដំណើរការ...
           </div>
           <div class="text-end">
-            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+            <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
           </div>
         </form>
 
@@ -74,11 +77,11 @@
       <!-- Layer -->
       <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
         <form action="/api/active-layers" id="toggleLayerForm">
-          <div class="list-group mb-2">
+          <div class="list-group mb-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
           <div class="text-end">
-            <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+            <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
           </div>
         </form>
       </div>
@@ -93,22 +96,22 @@
       <div class="modal-content">
         <form id="form">
           <div class="modal-header">
-            <h5 class="modal-title" id="addDocumentModalLabel">ឯកសារពាក់ព័ន្ធ</h5>
+            <h5 class="modal-title" id="addDocumentModalLabel" data-i18n="manage_related_file">ឯកសារពាក់ព័ន្ធ</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body ">
             <div class="row g-3 mb-3">
               <div class="col-12">
-                <label for="titleInput" class="form-label">ចំណងជើងឯកសារ</label>
+                <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
               </div>
               <div class="col-12">
-                <label for="descriptionInput" class="form-label">អត្ថបទសង្ខេបអំពីឯកសារ</label>
+                <label for="descriptionInput" class="form-label" data-i18n="file_description">អត្ថបទសង្ខេបអំពីឯកសារ</label>
                 <textarea id="descriptionInput" class="form-control" rows="3"></textarea>
               </div>
             </div>
             <div>
-              <label for="formFile" class="d-block form-label text-start">ឯកសារ</label>
+              <label for="formFile" class="d-block form-label text-start" data-i18n="file">ឯកសារ</label>
               <div class="d-flex flex-column justify-content-center align-items-center text-center">
                 <label for="formFile" class="form-label text-center mb-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
@@ -119,15 +122,15 @@
                       d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
                   </svg>
                 </label>
-                <label for="formFile" class="btn">ជ្រើសរើសឯកសារ</label>
+                <label for="formFile" class="btn" data-i18n="choose_a_file">ជ្រើសរើសឯកសារ</label>
                 <input class="visually-hidden" type="file" id="formFile" name="fileUpload" required>
               </div>
             </div>
             <input type="hidden" name="positionInput" id="positionInput">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
-            <button id="addFormBtn" type="submit" class="btn btn-primary">រក្សាទុក</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">បិទ</button>
+            <button id="addFormBtn" type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
           </div>
         </form>
       </div>
@@ -140,25 +143,28 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="listDocumentModalLabel">ឯកសារពាក់ព័ន្ធ</h5>
+          <h5 class="modal-title" id="listDocumentModalLabel" data-i18n="manage_related_file">ឯកសារពាក់ព័ន្ធ</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body text-center">
 
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">បិទ</button>
-          <button type="submit" class="btn btn-primary">រក្សាទុក</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="close">បិទ</button>
+          <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
         </div>
       </div>
     </div>
   </div>
 
+  <script src="/javascript/translator.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
     crossorigin="anonymous"></script>
   <script src="/javascript/utils.js"></script>
   <script>
+    I18n.init();
+
     const REGEX_YEAR = /(_(20)\d{2})/s;
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfr/ows`;
@@ -169,7 +175,7 @@
       const btn = document.createElement('button');
       btn.type = "button";
       btn.classList.add('btn', 'btn-primary');
-      btn.innerText = 'បន្ថែមឯកសារ';
+      btn.innerText = I18n.translate('add_file');
       btn.dataset.bsToggle = 'modal';
       btn.dataset.bsTarget = '#addDocumentModal';
       btn.dataset.val = encodeURIComponent(JSON.stringify(cfi));
@@ -177,7 +183,7 @@
       btn.dataset.y = cfi.geometry.coordinates[1];
 
       const btnList = btn.cloneNode();
-      btnList.innerText = 'កែសម្រួលឯកសារ';
+      btnList.innerText = I18n.translate('edit_file');
       btnList.dataset.bsTarget = '#listDocumentModal';
       btnList.dataset.id = cfi.id;
 
@@ -229,17 +235,17 @@
         data: {
           typeName: 'cfr:cambodian_provincial',
           outputFormat: 'application/json',
-          propertyname: 'ADM1_EN,ADM1_PCODE',
-          SORTBY: 'ADM1_PCODE ASC',
+          propertyname: 'hrname,pro_name_k,pro_code',
+          SORTBY: 'pro_code ASC',
         },
       });
       const provinceSelect = document.getElementById('provinceSelect');
 
       // append options to select
-      provinceSelect.append(Utils.defaultOptionDOM('ជ្រើសរើសខេត្តឬក្រុង'));
+      provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province')));
       data.features.forEach((item) => {
         const option = document.createElement('option');
-        option.text = item.properties.ADM1_EN;
+        option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
         option.value = item.id;
         provinceSelect.append(option);
       });
@@ -249,7 +255,7 @@
         document.getElementById('tableProfile').classList.remove('d-none');
 
         const tbody = document.querySelector('#tableProfile table tbody');
-        tbody.innerHTML = 'កំពុងដំណើរការ...';
+        tbody.innerHTML = I18n.translate('loading...');
 
         const cfrResponse = await Utils.fetchGeoJson({
           data: {
@@ -267,7 +273,7 @@
             tbody.append(tr);
           });
         } else {
-          tbody.innerHTML = 'ខេត្តនេះមិនមានសហគមន៍នេសាទ។';
+          tbody.innerHTML = I18n.translate('this_province_does_not_have_cfr');
         }
       });
     }
@@ -281,7 +287,7 @@
       form.dataset.y = btn.dataset.y;
 
       const label = form.querySelector('.btn[for="formFile"]');
-      label.innerText = 'ជ្រើសរើសឯកសារ';
+      label.innerText = I18n.translate('choose_a_file');
     }
 
     function handleDeleteDocument(e) {
@@ -290,15 +296,15 @@
       const fileName = btnDel.dataset.url.split('/').slice(-1)[0];
 
       if (!id) {
-        return alert('មិនអាចលុបបាន រកមិនឃើញអត្តសញ្ញាណរបស់ឯកសារ។');
+        return alert(I18n.translate('unable_to_delete_file_not_found'));
       }
 
       if (!fileName) {
-        return alert('មិនអាចលុបបាន ឈ្មោះឯកសារមិនត្រឹមត្រូវ។');
+        return alert('unable_to_delete_file_name_not_found');
       }
 
       btnDel.setAttribute('disabled', true);
-      btnDel.innerText = 'កំពុងដំណើរការ...';
+      btnDel.innerText = I18n.translate('loading...');
       const res = fetch(`/admin/documents/cfr/${id}`, {
         method: 'DELETE',
         body: JSON.stringify({ fileName }),
@@ -309,12 +315,12 @@
 
       Utils.handleFetchPromise(res, () => {
         if (btnDel.parentNode.parentNode.childNodes.length === 1) {
-          btnDel.parentNode.parentNode.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
+          btnDel.parentNode.parentNode.innerHTML = I18n.translate('no_existing_file');
         } else {
           btnDel.parentNode.outerHTML = '';
         }
 
-        alert('ឯកសារត្រូវលុបបានដោយជោគជ័យ');
+        alert(I18n.translate('file_deleted_successfully'));
       });
     }
 
@@ -322,7 +328,6 @@
       const btn = e.relatedTarget;
       const documentModalBody = document.querySelector('#listDocumentModal .modal-body');
       // There should be a better way to do this
-      console.log(btn);
       const documentLayer = await Utils.fetchGeoJson({
         data: {
           typeName: '	cfr:documents',
@@ -331,7 +336,7 @@
       });
 
       if (!documentLayer.features.length > 0) {
-        documentModalBody.innerHTML = 'មិនទាន់មានឯកសារនៅឡើយ';
+        documentModalBody.innerHTML = I18n.translate('no_existing_file');
         return;
       }
 
@@ -361,7 +366,7 @@
         btnDel.dataset.url = doc.url;
         btnDel.addEventListener('click', handleDeleteDocument);
         btnDel.classList.add('btn', 'btn-sm', 'btn-danger', 'float-end');
-        btnDel.innerText = 'លុប';
+        btnDel.innerText = I18n.translate('delete');
 
         const li = document.createElement('li');
         li.classList.add('document-list-item');
@@ -396,17 +401,17 @@
       })
         .then(function (response) {
           if (response.ok) {
-            setTimeout(() => { alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ'); }, 0)
+            setTimeout(() => { alert(I18n.translate('file_uploaded_successfully')); }, 0)
             return response.text();
           }
 
           throw new Error('Something went wrong.');
         })
         .catch((err) => {
-          setTimeout(() => { alert('ការរក្សាទុកមានបញ្ញា សូមពិនិត្យទិន្នន័យរូចធ្វើការព្យាយាមម្តងទៀត។'); }, 0)
+          setTimeout(() => { alert(I18n.translate('something_went_wrong_while_saving')); }, 0)
         }).finally(() => {
           const label = document.querySelector('.btn[for="formFile"]');
-          label.innerText = 'ជ្រើសរើសឯកសារ';
+          label.innerText = I18n.translate('choose_a_file');
           currentForm.reset();
           modal.hide();
           submitBtn.removeAttribute('disabled');
@@ -419,7 +424,7 @@
       const submitBtn = form.querySelector(`button[type="submit"]`);
       const prevBtnText = submitBtn.textContent;
       submitBtn.setAttribute('disabled', true);
-      submitBtn.innerText = 'កំពុងដំណើរការ...';
+      submitBtn.innerText = I18n.translate('loading...');
 
       const selectedActiveLayers = form.querySelectorAll(`input.list-group-input:checked`);
       const reqBody = {}
@@ -437,7 +442,7 @@
       });
 
       Utils.handleFetchPromise(res, () => {
-        alert('ទិន្នន័យត្រូវបានរក្សាទុកដោយជោគជ័យ');
+        alert(I18n.translate('file_uploaded_successfully'));
       }).finally(() => {
         submitBtn.removeAttribute('disabled');
         submitBtn.innerText = prevBtnText;
@@ -499,7 +504,7 @@
       const listModal = document.getElementById('listDocumentModal');
       listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
       listModal.addEventListener('shown.bs.modal', function (e) {
-        document.querySelector('#listDocumentModal .modal-body').innerHTML = 'កំពុងដំណើរការ...';
+        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
       })
 
       const form = document.getElementById('form');
@@ -513,7 +518,8 @@
       activeLayerTabBtn.addEventListener('click', function (e) {
         if (!hasLoadedActiveLayerTab) {
           hasLoadedActiveLayerTab = true;
-          const header = document.createTextNode('ជ្រើសរើសសំន៉ំទិន្នន័យពាក់ព័ន្ធដើម្បីបង្ហាញ');
+          const header = document.createElement('h6');
+          header.innerText = I18n.translate('select_related_data_to_show')
           const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
           listGroupDom.parentElement.prepend(header);
           loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'));
@@ -527,7 +533,7 @@
       defaultProfileTab.addEventListener('click', function (e) {
         if (!hasLoadedProfileTab) {
           hasLoadedProfileTab = true;
-          const profileHeader = document.createTextNode('ជ្រើសរើសProfileដើម្បីបង្ហាញ');
+          const profileHeader = document.createTextNode(I18n.translate('select_a_profile_to_show'));
           const profileList = document.querySelector(`#defaultProfileForm .list-group`);
           profileList.parentElement.prepend(profileHeader);
           loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
@@ -552,12 +558,12 @@
       formInput.addEventListener('change', function () {
         if (formInput.files && formInput.files[0]) {
           const label = document.querySelector('.btn[for="formFile"]');
-          label.innerText = 'កំពុងដំណើរការ';
+          label.innerText = I18n.translate('loading...');
 
           const reader = new FileReader();
           reader.readAsDataURL(formInput.files[0]);
           reader.onload = function (e) {
-            const fileName = formInput.value.split("\\").slice('-1') || 'ឯកសារ';
+            const fileName = formInput.value.split("\\").slice('-1') || I18n.translate('file');
             label.innerText = fileName;
           }
         }

@@ -11,7 +11,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <title>សហគមន៍នេសាទ</title>
+  <title data-i18n="fish_reservation_community">សហគមន៍ស្រះជម្រកត្រី</title>
 </head>
 
 <body>
@@ -30,7 +30,13 @@
   <div class="sidebar open">
     <div class="logo-details">
       <a href="/" class="logo_name" data-i18n="homepage">ទំព័រដើម</a>
-      <a id="adminLink" href="/admin/" class="logo_name icon">
+      <a data-val="en" type="button" class="logo_name icon icon-lang" style="margin-left: auto;">
+        <img src="/img/us-flag.svg" alt="flag" width="22" height="22">
+      </a>
+      <a data-val="kh" type="button" class="logo_name icon icon-lang">
+        <img src="/img/kh-flag.svg" alt="flag" width="22" height="22">
+      </a>
+      <a id="adminLink" href="/admin/" class="logo_name icon icon-gear">
         <svg class="icon" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 50 50" width="22" height="22"
           fill="#fff">
           <path
@@ -95,18 +101,16 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
   <script src="/javascript/translator.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
   <script src="/javascript/utils.js"></script>
   <script src="/javascript/config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.2/proj4.js"
     integrity="sha512-S0ojOEysgB/TxIOyywNVRLJV0RlQR0PHT9nBxtjVziDz9smFvUQyiRD7RXwYlx5MJeJXJZ+cvqjHPWuReGfQIQ=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
-    const i18n = new I18n();
     const SERVER = 'cfr';
     const GEOSERVER = `/geoserver/${SERVER}/ows`;
-
     let defaultProfileTypeName = 'cfr:cfr_wf_assessment_2022';
     let defaultChartTypeName = 'cfr:cfr_wf_assessment_2022';
 
@@ -147,10 +151,17 @@
 
       const adminLink = document.getElementById('adminLink');
       adminLink.href += SERVER;
+
+      const langButtons = document.querySelectorAll('a.icon-lang');
+      langButtons.forEach((btn) => {
+        btn.addEventListener('click', function (e) {
+          localStorage.setItem('lang', e.currentTarget.dataset.val || 'kh')
+          window.location.reload();
+        });
+      })
     })
   </script>
   <script src="/javascript/cfr.js"></script>
-
 </body>
 
 </html>

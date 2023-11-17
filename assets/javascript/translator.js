@@ -4,13 +4,13 @@ class I18n {
   static _translate = {};
 
   static _getLang() {
-    const stored = localStorage.getItem('language');
+    const stored = localStorage.getItem('lang');
 
     if (stored) {
       return stored;
     }
 
-    localStorage.setItem('langauge', this._defaultLang);
+    localStorage.setItem('lang', this._defaultLang);
 
     return this._defaultLang;
   }
@@ -54,7 +54,6 @@ class I18n {
     }
 
     if (!key || typeof this._translate[key] === 'undefined') {
-      console.log(this._translate);
       return key;
     }
 
