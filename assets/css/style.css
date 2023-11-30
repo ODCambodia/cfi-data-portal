@@ -333,7 +333,7 @@ td span {
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: transparent;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* Modal Content Box */
@@ -356,10 +356,6 @@ td span {
   overflow: auto;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex: 1;
 }
 
 .modal__table {
@@ -375,12 +371,13 @@ td span {
 
 .close {
   float: right;
-  font-size: 28px;
+  font-size: 36px;
   font-weight: bold;
-  color: white;
+  color: black;
   padding: 0 4px;
   line-height: 25px;
   margin-bottom: 8px;
+  background: lightgray;
 }
 
 .close:hover,
