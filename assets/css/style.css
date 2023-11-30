@@ -356,6 +356,9 @@ td span {
   overflow: auto;
   width: 100%;
   height: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
 }
 
 .modal__table {
@@ -363,9 +366,17 @@ td span {
   border-collapse: collapse;
 }
 
+.modal__table.vertical {
+  align-self: flex-start;
+}
+
+.modal__table th {
+  white-space: nowrap;
+  padding: 5px;
+}
+
 .modal__table th,
 .modal__table td {
-  padding: 0 5px;
   border: 1px solid #000;
 }
 

@@ -86,7 +86,7 @@ function switchCRS() {
   document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(decimalsPos)).join(' ');
 }
 
-function getESPGToggleBtn(text, coordinateDOM) {
+function getESPGToggleBtn(text) {
   const btn = document.createElement('button');
   btn.innerHTML = text;
   btn.id = 'espgToggleBtn';
@@ -239,14 +239,13 @@ async function handleRelatedLayerClick(e) {
     return;
   }
 
-  const modalHeader = document.querySelector('#cfiModal .modal-header');
-  const headerText = document.createElement('strong');
-  headerText.innerText = layerName;
-  modalHeader.prepend(headerText);
+  const modalHeader = document.querySelector('#cfiModal .modal-header strong');
+  modalHeader.innerText = layerName;
 
   const table = document.querySelector('#cfiModal table');
   const tbody = document.createElement('tbody');
   table.innerHTML = '';
+  table.classList.remove('vertical');
 
   if (layerData.features.length > 1) {
     const thead = document.createElement('thead');
@@ -265,11 +264,18 @@ async function handleRelatedLayerClick(e) {
       const contents = Object.values(layer.properties);
       const tr = document.createElement('tr');
 
-      contents.forEach((item) => {
+      for (key in contents) {
+        const item = contents[key]
         const td = document.createElement('td');
-        td.append(item);
+
+        if (Utils.isNumeric(item) && !Utils.isCoordinate(key)) {
+          td.innerText = Number(item).toFixed(2);
+        } else {
+          td.append(item);
+        }
+
         tr.append(td);
-      });
+      }
 
       tbody.append(tr);
     });
@@ -279,6 +285,7 @@ async function handleRelatedLayerClick(e) {
   } else {
     const contentObj = layerData.features[0].properties;
     tbody.style.textAlign = 'left';
+    table.classList.add('vertical');
 
     for (key in contentObj) {
       const tr = document.createElement('tr');
@@ -288,7 +295,12 @@ async function handleRelatedLayerClick(e) {
       tdKey.innerText = TRANSLATE[key] || key;
       tr.append(tdKey);
 
-      tdVal.innerText = contentObj[key];
+      if (Utils.isNumeric(contentObj[key]) && !Utils.isCoordinate(key)) {
+        tdVal.innerText = Number(contentObj[key]).toFixed(2);
+      } else {
+        tdVal.innerText = contentObj[key];
+      }
+
       tr.append(tdVal);
 
       tbody.append(tr);
@@ -420,15 +432,11 @@ async function showCFI_B(data, defaultCrs) {
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
-
-
   // careful about changing key
   // change the listener as well
   cfi_b['coordinate_system'] = (espg && espg.name) || I18n.translate('no_data');
   cfi_b['referencing_coordinate'] = `${x_coordinate} ${y_coordinate}`;
   cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
-
-  console.log(data.feature);
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
@@ -449,6 +457,8 @@ async function showCFI_B(data, defaultCrs) {
 
       if (x instanceof Element) {
         td.append(x);
+      } else if (Utils.isNumeric(x)) {
+        td.innerText = Number(x).toFixed(2);
       } else {
         td.innerText = x;
       }
