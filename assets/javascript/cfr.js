@@ -197,12 +197,20 @@ async function showCFR_A(data) {
       cfi_b[key] = Utils.formatDate(cfi_b[key]);
     }
 
-    [I18n.translate(key), cfi_b[key]].forEach((x, i) => {
+    [key, cfi_b[key]].forEach((x, i) => {
       const td = document.createElement('td');
-      td.innerText = x;
 
-      if (i > 0 && !x) {
-        td.innerText = I18n.translate('no_data');
+      if (i > 0) {
+        td.innerText = x;
+
+        if (!x) {
+          td.innerText = I18n.translate('no_data');
+        } else if (Utils.isNumeric(x) && !Utils.isCoordinate(x)) {
+          const str = typeof x === 'string' ? x.replace(',', '') : x;
+          td.innerText = Number(str).toFixed(2);
+        }
+      } else {
+        td.innerText = I18n.translate(x);
       }
 
       tr.append(td);

@@ -135,6 +135,28 @@ const Utils = {
     const year = d.getFullYear();
 
     return day + separator + (I18n.translate(month)) + separator + year;
+  },
+  isNumeric: function (str) {
+    if (typeof str === 'string' && str[0] === '0' && (str[1] !== '.' || str[1] !== ',')) {
+      return false;
+    }
+
+    return /^-?[0-9][0-9,\.]+$/.test(str);
+  },
+  isCoordinate: function (key) {
+    const hashs = {
+      'x_coord': 1,
+      'y_coord': 1,
+      'lat': 1,
+      'long': 1,
+      'latitude': 1,
+      'longtitude': 1,
+      '_cfr_geopoint_latitude': 1,
+      '_cfr_geopoint_longitude': 1,
+      '_cfr_geopoint_altitude': 1,
+      '_cfr_geopoint_precision': 1,
+    };
+    return hashs[key] !== undefined;
   }
 };
 
@@ -159,12 +181,12 @@ const CustomCharts = {
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';
     pieHeader.style.paddingTop = '5px';
-    
+
     const canvas = document.getElementById(selectorId);
     canvas.parentNode.insertBefore(pieHeader, canvas);
     canvas.style.paddingBottom = '10px';
     canvas.style.borderBottom = '1px dashed #000';
-    
+
     return new Chart(canvas, { type: 'pie', data: pieData });
   },
   barChart: function (selectorId) {
