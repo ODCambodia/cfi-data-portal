@@ -221,6 +221,7 @@ async function handleRelatedLayerClick(e) {
   );
   e.currentTarget.classList.add('active');
 
+  const layerName = e.currentTarget.textContent;
   const typeName = e.currentTarget.dataset.name;
   const cfiId = e.currentTarget.dataset.cfiId;
   const layerData = await Utils.fetchGeoJson({
@@ -238,43 +239,62 @@ async function handleRelatedLayerClick(e) {
     return;
   }
 
+  const modalHeader = document.querySelector('#cfiModal .modal-header');
+  const headerText = document.createElement('strong');
+  headerText.innerText = layerName;
+  modalHeader.prepend(headerText);
+
   const table = document.querySelector('#cfiModal table');
-  const thead = document.createElement('thead');
   const tbody = document.createElement('tbody');
   table.innerHTML = '';
 
-  const headers = Object.keys(layerData.features[0].properties).map(
-    (key) => TRANSLATE[key] || key,
-  );
-  const trHead = document.createElement('tr');
-
-  headers.push('ទាញយក');
-  headers.forEach((head) => {
-    const th = document.createElement('th');
-    th.innerText = head;
-    trHead.append(th);
-  });
-
-  layerData.features.forEach((layer) => {
-    const contents = Object.values(layer.properties);
-    const tr = document.createElement('tr');
-
-    contents.push(
-      getDownloadDom(
-        `/geoserver/cfi/wfs?service=WFS&version=1.1.0&request=GetFeature&outputFormat=text/csv&typeName=${typeName}&featureId=${layer.id}`,
-      ),
+  if (layerData.features.length > 1) {
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+    const headers = Object.keys(layerData.features[0].properties).map(
+      (key) => TRANSLATE[key] || key,
     );
-    contents.forEach((item) => {
-      const td = document.createElement('td');
-      td.append(item);
-      tr.append(td);
+
+    headers.forEach((head) => {
+      const th = document.createElement('th');
+      th.innerText = head;
+      trHead.append(th);
     });
 
-    tbody.append(tr);
-  });
+    layerData.features.forEach((layer) => {
+      const contents = Object.values(layer.properties);
+      const tr = document.createElement('tr');
 
-  thead.append(trHead);
-  table.append(thead);
+      contents.forEach((item) => {
+        const td = document.createElement('td');
+        td.append(item);
+        tr.append(td);
+      });
+
+      tbody.append(tr);
+    });
+
+    thead.append(trHead);
+    table.append(thead);
+  } else {
+    const contentObj = layerData.features[0].properties;
+    tbody.style.textAlign = 'left';
+
+    for (key in contentObj) {
+      const tr = document.createElement('tr');
+      const tdKey = document.createElement('td');
+      const tdVal = document.createElement('td');
+
+      tdKey.innerText = TRANSLATE[key] || key;
+      tr.append(tdKey);
+
+      tdVal.innerText = contentObj[key];
+      tr.append(tdVal);
+
+      tbody.append(tr);
+    }
+  }
+
   table.append(tbody);
 
   const modal = document.getElementById('cfiModal');
