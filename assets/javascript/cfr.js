@@ -207,7 +207,7 @@ async function showCFR_A(data) {
           td.innerText = I18n.translate('no_data');
         } else if (Utils.isNumeric(x) && !Utils.isCoordinate(x)) {
           const str = typeof x === 'string' ? x.replace(',', '') : x;
-          td.innerText = Number(str).toFixed(2);
+          td.innerText = Utils.toFixed(Number(str), 2);
         }
       } else {
         td.innerText = I18n.translate(x);

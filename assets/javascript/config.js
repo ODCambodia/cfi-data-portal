@@ -59,6 +59,8 @@ const CONFIGS = {
 
 // remove this later and use translation.js
 const TRANSLATE = {
+  'name': 'ឈ្មោះ',
+  'area': 'ក្រឡា​ផ្ទៃ',
   'area_ha': 'ក្រឡា​ផ្ទៃ(ហិកតា)',
   'cfi_code': 'លេខកូដសម្គាល់​សហគមន៍',
   'type': 'ប្រភេទ',
