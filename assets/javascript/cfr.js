@@ -5,6 +5,30 @@ const map = L.map('map', {
   minZoom: 7,
 });
 
+let activePoint = null;
+
+function showActivePoint(layer) {
+  let radius = layer.getRadius();
+
+  if (activePoint !== null) {
+    // Reset style|
+    activePoint.setStyle({ ...POINT_STYLE.default, radius });
+    activePoint = null;
+  }
+
+  // set active in view with offset
+  const center = Object.values(layer.getLatLng());
+  const offsetCenter = new L.Point(200, 0);
+  map.panTo(center, { animate: false });
+  map.panBy(offsetCenter, { animate: false });
+
+  radius = layer.getRadius() * 1.3;
+  layer.bringToFront();
+  layer.setStyle({ ...POINT_STYLE.active, radius });
+
+  activePoint = layer;
+}
+
 map.setMaxBounds(map.getBounds());
 
 const mapLink = '<a href="http://www.esri.com/">Esri</a>';
@@ -166,6 +190,7 @@ function drawAboutSection() {
 }
 
 async function showCFR_A(data) {
+  document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
   const {
@@ -243,6 +268,17 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A].off('click');
   OVERLAY_MAP[KEYS.CFR_A].on('click', function (e) {
     showCFR_A(e.layer);
+    showActivePoint(e.layer);
+  });
+
+  map.on('zoomend', function () {
+    const currentZoom = map.getZoom();
+    let radius = currentZoom * 1.2; //or whatever ratio you prefer
+    if (currentZoom < 10) {
+      radius *= 0.85;
+    }
+
+    OVERLAY_MAP[KEYS.CFR_A].setStyle({ radius: radius });
   });
 
   // load number of CFR
@@ -269,6 +305,15 @@ async function loadCFRSelect(options) {
     const selectedCFR = cfr_data.features.find((item) => item.id === val);
 
     document.querySelector('.about__body').innerHTML = '';
+
+    if (OVERLAY_MAP[KEYS.CFR_A]) {
+      const polygonsLayers = OVERLAY_MAP[KEYS.CFR_A].getLayers();
+      const activeLayer = polygonsLayers.find(
+        (layer) => layer.feature.id === val,
+      );
+
+      showActivePoint(activeLayer);
+    }
 
     if (selectedCFR) {
       showCFR_A({ feature: selectedCFR });

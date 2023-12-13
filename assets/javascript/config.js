@@ -30,6 +30,25 @@ const POLYGON_STYLE = {
   }
 }
 
+const POINT_STYLE = {
+  default: {
+    color: '#000',
+    fillColor: "#FFD04B",
+    radius: 5,
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+  },
+  active: {
+    color: '#000',
+    fillColor: "#DE0004",
+    radius: 9,
+    weight: 2.5,
+    opacity: 1,
+    fillOpacity: 1,
+  }
+}
+
 // CONFIG OVERLAY STYLES
 const STYLES = {
   [KEYS.CFI_A]: () => ({
@@ -41,14 +60,7 @@ const STYLES = {
     fillOpacity: 0.8
   }),
   [KEYS.CFI_B]: () => POLYGON_STYLE.default,
-  [KEYS.CFR_A]: () => ({
-    color: '#000',
-    fillColor: "#FFD04B",
-    radius: 5,
-    weight: 1,
-    opacity: 1,
-    fillOpacity: 0.8
-  })
+  [KEYS.CFR_A]: () => POINT_STYLE.default,
 }
 
 // MAIN CONFIG
