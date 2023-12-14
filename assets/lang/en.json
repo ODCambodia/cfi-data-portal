@@ -1,4 +1,7 @@
 {
+  "area": "Area (Hectare)",
+  "name": "Name",
+  "conservation_area_in_community": "Conservation area in community",
   "select_to_get_started": "Select an option to get started",
   "close": "Close",
   "save": "Save",

@@ -253,6 +253,14 @@ td span {
   flex: 0 1 auto;
 }
 
+.conservation__area__wrapper .about__header {
+  display: block;
+  line-height: 25px;
+  font-size: 18px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 .conservation__area__wrapper table thead {
   font-weight: bold;
 }

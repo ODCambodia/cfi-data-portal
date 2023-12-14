@@ -229,6 +229,10 @@ async function loadConservationAreas(cfiId) {
   });
 
   if (conservationArea.features.length > 0) {
+    const header = document.createElement('h2');
+    header.classList.add('about__header');
+    header.innerText = I18n.translate('conservation_area_in_community');
+    
     const tbody = document.createElement('tbody');
     const thead = document.createElement('thead');
     const ItemsToShowKeys = ['name', 'area'];
@@ -251,7 +255,7 @@ async function loadConservationAreas(cfiId) {
         if (Utils.isNumeric(val)) {
           td.innerText = Utils.toFixed(Number(val), 2);
         } else if (key === 'name') {
-          td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })];
+          td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
         }
 
         tr.append(td);
@@ -260,6 +264,7 @@ async function loadConservationAreas(cfiId) {
       tbody.append(tr);
     })
 
+    document.querySelector('.conservation__area__wrapper').prepend(header);
     const conservationTable = document.querySelector('.conservation__area__wrapper table');
     conservationTable.append(thead);
     conservationTable.append(tbody);
@@ -527,7 +532,7 @@ async function showCFI_B(data, defaultCrs) {
   }
 
   const cfi_name = data.feature.properties[I18n.translate({ en: 'name_en', kh: 'name' })]
-  const header = document.querySelector('.about__header');
+  const header = document.querySelector('.about__wrapper .about__header');
   header.innerText = I18n.translate('fishing_community') + ` ${sub_name || cfi_name} `;
 
   const profileTable = document.querySelector('.about__table__wrapper table');
