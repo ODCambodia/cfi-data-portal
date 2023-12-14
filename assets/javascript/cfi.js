@@ -147,8 +147,8 @@ const DemoGraphyChart = (function () {
     committee: {
       typeName: 'cfi:cfi_status_assessment_2018',
       id: 'committeePieChart',
-      title: I18n.translate('committees'),
-      labels: [I18n.translate('female'), I18n.translate('male')],
+      title: 'committees',
+      labels: ['female', 'male'],
       propertyKeys: {
         female: 'cfi_cmte_female',
         total: 'cfi_cmte_total',
@@ -157,8 +157,8 @@ const DemoGraphyChart = (function () {
     member: {
       typeName: 'cfi:cfi_status_assessment_2018',
       id: 'memberPieChart',
-      title: I18n.translate('members'),
-      labels: [I18n.translate('female'), I18n.translate('male')],
+      title: 'members',
+      labels: ['female', 'male'],
       propertyKeys: {
         female: 'cfi_member_female',
         total: 'cfi_member_total',
@@ -167,8 +167,8 @@ const DemoGraphyChart = (function () {
     population: {
       typeName: defaultChartTypeName,
       id: 'populationPieChart',
-      title: I18n.translate('population'),
-      labels: [I18n.translate('female'), I18n.translate('male')],
+      title: 'population',
+      labels: ['female', 'male'],
       propertyKeys: {
         female: 'population_female',
         total: 'population_total',
@@ -232,7 +232,7 @@ async function loadConservationAreas(cfiId) {
     const header = document.createElement('h2');
     header.classList.add('about__header');
     header.innerText = I18n.translate('conservation_area_in_community');
-    
+
     const tbody = document.createElement('tbody');
     const thead = document.createElement('thead');
     const ItemsToShowKeys = ['name', 'area'];

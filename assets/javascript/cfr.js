@@ -64,8 +64,8 @@ const DemoGraphyChart = (function () {
     committee: {
       typeName: defaultProfileTypeName,
       id: 'committeePieChart',
-      title: I18n.translate('committees'),
-      labels: [I18n.translate('female'), I18n.translate('male')],
+      title: 'committees',
+      labels: ['female', 'male'],
       propertyKeys: {
         female: 'num_cmte_female',
         total: 'num_cmte_mem',
@@ -74,8 +74,8 @@ const DemoGraphyChart = (function () {
     population: {
       typeName: defaultChartTypeName,
       id: 'populationPieChart',
-      title: I18n.translate('population'),
-      labels: [I18n.translate('female'), I18n.translate('male')],
+      title: 'population',
+      labels: ['female', 'male'],
       propertyKeys: {
         female: 'num_commune_women',
         total: 'num_commune_ppl',

@@ -166,8 +166,9 @@ const Utils = {
 
 const CustomCharts = {
   pieChart: function (selectorId, title, labels, data) {
+    const translatedLabels = labels.map((item) => I18n.translate(item));
     const pieData = {
-      labels,
+      labels: translatedLabels,
       datasets: [{
         data,
         label: title,
@@ -181,7 +182,7 @@ const CustomCharts = {
     };
 
     const pieHeader = document.createElement('p');
-    pieHeader.innerText = title;
+    pieHeader.innerText = I18n.translate(title);
     pieHeader.style.textAlign = 'center';
     pieHeader.style.color = '#2f4f4f';
     pieHeader.style.paddingTop = '5px';
