@@ -114,6 +114,10 @@ function drawAboutSection() {
   tableWrapper.append(tableProfile);
   tableWrapper.classList.add('about__table__wrapper');
 
+  const conservationWrapper = document.createElement('div');
+  conservationWrapper.classList.add('conservation__area__wrapper');
+  conservationWrapper.append(tableProfile.cloneNode(true));
+
   const chartWrapper = document.createElement('div');
   chartWrapper.classList.add('chart__wrapper');
 
@@ -134,6 +138,7 @@ function drawAboutSection() {
   // Appending everything
   const body = document.querySelector('.about__body');
   body.append(tableWrapper);
+  body.append(conservationWrapper);
   body.append(chartWrapper);
 }
 
@@ -215,6 +220,54 @@ const DemoGraphyChart = (function () {
   };
 })();
 
+async function loadConservationAreas(cfiId) {
+  const conservationArea = await Utils.fetchGeoJson({
+    data: {
+      typeName: defaultConservationTypeName,
+      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')))`,
+    },
+  });
+
+  if (conservationArea.features.length > 0) {
+    const tbody = document.createElement('tbody');
+    const thead = document.createElement('thead');
+    const ItemsToShowKeys = ['name', 'area'];
+
+    const trHead = document.createElement('tr');
+    ItemsToShowKeys.forEach((item) => {
+      const td = document.createElement('td');
+      td.innerText = I18n.translate(item);
+      trHead.append(td);
+    });
+    thead.append(trHead);
+
+    conservationArea.features.forEach((item) => {
+      const tr = document.createElement('tr');
+
+      ItemsToShowKeys.forEach((key) => {
+        const td = document.createElement('td');
+        const val = item.properties[key];
+
+        if (Utils.isNumeric(val)) {
+          td.innerText = Utils.toFixed(Number(val), 2);
+        } else if (key === 'name') {
+          td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })];
+        }
+
+        tr.append(td);
+      });
+
+      tbody.append(tr);
+    })
+
+    const conservationTable = document.querySelector('.conservation__area__wrapper table');
+    conservationTable.append(thead);
+    conservationTable.append(tbody);
+  } else {
+    document.querySelector('.conservation__area__wrapper').outerHTML = '';
+  }
+}
+
 async function handleRelatedLayerClick(e) {
   e.currentTarget.parentNode.childNodes.forEach((item) =>
     item.classList.remove('active'),
@@ -269,7 +322,7 @@ async function handleRelatedLayerClick(e) {
         const td = document.createElement('td');
 
         if (Utils.isNumeric(item) && !Utils.isCoordinate(key)) {
-          td.innerText = Number(item).toFixed(2);
+          td.innerText = Utils.toFixed(Number(item), 2);
         } else {
           td.append(item);
         }
@@ -296,7 +349,7 @@ async function handleRelatedLayerClick(e) {
       tr.append(tdKey);
 
       if (Utils.isNumeric(contentObj[key]) && !Utils.isCoordinate(key)) {
-        tdVal.innerText = Number(contentObj[key]).toFixed(2);
+        tdVal.innerText = Utils.toFixed(Number(contentObj[key]), 2);
       } else {
         tdVal.innerText = contentObj[key];
       }
@@ -458,7 +511,7 @@ async function showCFI_B(data, defaultCrs) {
       if (x instanceof Element) {
         td.append(x);
       } else if (Utils.isNumeric(x)) {
-        td.innerText = Number(x).toFixed(2);
+        td.innerText = Utils.toFixed(Number(x), 2);
       } else {
         td.innerText = x;
       }
@@ -495,19 +548,22 @@ function addBoundaryClickEvent() {
     document.getElementById('cfiSelect').value = cfiId;
 
     drawAboutSection();
-    await DemoGraphyChart.loadAllChart(cfiId);
 
-    const cfiProfile = await Utils.fetchGeoJson({
-      data: {
-        typeName: defaultProfileTypeName,
-        SORTBY: 'name ASC',
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
-      },
-    });
+    const [cfiProfile] = await Promise.all([  // mostly unrelated function but run them in sync to speed things up
+      Utils.fetchGeoJson({
+        data: {
+          typeName: defaultProfileTypeName,
+          SORTBY: 'name ASC',
+          CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+        },
+      }),
+      loadConservationAreas(cfiId),
+      loadRelatedDocuments(cfiId),
+      DemoGraphyChart.loadAllChart(cfiId),
+    ]);
+
     const defaultCrs = await loadRelatedLayers(cfiId);
     await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
-
-    await loadRelatedDocuments(cfiId);
     toggleLoading(false);
   });
 }
@@ -516,15 +572,20 @@ async function handleCfiSelect(e) {
   toggleLoading(true);
   const cfiId = e.currentTarget.value;
   document.querySelector('.about__body').innerHTML = '';
-  const cfiProfile = await Utils.fetchGeoJson({
-    data: {
-      typeName: defaultProfileTypeName,
-      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
-    },
-  });
-
   drawAboutSection();
-  await DemoGraphyChart.loadAllChart(cfiId);
+
+  const [cfiProfile] = await Promise.all([
+    Utils.fetchGeoJson({
+      data: {
+        typeName: defaultProfileTypeName,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+      },
+    }),
+    DemoGraphyChart.loadAllChart(cfiId),
+    loadConservationAreas(cfiId),
+    loadRelatedDocuments(cfiId),
+  ]);
+
   if (OVERLAY_MAP[KEYS.CFI_B]) {
     const polygonsLayers = OVERLAY_MAP[KEYS.CFI_B].getLayers();
     const activeLayer = polygonsLayers.find(
@@ -539,9 +600,7 @@ async function handleCfiSelect(e) {
     await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
   }
 
-  await loadRelatedDocuments(cfiId);
   toggleLoading(false);
-
 }
 
 async function loadCfiSelect(cfiBoundary) {

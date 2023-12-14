@@ -122,16 +122,15 @@
         const GEOSERVER = `/geoserver/${SERVER}/ows`;
         let defaultProfileTypeName = 'cfi:cfi_profiles_2023';
         let defaultChartTypeName = 'cfi:cfi_demography_2018';
+        let defaultConservationTypeName = 'cfi:cfi_conservation_sites_2018';
 
         (async function loadSettings() {
-            const settings = await Promise.all([
-                Utils.fetchJson({ baseUrl: '/api/default-profile-layer/' + SERVER }),
-                Utils.fetchJson({ baseUrl: '/api/default-chart-layer/' + SERVER }),
-            ]);
+            const settings = await Utils.fetchJson({ baseUrl: '/api/default-layer/' + SERVER });
 
-            defaultProfileTypeName = Object.keys(settings[0])[0];
-            defaultChartTypeName = Object.keys(settings[1])[0];
-        })()
+            defaultProfileTypeName = settings['profile'];
+            defaultChartTypeName = settings['chart'];
+            defaultConservationTypeName = settings['conservation'];
+        })();
 
         function toggleLoading(shouldShow) {
             document

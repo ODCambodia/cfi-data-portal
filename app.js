@@ -109,6 +109,11 @@ app.post('/api/default-profile-layer/:key', Auth.validate, jsonParser, (req, res
 app.get('/api/default-chart-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_chart'));
 app.post('/api/default-chart-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_chart'));
 
+app.get('/api/default-conservation-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_conservation'));
+app.post('/api/default-conservation-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_conservation'));
+
+app.get('/api/default-layer/:key', (req, res) => LayerSettings.handleGetDefaultLayers(req, res));
+
 app.listen(port);
 console.log("NODE_PATH=" + process.env.NODE_PATH);
 console.log('Server started at http://localhost:' + port);

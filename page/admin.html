@@ -27,7 +27,7 @@
       </div>
     </nav>
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
-      <!-- Home -->
+      <!-- Related document forms -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="mb-2">
           <label class="d-inline-block" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <!-- Profile -->
+      <!-- Default Layer Toggle forms -->
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <form action="/api/default-profile-layer" id="defaultProfileForm"
           class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
@@ -64,6 +64,16 @@
         </form>
 
         <form action="/api/default-chart-layer" id="defaultChartForm"
+          class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <div class="list-group my-2" data-i18n="loading...">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
+          </div>
+        </form>
+
+        <form action="/api/default-conservation-layer" id="defaultConservationForm"
           class="shadow border border-opacity-50 border-black rounded-3 p-3">
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
@@ -74,7 +84,7 @@
         </form>
       </div>
 
-      <!-- Layer -->
+      <!-- Related Layer -->
       <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
         <form action="/api/active-layers" id="toggleLayerForm">
           <div class="list-group mb-2" data-i18n="loading...">
@@ -512,6 +522,16 @@
       }
     }
 
+    function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
+      const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
+      const header = document.createTextNode(I18n.translate(`select_a_${key}_to_show`));
+      const list = document.querySelector(`#${formId} .list-group`);
+      list.parentElement.prepend(header);
+      loadSettings(apiUrl, formId, domType, validationCallback);
+
+      document.getElementById(formId).addEventListener('submit', handleSubmitLayerForm);
+    }
+
     // main
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
@@ -528,47 +548,29 @@
       const form = document.getElementById('form');
       form.addEventListener('submit', handleFormSubmit);
 
-
       // set active layers
-      const activeLayerForm = document.getElementById('toggleLayerForm');
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
-      activeLayerForm.addEventListener('submit', handleSubmitLayerForm);
       activeLayerTabBtn.addEventListener('click', function (e) {
         if (!hasLoadedActiveLayerTab) {
           hasLoadedActiveLayerTab = true;
-          const header = document.createElement('h6');
-          header.innerText = I18n.translate('select_related_data_to_show');
-          const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
-          listGroupDom.parentElement.prepend(header);
-          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'));
+          loadDefaultFormToggle(
+            'related_data',
+            'toggleLayerForm',
+            (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'),
+            `/api/active-layers/${SERVER}`,
+            'checkbox',
+          );
         }
       })
 
       // set default profile layer
-      const defaultProfileForm = document.getElementById('defaultProfileForm');
       const defaultProfileTab = document.getElementById('nav-profile-tab');
-      defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
       defaultProfileTab.addEventListener('click', function (e) {
         if (!hasLoadedProfileTab) {
-          // jesus this is terrible code
-          // no time though
-          // refactor later
           hasLoadedProfileTab = true;
-          const profileHeader = document.createTextNode(I18n.translate('select_a_profile_to_show'));
-          const profileList = document.querySelector(`#defaultProfileForm .list-group`);
-          profileList.parentElement.prepend(profileHeader);
-          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('profile'));
-
-          const defaultProfileForm = document.getElementById('defaultProfileForm');
-          defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
-
-          const demographyHeader = document.createTextNode(I18n.translate('select_a_chart_to_show'));
-          const demographyList = document.querySelector(`#defaultChartForm .list-group`);
-          demographyList.parentElement.prepend(demographyHeader);
-          loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('demography'));
-
-          const defaultChartForm = document.getElementById('defaultChartForm');
-          defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
+          loadDefaultFormToggle('profile', 'defaultProfileForm', (name) => !REGEX_YEAR.test(name) || !name.includes('profile'));
+          loadDefaultFormToggle('chart', 'defaultChartForm', (name) => !REGEX_YEAR.test(name) || !name.includes('demography'));
+          loadDefaultFormToggle('conservation', 'defaultConservationForm', (name) => !name.includes('conservation'))
         }
       });
 

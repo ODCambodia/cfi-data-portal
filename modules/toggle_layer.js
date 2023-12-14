@@ -68,7 +68,7 @@ function getLayer(req, res, key) {
 
 function handleSaveLayer(req, res, key) {
   const jsonKey = (req.params.key || 'cfi') + key;
-  
+
   if (key) {
     return saveLayer(req, res, jsonKey);
   }
@@ -86,12 +86,33 @@ function handleGetLayer(req, res, key) {
   return res.end();
 }
 
+function handleGetDefaultLayers(req, res) {
+  const defaultKey = (req.params.key || 'cfi') + '_default_';
+
+  let layerHash = {};
+  try {
+    const settings = readJsonFileSync('active-layers.json');
+    for (const key in settings) {
+      if (key.includes(defaultKey)) {
+        layerHash[key.split('_default_')[1]] = Object.keys(settings[key])[0]; // why did I format the active-layer like that ?
+      }
+    }
+
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ error: 'Something went wrong while trying to get active layers' });
+  }
+
+  return res.status(200).json(layerHash);
+}
+
 
 const ToggleLayer = {
   readJsonFileSync,
   writeJsonFileSync,
   handleGetLayer,
   handleSaveLayer,
+  handleGetDefaultLayers,
 }
 
 // export custom middleware

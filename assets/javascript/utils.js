@@ -143,6 +143,10 @@ const Utils = {
 
     return /^-?[0-9][0-9,\.]+$/.test(str);
   },
+  toFixed: function (num, fixed = 2) {
+    const regex = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return num.toString().match(regex)[0];
+  },
   isCoordinate: function (key) {
     const hashs = {
       'x_coord': 1,

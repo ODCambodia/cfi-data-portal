@@ -225,7 +225,8 @@ td span {
 }
 
 .about__table__wrapper,
-.contact__table__wrapper {
+.contact__table__wrapper,
+.conservation__area__wrapper {
   border-bottom: 1.5px solid #000;
   line-height: 20px;
 }
@@ -246,6 +247,14 @@ td span {
   flex: 0 1 auto;
   max-height: 50%;
   min-height: 180px;
+}
+
+.conservation__area__wrapper {
+  flex: 0 1 auto;
+}
+
+.conservation__area__wrapper table thead {
+  font-weight: bold;
 }
 
 .document__body {
