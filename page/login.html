@@ -21,14 +21,17 @@
             <form id="formLogin">
               <div class="mb-4">
                 <label for="username" class="form-label" data-i18n="login_username">ឈ្មោះគណនី</label>
-                <input type="text" class="form-control" id="username" />
+                <input type="text" class="form-control" id="username" autocomplete="on"/>
               </div>
               <div class="mb-4">
                 <label for="password" class="form-label" data-i18n="password">កូដសម្ងាត់</label>
-                <input type="password" class="form-control" id="password" />
+                <input type="password" class="form-control" id="password" autocomplete="on"/>
               </div>
-              <div class="text-end">
-                <button type="submit" class="btn d-inline-block btn-primary">ចូល</button>
+              <div class="d-flex justify-content-between">
+                <script async src="https://telegram.org/js/telegram-widget.js?22"
+                  data-telegram-login="cfi_authorize_bot" data-size="large" data-userpic="false"
+                  data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+                <button id="loginBtn" type="submit" class="btn d-inline-block btn-primary">ចូល</button>
               </div>
             </form>
           </div>
@@ -54,7 +57,7 @@
       requestBody.username = usernameInput.value;
       requestBody.password = passwordInput.value;
 
-      const submitBtn = document.querySelector('.btn');
+      const submitBtn = document.getElementById('loginBtn');
       submitBtn.setAttribute('disabled', true);
       fetch("/login", {
         method: 'POST',
@@ -88,6 +91,46 @@
           })
         }).finally(() => {
           submitBtn.removeAttribute('disabled');
+        });
+    }
+
+    function onTelegramAuth(user) {
+      const submitBtn = document.getElementById('loginBtn');
+      submitBtn.setAttribute('disabled', true);
+
+      console.log(JSON.stringify(user));
+
+      fetch("/login/verify-telegram", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({payload: user}),
+      })
+        .then(response => response.text()) // Parse the response as text
+        .then(text => {
+          let data = null;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            throw new Error(text);
+          }
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          setTimeout(() => { alert(I18n.translate('success')); });
+          setTimeout(() => {
+            window.location.href = '/admin/' + Utils.getServer();
+          }, 500);
+        })
+        .catch((err) => {
+          console.log(err);
+          setTimeout(() => {
+            alert(I18n.translate('user_has_not_been_approved_yet'));
+          })
+        }).finally(() => {
         });
     }
   </script>
