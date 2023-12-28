@@ -117,7 +117,7 @@ app.post('/api/default-conservation-layer/:key', Auth.validate, jsonParser, (req
 
 app.get('/api/default-layer/:key', LayerSettings.handleGetDefaultLayers);
 
-app.get('/api/users', Auth.validateSuperAdmin, User.handleGetAllUsers);
+app.get('/api/:server/users', Auth.validateSuperAdmin, User.handleGetAllUsers);
 app.post('/api/users/:id/approve', Auth.validateSuperAdmin, User.handleApproveUser);
 app.delete('/api/users/:id', Auth.validateSuperAdmin, User.handleDeleteUser);
 

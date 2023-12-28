@@ -21,11 +21,11 @@
             <form id="formLogin">
               <div class="mb-4">
                 <label for="username" class="form-label" data-i18n="login_username">ឈ្មោះគណនី</label>
-                <input type="text" class="form-control" id="username" autocomplete="on"/>
+                <input type="text" class="form-control" id="username" autocomplete="on" />
               </div>
               <div class="mb-4">
                 <label for="password" class="form-label" data-i18n="password">កូដសម្ងាត់</label>
-                <input type="password" class="form-control" id="password" autocomplete="on"/>
+                <input type="password" class="form-control" id="password" autocomplete="on" />
               </div>
               <div class="d-flex justify-content-between">
                 <script async src="https://telegram.org/js/telegram-widget.js?22"
@@ -97,15 +97,15 @@
     function onTelegramAuth(user) {
       const submitBtn = document.getElementById('loginBtn');
       submitBtn.setAttribute('disabled', true);
-
-      console.log(JSON.stringify(user));
+      const payload = { ...user, type: Utils.getServer() };
+      console.log(payload);
 
       fetch("/login/verify-telegram", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({payload: user}),
+        body: JSON.stringify(payload),
       })
         .then(response => response.text()) // Parse the response as text
         .then(text => {

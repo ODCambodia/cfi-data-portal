@@ -711,7 +711,7 @@ async function loadProvince() {
       provinceSelect.append(option);
     });
 
-    const choices = new Choices(provinceSelect);
+    // const choices = new Choices(provinceSelect);
     provinceSelect.addEventListener('change', handleProvinceSelect);
   } catch (e) {
     console.warn('Unable to load province select', e);

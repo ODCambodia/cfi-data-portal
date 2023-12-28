@@ -17,6 +17,8 @@ const validateSession = async (req, res, next, shouldBeSuperAdmin) => {
           req.user = payload;
           return next();
         }
+
+        return res.status(403).json({ error: 'Forbidden' });
       } catch (error) {
         console.log(error);
       }
@@ -57,7 +59,7 @@ const handleTelegramVerification = async function (req, res) {
   const secretKey = crypto.createHash('sha256')
     .update(process.env.BOT_TOKEN)
     .digest();
-  const { hash, ...data } = req.body.payload
+  const { hash, type, ...data } = req.body;
 
   const checkString = Object.keys(data)
     .sort()
@@ -71,8 +73,8 @@ const handleTelegramVerification = async function (req, res) {
 
   // telegram verified
   if (hmac === hash) {
-    const hasUser = await UserDAO.get(data.id);
-    if (typeof hasUser === 'object' && Object.keys(hasUser).length > 0) {
+    const user = await UserDAO.get(data.id, type, true);
+    if (user && user.user_id) {
       const token = await jwt.sign({ username: data.username || data.id, isSuper: false }, process.env.SECRET);
       req.session.token = token;
       return res.json({ token });

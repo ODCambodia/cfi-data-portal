@@ -1,4 +1,6 @@
 {
+  "pending_platform_login_request": "Pending Telgram Login Request",
+  "approved_user": "Approved Users",
   "manage_user_login": "Manage user login",
   "area": "Area (Hectare)",
   "name": "Name",

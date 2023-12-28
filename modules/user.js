@@ -1,10 +1,23 @@
 import UserDAO from '../database/user.js';
 
 async function handleGetAllUsers(req, res) {
-  const shouldGetApproved = req.query.approved;
+  let shouldGetApproved = false;
+
+  // man this is terrible code
+  if (req.query.approved === 'true' || req.query.approved === '1') {
+    shouldGetApproved = true;
+  } else if (req.query.approved === undefined || req.query.approved === null || req.query.approved === '') {
+    shouldGetApproved = null;
+  }
+
+  const server = req.params.server;
+
+  if (!server) {
+    return res.status(400).json({ error: 'Missing server' });
+  }
 
   try {
-    const users = UserDAO.getAll(shouldGetApproved);
+    const users = await UserDAO.getAll(server, shouldGetApproved);
     return res.status(200).json(users);
   } catch (e) {
     console.error(e);
@@ -21,7 +34,7 @@ async function handleDeleteUser(req, res) {
   }
 
   try {
-    const users = UserDAO.remove(userId);
+    const users = await UserDAO.remove(userId);
     return res.status(200).json(users);
   } catch (e) {
     console.error(e);
@@ -38,7 +51,7 @@ async function handleApproveUser(req, res) {
   }
 
   try {
-    const user = UserDAO.approve(userId);
+    const user = await UserDAO.approve(userId);
     return res.status(200).json({ message: 'approved', user });
   } catch (e) {
     console.error(e);

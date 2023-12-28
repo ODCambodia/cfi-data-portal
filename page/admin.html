@@ -101,12 +101,14 @@
 
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
         <form id="userApprovalForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <h2 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h2>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
         </form>
 
         <form id="userDeletionForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <h2 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h2>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
@@ -238,7 +240,6 @@
     function createRow(cfi) {
       const rows = [];
       for (let i = 0; i < cfi.length; i++) {
-        console.log(cfi[i].properties)
         const tr = document.createElement('tr');
         const tdName = document.createElement('td');
         tdName.innerText = cfi[i].properties.name;
@@ -610,22 +611,24 @@
 
       // load users
       try {
-        const userRes = await Utils.fetchJson({ baseUrl: '/api/users' });
-        const users = typeof userRes === 'object' && Object.keys(userRes).length > 0 ? [userRes] : userRes;
+        const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
 
-        const approvedUsers = users.filter((u) => u.approval_time);
-        const pendingUsers = users.filter((u) => !u.approval_time);
+        if (isSuperAdminRes.status === 403) {
+          throw new Error('No Permission');
+        }
 
-        document.querySelector(`#userDeletionForm .list-group`).innerHTML = '';        
-        document.querySelector(`#userApprovalForm .list-group`).innerHTML = '';
+        const approvedUsers = await Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'true' } });
+        const pendingUsers = await Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'false' } });
         document.getElementById('user-approval-tab').classList.remove('invisible');
 
-        if (pendingUsers.length > 0) {
+        document.querySelector(`#userDeletionForm .list-group`).innerHTML = '';
+        document.querySelector(`#userApprovalForm .list-group`).innerHTML = '';
 
+        if (pendingUsers.length > 0) {
           pendingUsers.forEach((user) => {
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `User ID: ${user.user_id} Username: @${user.username}`;
+            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
 
             const approveBtn = document.createElement('button');
             approveBtn.dataset.href = '/api/users/' + user.user_id + '/approve';
@@ -657,7 +660,7 @@
           approvedUsers.forEach((user) => {
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `User ID: ${user.user_id} User Name: ${user.username}`;
+            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
 
             const removeBtn = document.createElement('button');
             removeBtn.type = 'button';
