@@ -1,4 +1,7 @@
 {
+  "pending_platform_login_request": "សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ",
+  "approved_user": "អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត",
+  "manage_user_login": "កំណត់ការចូលរបស់អ្នកប្រើប្រាស់",
   "area": "ក្រឡា​ផ្ទៃ(ហិកតា)",
   "name": "ឈ្មោះ",
   "conservation_area_in_community": "តំបន់អភិរក្សនៅក្នុងសហគមន៍",
@@ -31,6 +34,7 @@
   "manage_community_info": "កំណត់ផ្ទំាងពត៌មានសហគមន៍",
   "manage_related_data": "កំណត់សំន៉ំទិន្នន័យពាក់ព័ន្ធ",
   "manage_related_file": "កំណត់ឯកសារពាក់ព័ន្ធ",
+  "user_has_not_been_approved_yet": "ការចូលមិនត្រឹមត្រូវ អ្នកប្រើមិនទាន់ត្រូវបានអនុម័តនៅឡើយទេ",
   "incorrect_incredential_please_verify": "ពត៌មានមិនត្រឹមត្រូវ សូមពិនិត្យមើលឈ្មោះគណនីឬកូដសម្ងាត់អោយបានត្រឹមត្រូវ រូចព្យាយាមម្តងទៀត។",
   "login_portal": "ច្រកចូលទៅកាន់ទំព័រគ្រប់គ្រង",
   "login_username": "ឈ្មោះគណនី",

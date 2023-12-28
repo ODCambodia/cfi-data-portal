@@ -9,6 +9,8 @@ import bodyParser from 'body-parser';
 import Document from './modules/document.js';
 import Auth from './modules/auth.js';
 import LayerSettings from './modules/toggle_layer.js';
+import './modules/bot.js';
+import User from './modules/user.js';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -93,6 +95,7 @@ app.delete('/admin/documents/:server/:id', Auth.validate, jsonParser, Document.h
 
 
 app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
+app.post('/login/verify-telegram', rateLimiter, jsonParser, Auth.handleTelegramVerification);
 
 app.get('/login/:key', function (req, res) {
   res.sendFile(path.join(dirName, 'page/login.html'));
@@ -112,7 +115,12 @@ app.post('/api/default-chart-layer/:key', Auth.validate, jsonParser, (req, res) 
 app.get('/api/default-conservation-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_conservation'));
 app.post('/api/default-conservation-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_conservation'));
 
-app.get('/api/default-layer/:key', (req, res) => LayerSettings.handleGetDefaultLayers(req, res));
+app.get('/api/default-layer/:key', LayerSettings.handleGetDefaultLayers);
+
+app.get('/api/:server/users', Auth.validateSuperAdmin, User.handleGetAllUsers);
+app.post('/api/users/:id/approve', Auth.validateSuperAdmin, User.handleApproveUser);
+app.delete('/api/users/:id', Auth.validateSuperAdmin, User.handleDeleteUser);
+
 
 app.listen(port);
 console.log("NODE_PATH=" + process.env.NODE_PATH);

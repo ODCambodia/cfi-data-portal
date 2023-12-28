@@ -17,7 +17,11 @@ const Utils = {
     const baseUrl = options.baseUrl || GEOSERVER;
 
     const res = await fetch(baseUrl + '?' + new URLSearchParams(defaultParams), options);
-    return res.json();
+    if (res && (res.status === 200 || res.status === 201)) {
+      return res.json();
+    }
+
+    return res.text();
   },
   fetchXml: async function (options = {}) {
     const defaultParams = Object.assign({

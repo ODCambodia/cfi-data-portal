@@ -1,4 +1,7 @@
 {
+  "pending_platform_login_request": "Pending Telgram Login Request",
+  "approved_user": "Approved Users",
+  "manage_user_login": "Manage user login",
   "area": "Area (Hectare)",
   "name": "Name",
   "conservation_area_in_community": "Conservation area in community",
@@ -31,6 +34,7 @@
   "manage_community_info": "Manage Community Info",
   "manage_related_data": "Manage Related Data",
   "manage_related_file": "Manage Related Files",
+  "user_has_not_been_approved_yet": "Invalid Login, User has not been approved yet.",
   "incorrect_incredential_please_verify": "Invalid Login Credential. Please check your username and password",
   "login_portal": "Admin Login",
   "login_username": "Username",
