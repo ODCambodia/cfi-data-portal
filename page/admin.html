@@ -549,6 +549,30 @@
       document.getElementById(formId).addEventListener('submit', handleSubmitLayerForm);
     }
 
+    function createUserDeleteBtn(userId, classes = []) {
+      const removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.dataset.href = '/api/users/' + userId;
+      removeBtn.classList.add('btn', 'btn-danger', ...classes);
+      removeBtn.innerText = 'remove';
+      removeBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const url = e.currentTarget.dataset.href;
+        const res = fetch(url, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+        })
+
+        Utils.handleFetchPromise(res, () => {
+          window.location.reload();
+        });
+      });
+
+      return removeBtn;
+    }
+
     // main
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
@@ -619,10 +643,10 @@
 
         const approvedUsers = await Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'true' } });
         const pendingUsers = await Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'false' } });
-        document.getElementById('user-approval-tab').classList.remove('invisible');
 
         document.querySelector(`#userDeletionForm .list-group`).innerHTML = '';
         document.querySelector(`#userApprovalForm .list-group`).innerHTML = '';
+        document.getElementById('user-approval-tab').classList.remove('invisible');
 
         if (pendingUsers.length > 0) {
           pendingUsers.forEach((user) => {
@@ -633,7 +657,7 @@
             const approveBtn = document.createElement('button');
             approveBtn.dataset.href = '/api/users/' + user.user_id + '/approve';
             approveBtn.type = 'button';
-            approveBtn.classList.add('btn', 'btn-success', 'ms-auto');
+            approveBtn.classList.add('btn', 'btn-success', 'ms-auto', 'me-2');
             approveBtn.innerText = 'approve';
             approveBtn.addEventListener('click', function (e) {
               e.preventDefault();
@@ -650,10 +674,11 @@
               });
             });
 
+            const removeBtn = createUserDeleteBtn(user.user_id);
             li.append(approveBtn);
+            li.append(removeBtn);
             document.querySelector(`#userApprovalForm .list-group`).append(li);
           });
-
         }
 
         if (approvedUsers.length > 0) {
@@ -661,26 +686,7 @@
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
             li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
-
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.dataset.href = '/api/users/' + user.user_id;
-            removeBtn.classList.add('btn', 'btn-danger', 'ms-auto');
-            removeBtn.innerText = 'remove';
-            removeBtn.addEventListener('click', function (e) {
-              e.preventDefault();
-              const url = e.currentTarget.dataset.href;
-              const res = fetch(url, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-              })
-
-              Utils.handleFetchPromise(res, () => {
-                window.location.reload();
-              });
-            });
+            const removeBtn = createUserDeleteBtn(user.user_id, ['ms-auto']);
 
             li.append(removeBtn);
             document.querySelector(`#userDeletionForm .list-group`).append(li);
