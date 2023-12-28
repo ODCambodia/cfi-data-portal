@@ -8,7 +8,6 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   const messageText = msg.text;
   const user = msg.from;
-  console.log(JSON.stringify(msg));
   let type = null;
 
   if (chatId.toString() === process.env.CFI_GROUP_CHAT_ID) {
