@@ -22,9 +22,9 @@ const POLYGON_STYLE = {
     opacity: 0.5,
   },
   active: {
-    color: "black",
-    fillColor: '#FFD04B',
-    weight: 2,
+    color: "orange",
+    fillColor: 'yellow',
+    weight: 3,
     fillOpacity: 0.7,
     opacity: 1,
   }

@@ -98,7 +98,6 @@
       const submitBtn = document.getElementById('loginBtn');
       submitBtn.setAttribute('disabled', true);
       const payload = { ...user, type: Utils.getServer() };
-      console.log(payload);
 
       fetch("/login/verify-telegram", {
         method: 'POST',
@@ -128,7 +127,7 @@
         .catch((err) => {
           console.log(err);
           setTimeout(() => {
-            alert(I18n.translate('user_has_not_been_approved_yet'));
+            alert(I18n.translate(err.message));
           })
         }).finally(() => {
         });
