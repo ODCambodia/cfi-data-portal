@@ -9,7 +9,6 @@ import bodyParser from 'body-parser';
 import Document from './modules/document.js';
 import Auth from './modules/auth.js';
 import LayerSettings from './modules/toggle_layer.js';
-import './modules/bot.js';
 import User from './modules/user.js';
 
 const app = express();

@@ -73,8 +73,13 @@ const handleTelegramVerification = async function (req, res) {
 
   // telegram verified
   if (hmac === hash) {
-    const user = await UserDAO.get(data.id, type, true);
-    if (user && user.user_id) {
+    const user = await UserDAO.get(data.id, type);
+
+    if (!user) {
+      const payload = { user_id: data.id, username: data.username, firstname: data.first_name || null, lastname: data.last_name || null, type };
+      UserDAO.insert(payload);
+      return res.status(403).json({ error: 'sent_pending_login_request' });
+    } else if (user && user.id && user.approval_time) {
       const token = await jwt.sign({ username: data.username || data.id, isSuper: false }, process.env.SECRET);
       req.session.token = token;
       return res.json({ token });
