@@ -32,9 +32,13 @@
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
       <!-- Related document forms -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <div class="mb-2">
-          <label class="d-inline-block" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
-          <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select" name="provinceSelect" id="provinceSelect"></select>
+          </div>
         </div>
 
         <div id="tableProfile" class="table-wrapper d-none">
@@ -101,14 +105,14 @@
 
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
         <form id="userApprovalForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h2>
+          <h4 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h4>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
         </form>
 
         <form id="userDeletionForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h2>
+          <h4 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h4>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
@@ -541,7 +545,8 @@
 
     function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
       const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
-      const header = document.createTextNode(I18n.translate(`select_a_${key}_to_show`));
+      const header = document.createElement('h4');
+      header.innerText = I18n.translate(`select_a_${key}_to_show`);
       const list = document.querySelector(`#${formId} .list-group`);
       list.parentElement.prepend(header);
       loadSettings(apiUrl, formId, domType, validationCallback);

@@ -8,13 +8,13 @@ const map = L.map('map', {
 let activePoint = null;
 
 function showActivePoint(layer) {
-  let radius = layer.getRadius();
-
-  if (activePoint !== null) {
+  if (activePoint !== null || !layer) {
     // Reset style|
-    activePoint.setStyle({ ...POINT_STYLE.default, radius });
+    activePoint.setStyle({ ...POINT_STYLE.default, ...(layer ? { radius: layer.getRadius() } : {}) });
     activePoint = null;
   }
+
+  if (!layer) { return; }
 
   // set active in view with offset
   const center = Object.values(layer.getLatLng());
@@ -22,7 +22,7 @@ function showActivePoint(layer) {
   map.panTo(center, { animate: false });
   map.panBy(offsetCenter, { animate: false });
 
-  radius = layer.getRadius() * 1.3;
+  const radius = layer.getRadius() * 1.3;
   layer.bringToFront();
   layer.setStyle({ ...POINT_STYLE.active, radius });
 
@@ -250,9 +250,8 @@ async function showCFR_A(data) {
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
 
-
-  loadRelatedDocuments(data.feature.id);
-  DemoGraphyChart.loadAllChart(data.feature);
+  await loadRelatedDocuments(data.feature.id);
+  await DemoGraphyChart.loadAllChart(data.feature);
 }
 
 async function loadCFRMap(options) {
@@ -301,9 +300,11 @@ async function loadCFRSelect(options) {
 
 
   cfiSelect.addEventListener('change', async function (e) {
+    toggleLoading(true);
     const val = e.currentTarget.value;
     const selectedCFR = cfr_data.features.find((item) => item.id === val);
 
+    sessionStorage.setItem(`${SERVER}_community`, val);
     document.querySelector('.about__body').innerHTML = '';
 
     if (OVERLAY_MAP[KEYS.CFR_A]) {
@@ -316,13 +317,45 @@ async function loadCFRSelect(options) {
     }
 
     if (selectedCFR) {
-      showCFR_A({ feature: selectedCFR });
+      await showCFR_A({ feature: selectedCFR });
     }
+
+    toggleLoading(false);
   });
 
   cfiSelect.removeAttribute('disabled');
 
   return OVERLAY_MAP[KEYS.CFR_A];
+}
+
+async function handleProvinceSelect(e) {
+  document.body.querySelector('.about__wrapper').classList.remove('active');
+  document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+  document.querySelector('.province-tooltip .tooltip').classList.remove('active');
+
+  const cfiSelect = document.getElementById('cfiSelect');
+  cfiSelect.value = '';
+  cfiSelect.innerHTML = '';
+  cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fish_reservation_community')));
+
+  if (typeof OVERLAY_MAP[KEYS.CFR_A] !== 'undefined') {
+    OVERLAY_MAP[KEYS.CFR_A].remove();
+  }
+
+  toggleLoading(true);
+
+  const val = e.currentTarget.value;
+  const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
+  const overlay = await loadCFRSelect({ CQL_FILTER });
+  const bounds = overlay.getBounds();
+
+  sessionStorage.setItem(`${SERVER}_province`, val);
+
+  if (Object.keys(bounds).length > 0) {
+    map.flyToBounds(bounds, { maxZoom: 9 });
+  }
+
+  toggleLoading(false);
 }
 
 async function loadProvinceCFR() {
@@ -355,42 +388,43 @@ async function loadProvinceCFR() {
       provinceSelect.append(option);
     });
 
-    provinceSelect.addEventListener('change', async function (e) {
-      document.body.querySelector('.about__wrapper').classList.remove('active');
-      document.getElementById('relatedLayers').parentElement.classList.add('d-none');
-      document.querySelector('.province-tooltip .tooltip').classList.remove('active');
-
-      const cfiSelect = document.getElementById('cfiSelect');
-      cfiSelect.value = '';
-      cfiSelect.innerHTML = '';
-      cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fish_reservation_community')));
-
-      if (typeof OVERLAY_MAP[KEYS.CFR_A] !== 'undefined') {
-        OVERLAY_MAP[KEYS.CFR_A].remove();
-      }
-
-      toggleLoading(true);
-
-      const val = e.currentTarget.value;
-      const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
-      const overlay = await loadCFRSelect({ CQL_FILTER });
-      const bounds = overlay.getBounds();
-
-      if (Object.keys(bounds).length > 0) {
-        map.flyToBounds(bounds, { maxZoom: 9 });
-      }
-
-      toggleLoading(false);
-    });
+    provinceSelect.addEventListener('change', handleProvinceSelect);
   } catch (e) {
     console.warn(e);
   }
 }
 
+async function loadSavedOption() {
+  const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
+  if (!savedProvince) { return; }
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  const cacheEvent = new Event('cacheLoad', { bubbles: true });
+
+  // dont try to dispatch them separately or else u'll run into race cond 
+  provinceSelect.value = savedProvince;
+  provinceSelect.addEventListener('cacheLoad', async function (e) {
+    await handleProvinceSelect(e);
+    const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
+    if (!savedCommunity) { return; }
+
+    const cfiEvent = new Event('change');
+    const cfiSelect = document.getElementById('cfiSelect');
+    cfiSelect.value = savedCommunity;
+    cfiSelect.dispatchEvent(cfiEvent);
+  });
+
+  provinceSelect.dispatchEvent(cacheEvent);
+}
+
 async function init() {
   await I18n.init();
   await loadProvinceCFR();
-  document.getElementById('provinceSelect').removeAttribute('disabled');
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  provinceSelect.removeAttribute('disabled');
+
+  await loadSavedOption();
   toggleLoading(false);
 }
 

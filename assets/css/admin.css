@@ -269,7 +269,7 @@ body {
 }
 
 .list-group input[type="radio"]:checked+.list-group-item:before {
-  content: "\25CF";
+  content: "✓";
   font-weight: normal;
   color: #fff;
   font-weight: bold;

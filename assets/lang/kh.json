@@ -1,4 +1,9 @@
 {
+  "select_a_conservation_to_show": "ជ្រើសរើសតំបន់អភិរក្សដើម្បីបង្ហាញ",
+  "select_a_related_data_to_show": "ជ្រើសរើសទិន្នន័យដែលទាក់ទងដើម្បីបង្ហាញ",
+  "user_already_exist_in_another_platform": "អ្នកប្រើមានរួចហើយនៅក្នុងនាយកដ្ឋានផ្សេងទៀត",
+  "something_went_wrong": "មាន​បញ្ហាមិន​ប្រក្រតីបានកើតឡើង",
+  "waiting_for_admin_approval": "រង់ចាំការអនុញ្ញាតពីំអ្នកគ្រប់គ្រង",
   "sent_pending_login_request": "បានផ្ញើសំណើចូល",
   "pending_platform_login_request": "សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ",
   "approved_user": "អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត",

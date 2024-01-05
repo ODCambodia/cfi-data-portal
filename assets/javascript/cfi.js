@@ -39,11 +39,13 @@ const REGEX_YEAR = /(_(20)\d{2})/s;
 let activePolygon = null;
 
 function showActivePolygon(layer) {
-  if (activePolygon !== null) {
+  if (activePolygon !== null || !layer) {
     // Reset style|
     activePolygon.setStyle(POLYGON_STYLE.default);
     activePolygon = null;
   }
+
+  if (!layer) { return; }
 
   // set active in view with offset
   const center = { ...layer.getBounds().getCenter() };
@@ -578,6 +580,10 @@ async function handleCfiSelect(e) {
   const cfiId = e.currentTarget.value;
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
+  console.log('HELLO HANDLE HERE', e);
+
+  // save to cache
+  sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
   const [cfiProfile] = await Promise.all([
     Utils.fetchGeoJson({
@@ -642,6 +648,10 @@ async function handleProvinceSelect(e) {
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
   const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+
+  // save to cache
+  console.log('HELLO DISPATCHED PROVINCE SELECT')
+  sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
@@ -718,11 +728,42 @@ async function loadProvince() {
   }
 }
 
+async function loadSavedOption() {
+  // load saved cache
+  // refactor the handler code instead of doing this
+  // or maybe this is better ???
+  // after writing it I actually think this approach is better
+  const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
+  if (!savedProvince) { return; }
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  const cacheEvent = new Event('cacheLoad', { bubbles: true });
+
+  // dont try to dispatch them separately or else u'll run into race cond 
+  provinceSelect.value = savedProvince;
+  provinceSelect.addEventListener('cacheLoad', async function (e) {
+    await handleProvinceSelect(e);
+    const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
+    if (!savedCommunity) { return; }
+
+    const cfiEvent = new Event('change');
+    const cfiSelect = document.getElementById('cfiSelect');
+    cfiSelect.value = savedCommunity;
+    cfiSelect.dispatchEvent(cfiEvent);
+  });
+
+  provinceSelect.dispatchEvent(cacheEvent);
+}
+
 async function init() {
   await I18n.init();
   await loadProvince();
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  provinceSelect.removeAttribute('disabled');
+
+  await loadSavedOption();
   toggleLoading(false);
-  document.getElementById('provinceSelect').removeAttribute('disabled');
 }
 
 if (document.readyState !== 'loading') {
