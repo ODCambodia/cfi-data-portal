@@ -25,14 +25,14 @@ const BASE_MAP = {
   )
 };
 
-L.control.scale().addTo(map);
-L.control.layers(BASE_MAP).addTo(map);
 L.control.resetView({
   position: "topleft",
   title: "Reset view",
   latlng: L.latLng(DEFAULT_COORD),
   zoom: 7,
 }).addTo(map);
+L.control.layers(BASE_MAP, null, { position: 'topleft' }).addTo(map);
+L.control.scale().addTo(map);
 
 const OVERLAY_MAP = {};
 const REGEX_YEAR = /(_(20)\d{2})/s;
@@ -133,8 +133,8 @@ function drawAboutSection() {
   const populationPieChart = document.createElement('canvas');
   populationPieChart.id = 'populationPieChart';
 
-  chartWrapper.append(memberPieChart);
   chartWrapper.append(committeePieChart);
+  chartWrapper.append(memberPieChart);
   chartWrapper.append(populationPieChart);
 
   // Appending everything
@@ -650,7 +650,6 @@ async function handleProvinceSelect(e) {
   const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
 
   // save to cache
-  console.log('HELLO DISPATCHED PROVINCE SELECT')
   sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
