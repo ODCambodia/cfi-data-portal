@@ -459,7 +459,7 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = item.properties.title;
+    a.innerText = item.properties[I18n.translate({ kh: 'title', en: 'title_en' })] || item.properties.title || item.properties.title_en; // damn this is terrible code (sorry)
     a.style.color = '#000';
     a.target = '_blank';
 
@@ -670,9 +670,7 @@ async function handleProvinceSelect(e) {
     },
   });
 
-  if (provinceName) {
-    cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
-  }
+  cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
 
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);

@@ -1,4 +1,5 @@
 {
+  "file_english_or_khmer_needed": "ឈ្មោះឯកសារអង់គ្លេសឬភាសាខ្មែរចាំបាច់",
   "hectre": "ហិកតា",
   "select_a_conservation_to_show": "ជ្រើសរើសតំបន់អភិរក្សដើម្បីបង្ហាញ",
   "select_a_related_data_to_show": "ជ្រើសរើសទិន្នន័យដែលទាក់ទងដើម្បីបង្ហាញ",
@@ -22,6 +23,7 @@
   "logout": "ចេញពីទំព័រគ្រប់គ្រង",
   "upload_file": "ផ្ទុកឯកសារ",
   "file_description": "អត្ថបទសង្ខេបអំពីឯកសារ",
+  "filename_english": "ចំណងជើងឯកសារ(អង់គ្លេស)",
   "filename": "ចំណងជើងឯកសារ",
   "file": "ឯកសារ",
   "delete": "លុប",

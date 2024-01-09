@@ -145,7 +145,7 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = item.properties.title;
+    a.innerText = item.properties[I18n.translate({ kh: 'title', en: 'title_en' })] || item.properties.title || item.properties.title_en; // damn this is terrible code (sorry)
     a.style.color = '#000';
     a.target = '_blank';
 

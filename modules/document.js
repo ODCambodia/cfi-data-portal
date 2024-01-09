@@ -19,13 +19,19 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const handleCreate = async function (req, res) {
-  let server = ''
-  if (req.params.server === 'cfi' || req.params.server === 'cfr') {
-    server = req.params.server;
-  } else {
+  if (req.params.server !== 'cfi' && req.params.server !== 'cfr') {
     return res.status(400).json({ error: 'Invalid Server Param' });
   }
 
+  if (!req.body.title && !req.body.title_en) {
+    return res.status(400).json({ error: 'filename_english_or_khmer_needed' });
+  }
+
+  if (!req.body.pos) {
+    return res.status(400).json({ error: 'no_spatial_data' });
+  }
+
+  const server = req.params.server;
   try {
     const template = `<wfs:Transaction
       version="2.0.0"
@@ -58,7 +64,7 @@ const handleCreate = async function (req, res) {
     cfiDocuments[`${server}:title`] = req.body.title;
     cfiDocuments[`${server}:title_en`] = req.body.title_en;
     cfiDocuments[`${server}:contentType`] = req.files[0].mimetype;
-    cfiDocuments[`${server}:url`] = req.files[0].path.replace('assets', '').replaceAll('\\','/');
+    cfiDocuments[`${server}:url`] = req.files[0].path.replace('assets', '').replaceAll('\\', '/');
 
     const builder = new xml2js.Builder();
     const xml = builder.buildObject(xmlData);
@@ -91,13 +97,11 @@ const handleDelete = async function (req, res) {
     return res.status(400).json({ error: 'Invalid FileName' });
   }
 
-  let server = ''
-  if (req.params.server === 'cfi' || req.params.server === 'cfr') {
-    server = req.params.server;
-  } else {
+  if (req.params.server !== 'cfi' && req.params.server !== 'cfr') {
     return res.status(400).json({ error: 'Invalid Server Param' });
   }
 
+  const server = req.params.server;
   const id = Number(req.params.id);
   const xml = `<wfs:Transaction
     version="2.0.0"

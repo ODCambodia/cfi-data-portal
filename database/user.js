@@ -44,20 +44,11 @@ async function get(user_id, type, shouldGetPending) {
     params.push(type);
   }
 
-  // console.log({ whereOptions });
-  // console.log(params);
-  // console.log(`SELECT * FROM users WHERE ${whereOptions};`);
-  // console.log(await db.prepare(`SELECT * FROM users WHERE user_id = ? AND ${whereOptions};`).get(...params))
-
   return db.prepare(`SELECT * FROM users WHERE user_id = ? AND ${whereOptions};`).get(...params);
 }
 
 async function getAll(type, shouldGetPending) {
   const whereOptions = _getStatement(type, shouldGetPending);
-  console.log({ whereOptions });
-  console.log({ type });
-  console.log(`SELECT * FROM users WHERE ${whereOptions};`);
-  console.log(await db.prepare(`SELECT * FROM users WHERE ${whereOptions};`).all(type))
 
   return db.prepare(`SELECT * FROM users WHERE ${whereOptions};`).all(type);
 }

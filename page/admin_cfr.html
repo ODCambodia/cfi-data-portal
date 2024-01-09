@@ -125,9 +125,13 @@
           </div>
           <div class="modal-body ">
             <div class="row g-3 mb-3">
-              <div class="col-12">
+              <div class="col-6">
                 <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
+              </div>
+              <div class="col-6">
+                <label for="titleInput" class="form-label" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
+                <input type="text" class="form-control" id="titleEnInput">
               </div>
               <div class="col-12">
                 <label for="descriptionInput" class="form-label"
@@ -272,6 +276,7 @@
         const option = document.createElement('option');
         option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
         option.value = item.id;
+        option.dataset.name = item.properties.pro_name_k;
         provinceSelect.append(option);
       });
 
@@ -290,16 +295,21 @@
           }
         });
 
-        const cfrReference = cfrResponse.features;
-        if (cfrReference.length > 0) {
-          cfrReference.sort((a, b) => a.properties.cfr_name.localeCompare(b.properties.name, 'km-KH'));
-          tbody.innerHTML = '';
-          createRow(cfrReference).forEach((tr) => {
-            tbody.append(tr);
-          });
-        } else {
+        if (cfrResponse.features.length <= 0) {
           tbody.innerHTML = I18n.translate('this_province_does_not_have_cfr');
         }
+
+        tbody.innerHTML = '';
+
+        const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+        const cfrReference = cfrResponse.features.filter((item) => item.properties.province.trim() === provinceName);
+        console.log(provinceName, cfrReference);
+        cfrReference.sort((a, b) => a.properties.cfr_name.localeCompare(b.properties.name, 'km-KH'));
+
+        createRow(cfrReference).forEach((tr) => {
+          tbody.append(tr);
+        });
+
       });
     }
 
@@ -408,12 +418,17 @@
       const currentForm = e.currentTarget;
       const fileInput = document.getElementById('formFile');
       const title = document.getElementById('titleInput');
+      const titleEn = document.getElementById('titleEnInput');
       const description = document.getElementById('descriptionInput');
       const formData = new FormData();
       formData.append('title', title.value);
-      formData.append('title_en', description.value);
+      formData.append('title_en', titleEn.value);
+      formData.append('description', description.value);
       formData.append('files', fileInput.files[0]);
-      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      if (currentForm.dataset.x && currentForm.dataset.y) {
+        formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+      }
 
       const modalEl = document.getElementById('addDocumentModal');
       const modal = bootstrap.Modal.getInstance(modalEl);

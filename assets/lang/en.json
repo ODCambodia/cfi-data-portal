@@ -1,4 +1,5 @@
 {
+  "file_english_or_khmer_needed": "Filename english or khmer required",
   "hectre": "Hectre",
   "select_a_conservation_to_show": "Select a conservation layer to show",
   "select_a_related_data_to_show": "Select a related data layer to show",
@@ -22,7 +23,8 @@
   "logout": "Logout",
   "upload_file": "Upload File",
   "file_description": "Description",
-  "filename": "File Name",
+  "filename_english": "Filename (English)",
+  "filename": "Filename",
   "file": "File",
   "delete": "Delete",
   "unable_to_delete_file_name_not_found": "Unable to delete the file name is invalid.",
