@@ -130,6 +130,7 @@
             alert(I18n.translate(err.message));
           })
         }).finally(() => {
+          submitBtn.removeAttribute('disabled');
         });
     }
   </script>
