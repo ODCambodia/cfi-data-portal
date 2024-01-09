@@ -25,25 +25,27 @@ const BASE_MAP = {
   )
 };
 
-L.control.scale().addTo(map);
-L.control.layers(BASE_MAP).addTo(map);
 L.control.resetView({
   position: "topleft",
   title: "Reset view",
   latlng: L.latLng(DEFAULT_COORD),
   zoom: 7,
 }).addTo(map);
+L.control.layers(BASE_MAP, null, { position: 'topleft' }).addTo(map);
+L.control.scale().addTo(map);
 
 const OVERLAY_MAP = {};
 const REGEX_YEAR = /(_(20)\d{2})/s;
 let activePolygon = null;
 
 function showActivePolygon(layer) {
-  if (activePolygon !== null) {
+  if (activePolygon !== null || !layer) {
     // Reset style|
     activePolygon.setStyle(POLYGON_STYLE.default);
     activePolygon = null;
   }
+
+  if (!layer) { return; }
 
   // set active in view with offset
   const center = { ...layer.getBounds().getCenter() };
@@ -131,8 +133,8 @@ function drawAboutSection() {
   const populationPieChart = document.createElement('canvas');
   populationPieChart.id = 'populationPieChart';
 
-  chartWrapper.append(memberPieChart);
   chartWrapper.append(committeePieChart);
+  chartWrapper.append(memberPieChart);
   chartWrapper.append(populationPieChart);
 
   // Appending everything
@@ -228,22 +230,29 @@ async function loadConservationAreas(cfiId) {
     },
   });
 
-  if (conservationArea.features.length > 0) {
-    const header = document.createElement('h2');
-    header.classList.add('about__header');
-    header.innerText = I18n.translate('conservation_area_in_community');
+  if (conservationArea.features.length < 0) {
+    document.querySelector('.conservation__area__wrapper').outerHTML = '';
+    return;
+  }
 
+  const header = document.createElement('h2');
+  const conservationWrapperDom = document.querySelector('.conservation__area__wrapper');
+  header.classList.add('about__header');
+  header.innerText = I18n.translate('conservation_area_in_community');
+  conservationWrapperDom.prepend(header);
+
+  if (conservationArea.features.length === 1) {
+    const conservationAreaRow = conservationArea.features[0].properties;
+    const name = conservationAreaRow[I18n.translate({ en: 'name_en', kh: 'name' })] || conservationAreaRow.name
+    const area = Utils.toFixed(Number(conservationAreaRow.area), 2) + ` ${I18n.translate('hectre')}`;
+    const p = document.createElement('p');
+    p.classList.add('conservation__text');
+    p.innerText = name + ' (' + area + ')';
+    conservationWrapperDom.querySelector('table').remove();
+    conservationWrapperDom.append(p);
+  } else if (conservationArea.features.length > 1) {
     const tbody = document.createElement('tbody');
-    const thead = document.createElement('thead');
     const ItemsToShowKeys = ['name', 'area'];
-
-    const trHead = document.createElement('tr');
-    ItemsToShowKeys.forEach((item) => {
-      const td = document.createElement('td');
-      td.innerText = I18n.translate(item);
-      trHead.append(td);
-    });
-    thead.append(trHead);
 
     conservationArea.features.forEach((item) => {
       const tr = document.createElement('tr');
@@ -253,7 +262,7 @@ async function loadConservationAreas(cfiId) {
         const val = item.properties[key];
 
         if (Utils.isNumeric(val)) {
-          td.innerText = Utils.toFixed(Number(val), 2);
+          td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectre')}`;
         } else if (key === 'name') {
           td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
         }
@@ -264,12 +273,8 @@ async function loadConservationAreas(cfiId) {
       tbody.append(tr);
     })
 
-    document.querySelector('.conservation__area__wrapper').prepend(header);
     const conservationTable = document.querySelector('.conservation__area__wrapper table');
-    conservationTable.append(thead);
     conservationTable.append(tbody);
-  } else {
-    document.querySelector('.conservation__area__wrapper').outerHTML = '';
   }
 }
 
@@ -454,7 +459,7 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = item.properties.title;
+    a.innerText = item.properties[I18n.translate({ kh: 'title', en: 'title_en' })] || item.properties.title || item.properties.title_en; // damn this is terrible code (sorry)
     a.style.color = '#000';
     a.target = '_blank';
 
@@ -578,6 +583,10 @@ async function handleCfiSelect(e) {
   const cfiId = e.currentTarget.value;
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
+  console.log('HELLO HANDLE HERE', e);
+
+  // save to cache
+  sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
   const [cfiProfile] = await Promise.all([
     Utils.fetchGeoJson({
@@ -643,6 +652,9 @@ async function handleProvinceSelect(e) {
   const selectedProvinceId = provinceSelect.value;
   const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
 
+  // save to cache
+  sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
+
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
   }
@@ -658,9 +670,7 @@ async function handleProvinceSelect(e) {
     },
   });
 
-  if (provinceName) {
-    cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
-  }
+  cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
 
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
@@ -718,11 +728,42 @@ async function loadProvince() {
   }
 }
 
+async function loadSavedOption() {
+  // load saved cache
+  // refactor the handler code instead of doing this
+  // or maybe this is better ???
+  // after writing it I actually think this approach is better
+  const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
+  if (!savedProvince) { return; }
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  const cacheEvent = new Event('cacheLoad', { bubbles: true });
+
+  // dont try to dispatch them separately or else u'll run into race cond 
+  provinceSelect.value = savedProvince;
+  provinceSelect.addEventListener('cacheLoad', async function (e) {
+    await handleProvinceSelect(e);
+    const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
+    if (!savedCommunity) { return; }
+
+    const cfiEvent = new Event('change');
+    const cfiSelect = document.getElementById('cfiSelect');
+    cfiSelect.value = savedCommunity;
+    cfiSelect.dispatchEvent(cfiEvent);
+  });
+
+  provinceSelect.dispatchEvent(cacheEvent);
+}
+
 async function init() {
   await I18n.init();
   await loadProvince();
+
+  const provinceSelect = document.getElementById('provinceSelect');
+  provinceSelect.removeAttribute('disabled');
+
+  await loadSavedOption();
   toggleLoading(false);
-  document.getElementById('provinceSelect').removeAttribute('disabled');
 }
 
 if (document.readyState !== 'loading') {

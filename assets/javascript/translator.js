@@ -49,9 +49,6 @@ class I18n {
   }
 
   static translate(key) {
-    if (key === 'name' || key === 'area') {
-      console.log('key = ', key, this._lang, this._translate[key]);
-    }
     if (typeof key === 'object') {
       return key[this._lang];
     }

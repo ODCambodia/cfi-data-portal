@@ -32,9 +32,13 @@
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
       <!-- Home -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <div class="mb-2">
-          <label class="d-inline-block" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
-          <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select" name="provinceSelect" id="provinceSelect"></select>
+          </div>
         </div>
 
         <div id="tableProfile" class="table-wrapper d-none">
@@ -92,15 +96,15 @@
       <!-- User Management -->
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
         <form id="userApprovalForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h2>
-          <div class="list-group my-2" data-i18n="loading...">
+          <h4 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h4>
+          <div class="list-group mt-3 mb-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
         </form>
 
         <form id="userDeletionForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h2>
-          <div class="list-group my-2" data-i18n="loading...">
+          <h4 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h4>
+          <div class="list-group my-3" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
         </form>
@@ -121,9 +125,13 @@
           </div>
           <div class="modal-body ">
             <div class="row g-3 mb-3">
-              <div class="col-12">
+              <div class="col-6">
                 <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
+              </div>
+              <div class="col-6">
+                <label for="titleInput" class="form-label" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
+                <input type="text" class="form-control" id="titleEnInput">
               </div>
               <div class="col-12">
                 <label for="descriptionInput" class="form-label"
@@ -268,6 +276,7 @@
         const option = document.createElement('option');
         option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
         option.value = item.id;
+        option.dataset.name = item.properties.pro_name_k;
         provinceSelect.append(option);
       });
 
@@ -286,16 +295,21 @@
           }
         });
 
-        const cfrReference = cfrResponse.features;
-        if (cfrReference.length > 0) {
-          cfrReference.sort((a, b) => a.properties.cfr_name.localeCompare(b.properties.name, 'km-KH'));
-          tbody.innerHTML = '';
-          createRow(cfrReference).forEach((tr) => {
-            tbody.append(tr);
-          });
-        } else {
+        if (cfrResponse.features.length <= 0) {
           tbody.innerHTML = I18n.translate('this_province_does_not_have_cfr');
         }
+
+        tbody.innerHTML = '';
+
+        const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+        const cfrReference = cfrResponse.features.filter((item) => item.properties.province.trim() === provinceName);
+        console.log(provinceName, cfrReference);
+        cfrReference.sort((a, b) => a.properties.cfr_name.localeCompare(b.properties.name, 'km-KH'));
+
+        createRow(cfrReference).forEach((tr) => {
+          tbody.append(tr);
+        });
+
       });
     }
 
@@ -404,12 +418,17 @@
       const currentForm = e.currentTarget;
       const fileInput = document.getElementById('formFile');
       const title = document.getElementById('titleInput');
+      const titleEn = document.getElementById('titleEnInput');
       const description = document.getElementById('descriptionInput');
       const formData = new FormData();
       formData.append('title', title.value);
-      formData.append('title_en', description.value);
+      formData.append('title_en', titleEn.value);
+      formData.append('description', description.value);
       formData.append('files', fileInput.files[0]);
-      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      if (currentForm.dataset.x && currentForm.dataset.y) {
+        formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+      }
 
       const modalEl = document.getElementById('addDocumentModal');
       const modal = bootstrap.Modal.getInstance(modalEl);
@@ -629,7 +648,7 @@
       activeLayerTabBtn.addEventListener('click', function (e) {
         if (!hasLoadedActiveLayerTab) {
           hasLoadedActiveLayerTab = true;
-          const header = document.createElement('h6');
+          const header = document.createElement('h5');
           header.innerText = I18n.translate('select_related_data_to_show')
           const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
           listGroupDom.parentElement.prepend(header);
@@ -644,9 +663,10 @@
       defaultProfileTab.addEventListener('click', function (e) {
         if (!hasLoadedProfileTab) {
           hasLoadedProfileTab = true;
-          const profileHeader = document.createTextNode(I18n.translate('select_a_profile_to_show'));
+          const header = document.createElement('h5');
+          header.innerText = I18n.translate('select_a_profile_to_show');
           const profileList = document.querySelector(`#defaultProfileForm .list-group`);
-          profileList.parentElement.prepend(profileHeader);
+          profileList.parentElement.prepend(header);
           loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
 
           const defaultProfileForm = document.getElementById('defaultProfileForm');

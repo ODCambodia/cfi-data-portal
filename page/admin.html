@@ -32,9 +32,13 @@
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
       <!-- Related document forms -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <div class="mb-2">
-          <label class="d-inline-block" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
-          <select class="d-inline-block" name="provinceSelect" id="provinceSelect"></select>
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select" name="provinceSelect" id="provinceSelect"></select>
+          </div>
         </div>
 
         <div id="tableProfile" class="table-wrapper d-none">
@@ -101,14 +105,14 @@
 
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
         <form id="userApprovalForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h2>
+          <h4 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h4>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
         </form>
 
         <form id="userDeletionForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h2 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h2>
+          <h4 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h4>
           <div class="list-group my-2" data-i18n="loading...">
             កំពុងដំណើរការ...
           </div>
@@ -129,9 +133,13 @@
           </div>
           <div class="modal-body ">
             <div class="row g-3 mb-3">
-              <div class="col-12">
+              <div class="col-6">
                 <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
-                <input type="text" class="form-control" id="titleInput" required>
+                <input type="text" class="form-control" id="titleInput">
+              </div>
+              <div class="col-6">
+                <label for="titleEnInput" class="form-label" data-i18n="filename_english">ចំណងជើងឯកសារ</label>
+                <input type="text" class="form-control" id="titleEnInput">
               </div>
               <div class="col-12">
                 <label for="descriptionInput" class="form-label"
@@ -273,11 +281,13 @@
         const option = document.createElement('option');
         option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
         option.value = item.id;
+        option.dataset.name = item.properties.pro_name_k;
         provinceSelect.append(option);
       });
 
       provinceSelect.addEventListener('change', async function (e) {
         const val = e.currentTarget.value;
+        const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
         document.getElementById('tableProfile').classList.remove('d-none');
 
         const tbody = document.querySelector('#tableProfile table tbody');
@@ -289,9 +299,11 @@
           data: {
             typeName: 'cfi:cfi',
             CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial','geom','IN(''${val}'')')))`,
-            propertyname: 'name',
+            propertyname: 'name,province',
           }
         });
+
+        cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
 
         const cfisId = cfiBoundary.features.map((item) => item.id.split('.')[1]).join(`'',''`);
         const cfiRefResponse = await Utils.fetchGeoJson({
@@ -433,12 +445,17 @@
       const currentForm = e.currentTarget;
       const fileInput = document.getElementById('formFile');
       const title = document.getElementById('titleInput');
+      const titleEn = document.getElementById('titleEnInput');
       const description = document.getElementById('descriptionInput');
       const formData = new FormData();
       formData.append('title', title.value);
-      formData.append('title_en', description.value);
+      formData.append('title_en', titleEn.value);
+      formData.append('description', description.value);
       formData.append('files', fileInput.files[0]);
-      formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+
+      if (currentForm.dataset.x && currentForm.dataset.y) {
+        formData.append('pos', `${currentForm.dataset.x} ${currentForm.dataset.y}`)
+      }
 
       const modalEl = document.getElementById('addDocumentModal');
       const modal = bootstrap.Modal.getInstance(modalEl);
@@ -541,7 +558,8 @@
 
     function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
       const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
-      const header = document.createTextNode(I18n.translate(`select_a_${key}_to_show`));
+      const header = document.createElement('h4');
+      header.innerText = I18n.translate(`select_a_${key}_to_show`);
       const list = document.querySelector(`#${formId} .list-group`);
       list.parentElement.prepend(header);
       loadSettings(apiUrl, formId, domType, validationCallback);

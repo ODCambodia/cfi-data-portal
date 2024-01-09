@@ -120,7 +120,6 @@ app.get('/api/:server/users', Auth.validateSuperAdmin, User.handleGetAllUsers);
 app.post('/api/users/:id/approve', Auth.validateSuperAdmin, User.handleApproveUser);
 app.delete('/api/users/:id', Auth.validateSuperAdmin, User.handleDeleteUser);
 
-
 app.listen(port);
 console.log("NODE_PATH=" + process.env.NODE_PATH);
 console.log('Server started at http://localhost:' + port);
