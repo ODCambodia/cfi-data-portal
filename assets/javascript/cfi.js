@@ -230,22 +230,29 @@ async function loadConservationAreas(cfiId) {
     },
   });
 
-  if (conservationArea.features.length > 0) {
-    const header = document.createElement('h2');
-    header.classList.add('about__header');
-    header.innerText = I18n.translate('conservation_area_in_community');
+  if (conservationArea.features.length < 0) {
+    document.querySelector('.conservation__area__wrapper').outerHTML = '';
+    return;
+  }
 
+  const header = document.createElement('h2');
+  const conservationWrapperDom = document.querySelector('.conservation__area__wrapper');
+  header.classList.add('about__header');
+  header.innerText = I18n.translate('conservation_area_in_community');
+  conservationWrapperDom.prepend(header);
+
+  if (conservationArea.features.length === 1) {
+    const conservationAreaRow = conservationArea.features[0].properties;
+    const name = conservationAreaRow[I18n.translate({ en: 'name_en', kh: 'name' })] || conservationAreaRow.name
+    const area = Utils.toFixed(Number(conservationAreaRow.area), 2) + ` ${I18n.translate('hectre')}`;
+    const p = document.createElement('p');
+    p.classList.add('conservation__text');
+    p.innerText = name + ' (' + area + ')';
+    conservationWrapperDom.querySelector('table').remove();
+    conservationWrapperDom.append(p);
+  } else if (conservationArea.features.length > 1) {
     const tbody = document.createElement('tbody');
-    const thead = document.createElement('thead');
     const ItemsToShowKeys = ['name', 'area'];
-
-    const trHead = document.createElement('tr');
-    ItemsToShowKeys.forEach((item) => {
-      const td = document.createElement('td');
-      td.innerText = I18n.translate(item);
-      trHead.append(td);
-    });
-    thead.append(trHead);
 
     conservationArea.features.forEach((item) => {
       const tr = document.createElement('tr');
@@ -255,7 +262,7 @@ async function loadConservationAreas(cfiId) {
         const val = item.properties[key];
 
         if (Utils.isNumeric(val)) {
-          td.innerText = Utils.toFixed(Number(val), 2);
+          td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectre')}`;
         } else if (key === 'name') {
           td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
         }
@@ -266,12 +273,8 @@ async function loadConservationAreas(cfiId) {
       tbody.append(tr);
     })
 
-    document.querySelector('.conservation__area__wrapper').prepend(header);
     const conservationTable = document.querySelector('.conservation__area__wrapper table');
-    conservationTable.append(thead);
     conservationTable.append(tbody);
-  } else {
-    document.querySelector('.conservation__area__wrapper').outerHTML = '';
   }
 }
 
