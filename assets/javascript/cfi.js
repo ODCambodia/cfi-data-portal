@@ -475,12 +475,47 @@ async function loadRelatedDocuments(cfiId) {
   relatedDocumentsDOM.parentElement.classList.remove('d-none');
 }
 
+function getDistrictTagDom(districts) {
+  if (!Array.isArray(districts) && districts.length < 0) {
+    return '';
+  }
+
+  if (districts.length === 1) {
+    return districts[0].properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })]
+  }
+
+  const div = document.createElement('div');
+  districts.forEach((item) => {
+    const span = document.createElement('span');
+    span.classList.add('badge-pill', 'badge-secondary');
+    span.innerText = item.properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })];
+    span.style.marginRight = '2px';
+    div.append(span);
+  });
+
+  return div;
+}
+
 async function showCFI_B(data, defaultCrs) {
   document.body.querySelector('.about__wrapper').classList.add('active');
-  const espg = await Utils.fetchGeoJson(
+
+  const fetchEspg = Utils.fetchGeoJson(
     { baseUrl: `https://epsg.io/${defaultCrs}.json` },
     false,
   );
+
+  const fetchDistrict = Utils.fetchGeoJson({
+    data: {
+      typeName: 'cfi:District_kh',
+      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('${defaultProfileTypeName}', 'geom', 'IN(''${data.feature.id}'')')))`,
+    },
+  });
+
+  const [espg, instersectingDistricts] = await Promise.all([fetchEspg, fetchDistrict]);
+
+  const provinceCode = document.querySelector('#provinceSelect option:checked').dataset.provinceCode;
+  const districts = instersectingDistricts.features.filter((item) => item.properties.pro_code === Number(provinceCode));
+
   const {
     x_coordinate,
     y_coordinate,
@@ -504,6 +539,10 @@ async function showCFI_B(data, defaultCrs) {
   cfi_b['coordinate_system'] = (espg && espg.name) || I18n.translate('no_data');
   cfi_b['referencing_coordinate'] = `${x_coordinate} ${y_coordinate}`;
   cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+
+  if (districts && districts.length > 0) {
+    cfi_b['district'] = getDistrictTagDom(districts);
+  }
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
@@ -728,6 +767,7 @@ async function loadProvince() {
       option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
+      option.dataset.provinceCode = item.properties.pro_code;
       provinceSelect.append(option);
     });
 
