@@ -22,7 +22,11 @@ function showActivePoint(layer) {
   map.panTo(center, { animate: false });
   map.panBy(offsetCenter, { animate: false });
 
-  const radius = layer.getRadius() * 1.3;
+  let radius = layer.getRadius();
+  if (activePoint !== layer) {
+    radius *= 1.3;
+  }
+
   layer.bringToFront();
   layer.setStyle({ ...POINT_STYLE.active, radius });
 
@@ -189,10 +193,39 @@ function drawAboutSection() {
   body.append(chartWrapper);
 }
 
+function getDistrictTagDom(districts) {
+  if (!Array.isArray(districts) && districts.length < 0) {
+    return '';
+  }
+
+  if (districts.length === 1) {
+    return districts[0].properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })]
+  }
+
+  const div = document.createElement('div');
+  districts.forEach((item) => {
+    const span = document.createElement('span');
+    span.classList.add('badge-pill', 'badge-secondary');
+    span.innerText = item.properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })];
+    span.style.marginRight = '2px';
+    div.append(span);
+  });
+
+  return div;
+}
+
 async function showCFR_A(data) {
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
+
+  const districts = await Utils.fetchGeoJson({
+    data: {
+      typeName: 'cfi:District_kh',
+      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('${defaultProfileTypeName}', 'geom', 'IN(''${data.feature.id}'')')))`,
+    },
+  });
+
   const {
     x_coordinate,
     y_coordinate,
@@ -214,6 +247,10 @@ async function showCFR_A(data) {
 
   // modify without affecting other translation
   cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+
+  if (districts && districts.length > 0) {
+    cfi_b['district'] = getDistrictTagDom(districts);
+  }
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
@@ -255,7 +292,7 @@ async function showCFR_A(data) {
 }
 
 async function loadCFRMap(options) {
-  const cfr_data = await Utils.fetchGeoJson({ data: { typeName: TYPENAME[KEYS.CFR_A], ...options } });
+  const cfr_data = await Utils.fetchGeoJson({ data: { typeName: defaultProfileTypeName, ...options } });
   const provinceName = document.querySelector('#provinceSelect option:checked').dataset.name;
 
   if (provinceName) {
@@ -354,6 +391,7 @@ async function handleProvinceSelect(e) {
   const bounds = overlay.getBounds();
 
   sessionStorage.setItem(`${SERVER}_province`, val);
+  sessionStorage.removeItem(`${SERVER}_community`);
 
   if (Object.keys(bounds).length > 0) {
     map.flyToBounds(bounds, { maxZoom: 9 });
@@ -400,6 +438,7 @@ async function loadProvinceCFR() {
 
 async function loadSavedOption() {
   const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
+  const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
   if (!savedProvince) { return; }
 
   const provinceSelect = document.getElementById('provinceSelect');
@@ -409,7 +448,6 @@ async function loadSavedOption() {
   provinceSelect.value = savedProvince;
   provinceSelect.addEventListener('cacheLoad', async function (e) {
     await handleProvinceSelect(e);
-    const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
     if (!savedCommunity) { return; }
 
     const cfiEvent = new Event('change');
