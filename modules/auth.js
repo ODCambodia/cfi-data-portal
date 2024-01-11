@@ -77,16 +77,21 @@ const handleTelegramVerification = async function (req, res) {
 
     if (!user) {
       const payload = { user_id: data.id, username: data.username, firstname: data.first_name || null, lastname: data.last_name || null, type };
-      UserDAO.insert(payload);
+      try {
+        await UserDAO.insert(payload);
+      } catch (e) {
+        return res.status(400).json({ error: 'user_already_exist_in_another_platform' });
+      }
+
       return res.status(403).json({ error: 'sent_pending_login_request' });
-    } else if (user && user.id && user.approval_time) {
+    } else if (user && user.user_id && user.approval_time) {
       const token = await jwt.sign({ username: data.username || data.id, isSuper: false }, process.env.SECRET);
       req.session.token = token;
       return res.json({ token });
     }
   }
 
-  return res.status(401).json({ error: 'Invalid telegram user' });
+  return res.status(401).json({ error: 'waiting_for_admin_approval' });
 }
 
 const appendUserToken = function (req, res, next) {

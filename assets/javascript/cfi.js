@@ -241,10 +241,14 @@ async function loadConservationAreas(cfiId) {
   header.innerText = I18n.translate('conservation_area_in_community');
   conservationWrapperDom.prepend(header);
 
+  if (!conservationArea.features.length) {
+    conservationWrapperDom.remove();
+  }
+
   if (conservationArea.features.length === 1) {
     const conservationAreaRow = conservationArea.features[0].properties;
     const name = conservationAreaRow[I18n.translate({ en: 'name_en', kh: 'name' })] || conservationAreaRow.name
-    const area = Utils.toFixed(Number(conservationAreaRow.area), 2) + ` ${I18n.translate('hectre')}`;
+    const area = Utils.toFixed(Number(conservationAreaRow.area), 2) + ` ${I18n.translate('hectare')}`;
     const p = document.createElement('p');
     p.classList.add('conservation__text');
     p.innerText = name + ' (' + area + ')';
@@ -262,7 +266,7 @@ async function loadConservationAreas(cfiId) {
         const val = item.properties[key];
 
         if (Utils.isNumeric(val)) {
-          td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectre')}`;
+          td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectare')}`;
         } else if (key === 'name') {
           td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
         }
@@ -538,7 +542,11 @@ async function showCFI_B(data, defaultCrs) {
 
   const cfi_name = data.feature.properties[I18n.translate({ en: 'name_en', kh: 'name' })]
   const header = document.querySelector('.about__wrapper .about__header');
-  header.innerText = I18n.translate('fishing_community') + ` ${sub_name || cfi_name} `;
+  if (I18n.getLang() === 'en') {
+    header.innerText = `${sub_name || cfi_name} ${I18n.translate('fishing_community')}`;
+  } else {
+    header.innerText = `${I18n.translate('fishing_community')}${sub_name || cfi_name}`;
+  }
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
@@ -556,6 +564,7 @@ function addBoundaryClickEvent() {
     const cfiId = e.layer.feature.id;
     document.querySelector('.about__body').innerHTML = '';
     document.getElementById('cfiSelect').value = cfiId;
+    sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
     drawAboutSection();
 
@@ -583,7 +592,6 @@ async function handleCfiSelect(e) {
   const cfiId = e.currentTarget.value;
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
-  console.log('HELLO HANDLE HERE', e);
 
   // save to cache
   sessionStorage.setItem(`${SERVER}_community`, cfiId);
@@ -646,6 +654,7 @@ async function loadCfiSelect(cfiBoundary) {
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+  document.getElementById('relatedDocuments').parentElement.classList.add('d-none');
   document.querySelector('.province-tooltip .tooltip').classList.remove('active');
 
   const provinceSelect = e.currentTarget;
@@ -654,6 +663,7 @@ async function handleProvinceSelect(e) {
 
   // save to cache
   sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
+  sessionStorage.removeItem(`${SERVER}_community`);
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
@@ -729,11 +739,9 @@ async function loadProvince() {
 }
 
 async function loadSavedOption() {
-  // load saved cache
-  // refactor the handler code instead of doing this
-  // or maybe this is better ???
-  // after writing it I actually think this approach is better
   const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
+  const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
+
   if (!savedProvince) { return; }
 
   const provinceSelect = document.getElementById('provinceSelect');
@@ -743,7 +751,6 @@ async function loadSavedOption() {
   provinceSelect.value = savedProvince;
   provinceSelect.addEventListener('cacheLoad', async function (e) {
     await handleProvinceSelect(e);
-    const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
     if (!savedCommunity) { return; }
 
     const cfiEvent = new Event('change');

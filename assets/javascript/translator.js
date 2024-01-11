@@ -3,7 +3,7 @@ class I18n {
   static _isReady = false;
   static _translate = {};
 
-  static _getLang() {
+  static getLang() {
     const stored = localStorage.getItem('lang');
 
     if (stored) {
@@ -16,7 +16,7 @@ class I18n {
   }
 
   static async init() {
-    this._lang = this._getLang();
+    this._lang = this.getLang();
     this._translate = await this._fetch(this._lang);
     this._isReady = true;
 

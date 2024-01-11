@@ -245,7 +245,7 @@ async function showCFR_A(data) {
   }
 
   const header = document.querySelector('.about__header');
-  header.innerText = I18n.translate('fish_reservation_community') + ' ' + cfr_name;
+  header.innerText = I18n.translate('community_fish_refuge') + ' ' + cfr_name;
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
@@ -266,6 +266,9 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].off('click');
   OVERLAY_MAP[KEYS.CFR_A].on('click', function (e) {
+    const cfiId = e.layer.feature.id;
+    document.getElementById('cfiSelect').value = cfiId;
+
     showCFR_A(e.layer);
     showActivePoint(e.layer);
   });
@@ -331,6 +334,7 @@ async function loadCFRSelect(options) {
 async function handleProvinceSelect(e) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
+  document.getElementById('relatedDocuments').parentElement.classList.add('d-none');
   document.querySelector('.province-tooltip .tooltip').classList.remove('active');
 
   const cfiSelect = document.getElementById('cfiSelect');
