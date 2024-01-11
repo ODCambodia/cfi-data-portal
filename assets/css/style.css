@@ -422,15 +422,25 @@ td span {
   cursor: pointer;
 }
 
+.about__table__wrapper table tr:nth-child(odd) td {
+  background-color: lightgray;
+}
+
 .about__table__wrapper table tr td:first-child {
   white-space: nowrap;
+}
+
+.about__table__wrapper table {
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 
 table {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
-  margin-top: 5px;
   text-align: center;
 }
 
