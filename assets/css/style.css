@@ -268,8 +268,16 @@ td span {
   text-align: center;
 }
 
+.conservation__area__wrapper table {
+  padding: 2px 0;
+}
+
 .conservation__area__wrapper table thead {
   font-weight: bold;
+}
+
+.conservation__area__wrapper table tbody td {
+  width: 50%;
 }
 
 .document__body {
@@ -422,8 +430,8 @@ td span {
   cursor: pointer;
 }
 
-.about__table__wrapper table tr:nth-child(odd) td {
-  background-color: lightgray;
+.about__table__wrapper table tr:nth-child(even) td {
+  background-color: whitesmoke;
 }
 
 .about__table__wrapper table tr td:first-child {

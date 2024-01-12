@@ -8,6 +8,11 @@ const map = L.map('map', {
 let activePoint = null;
 
 function showActivePoint(layer) {
+  let radius = layer.getRadius();
+  if (activePoint && activePoint.feature.id !== layer.feature.id) {
+    radius *= 1.2;
+  }
+
   if (activePoint !== null || !layer) {
     // Reset style|
     activePoint.setStyle({ ...POINT_STYLE.default, ...(layer ? { radius: layer.getRadius() } : {}) });
@@ -21,11 +26,6 @@ function showActivePoint(layer) {
   const offsetCenter = new L.Point(200, 0);
   map.panTo(center, { animate: false });
   map.panBy(offsetCenter, { animate: false });
-
-  let radius = layer.getRadius();
-  if (activePoint !== layer) {
-    radius *= 1.3;
-  }
 
   layer.bringToFront();
   layer.setStyle({ ...POINT_STYLE.active, radius });
@@ -163,7 +163,6 @@ async function loadRelatedDocuments(cfiId) {
 
 function drawAboutSection() {
   const tableProfile = document.createElement('table');
-  tableProfile.style.marginBottom = '5px';
   tableProfile.style.textAlign = 'left';
 
   const tableWrapper = document.createElement('div');
@@ -221,7 +220,7 @@ async function showCFR_A(data) {
 
   const districts = await Utils.fetchGeoJson({
     data: {
-      typeName: 'cfi:District_kh',
+      typeName: 'cfr:District_kh',
       CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('${defaultProfileTypeName}', 'geom', 'IN(''${data.feature.id}'')')))`,
     },
   });
@@ -251,6 +250,7 @@ async function showCFR_A(data) {
   if (districts && districts.length > 0) {
     cfi_b['district'] = getDistrictTagDom(districts);
   }
+
 
   for (const key in cfi_b) {
     const tr = document.createElement('tr');
@@ -368,7 +368,7 @@ async function loadCFRSelect(options) {
   return OVERLAY_MAP[KEYS.CFR_A];
 }
 
-async function handleProvinceSelect(e) {
+async function handleProvinceSelect(e, options = {}) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
   document.getElementById('relatedDocuments').parentElement.classList.add('d-none');
@@ -393,8 +393,9 @@ async function handleProvinceSelect(e) {
   sessionStorage.setItem(`${SERVER}_province`, val);
   sessionStorage.removeItem(`${SERVER}_community`);
 
+  console.log('out side')
   if (Object.keys(bounds).length > 0) {
-    map.flyToBounds(bounds, { maxZoom: 9 });
+    map.flyToBounds(bounds, { maxZoom: 9, animate: !options.shouldNotAnimate });
   }
 
   toggleLoading(false);
@@ -439,7 +440,10 @@ async function loadProvinceCFR() {
 async function loadSavedOption() {
   const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
   const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
-  if (!savedProvince) { return; }
+  if (!savedProvince) {
+    toggleLoading(false);
+    return;
+  }
 
   const provinceSelect = document.getElementById('provinceSelect');
   const cacheEvent = new Event('cacheLoad', { bubbles: true });
@@ -447,8 +451,11 @@ async function loadSavedOption() {
   // dont try to dispatch them separately or else u'll run into race cond 
   provinceSelect.value = savedProvince;
   provinceSelect.addEventListener('cacheLoad', async function (e) {
-    await handleProvinceSelect(e);
-    if (!savedCommunity) { return; }
+    await handleProvinceSelect(e, { shouldNotAnimate: true });
+    if (!savedCommunity) {
+      toggleLoading(false);
+      return;
+    }
 
     const cfiEvent = new Event('change');
     const cfiSelect = document.getElementById('cfiSelect');
@@ -467,7 +474,6 @@ async function init() {
   provinceSelect.removeAttribute('disabled');
 
   await loadSavedOption();
-  toggleLoading(false);
 }
 
 if (document.readyState !== 'loading') {

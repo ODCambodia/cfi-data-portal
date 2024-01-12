@@ -109,7 +109,6 @@ function getESPGToggleBtn(text) {
 
 function drawAboutSection() {
   const tableProfile = document.createElement('table');
-  tableProfile.style.marginBottom = '5px';
   tableProfile.style.textAlign = 'left';
 
   const tableWrapper = document.createElement('div');
@@ -245,16 +244,7 @@ async function loadConservationAreas(cfiId) {
     conservationWrapperDom.remove();
   }
 
-  if (conservationArea.features.length === 1) {
-    const conservationAreaRow = conservationArea.features[0].properties;
-    const name = conservationAreaRow[I18n.translate({ en: 'name_en', kh: 'name' })] || conservationAreaRow.name
-    const area = Utils.toFixed(Number(conservationAreaRow.area), 2) + ` ${I18n.translate('hectare')}`;
-    const p = document.createElement('p');
-    p.classList.add('conservation__text');
-    p.innerText = name + ' (' + area + ')';
-    conservationWrapperDom.querySelector('table').remove();
-    conservationWrapperDom.append(p);
-  } else if (conservationArea.features.length > 1) {
+  if (conservationArea.features.length > 0) {
     const tbody = document.createElement('tbody');
     const ItemsToShowKeys = ['name', 'area'];
 
@@ -264,6 +254,7 @@ async function loadConservationAreas(cfiId) {
       ItemsToShowKeys.forEach((key) => {
         const td = document.createElement('td');
         const val = item.properties[key];
+        td.style.width = '50%';
 
         if (Utils.isNumeric(val)) {
           td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectare')}`;
@@ -690,7 +681,7 @@ async function loadCfiSelect(cfiBoundary) {
   cfiSelect.removeAttribute('disabled');
 }
 
-async function handleProvinceSelect(e) {
+async function handleProvinceSelect(e, options = {}) {
   document.body.querySelector('.about__wrapper').classList.remove('active');
   document.getElementById('relatedLayers').parentElement.classList.add('d-none');
   document.getElementById('relatedDocuments').parentElement.classList.add('d-none');
@@ -730,7 +721,7 @@ async function handleProvinceSelect(e) {
   toggleLoading(false);
 
   if (Object.keys(OVERLAY_MAP[KEYS.CFI_B].getBounds()).length > 0) {
-    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds());
+    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds(), { animate: !options.shouldNotAnimate });
   }
 
   // load number of CFI
@@ -790,7 +781,7 @@ async function loadSavedOption() {
   // dont try to dispatch them separately or else u'll run into race cond 
   provinceSelect.value = savedProvince;
   provinceSelect.addEventListener('cacheLoad', async function (e) {
-    await handleProvinceSelect(e);
+    await handleProvinceSelect(e, { shouldNotAnimate: true });
     if (!savedCommunity) { return; }
 
     const cfiEvent = new Event('change');
