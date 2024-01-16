@@ -529,7 +529,7 @@ async function showCFI_B(data, defaultCrs) {
   // change the listener as well
   cfi_b['coordinate_system'] = (espg && espg.name) || I18n.translate('no_data');
   cfi_b['referencing_coordinate'] = `${x_coordinate} ${y_coordinate}`;
-  cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+  cfi_b['province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
 
   if (districts && districts.length > 0) {
     cfi_b['district'] = getDistrictTagDom(districts);
@@ -549,7 +549,15 @@ async function showCFI_B(data, defaultCrs) {
       cfi_b[key] = span;
     }
 
-    [I18n.translate(key), cfi_b[key]].forEach((x, i) => {
+    const coloumns = [I18n.translate(key), , cfi_b[key]];
+    if (I18n.getLang() === 'kh') {
+      const span = document.createElement('span');
+      span.innerText = ':';
+      span.style.margin = '0 2px';
+      coloumns.splice(1, 0, span); // inserting semi
+    }
+
+    coloumns.forEach((x, i) => {
       const td = document.createElement('td');
 
       if (x instanceof Element) {
