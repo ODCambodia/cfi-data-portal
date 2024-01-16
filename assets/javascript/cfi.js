@@ -602,7 +602,6 @@ function addBoundaryClickEvent() {
     const cfiId = e.layer.feature.id;
     document.querySelector('.about__body').innerHTML = '';
     document.getElementById('cfiSelect').value = cfiId;
-    sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
     drawAboutSection();
 
@@ -630,9 +629,6 @@ async function handleCfiSelect(e) {
   const cfiId = e.currentTarget.value;
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
-
-  // save to cache
-  sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
   const [cfiProfile] = await Promise.all([
     Utils.fetchGeoJson({
@@ -698,10 +694,6 @@ async function handleProvinceSelect(e, options = {}) {
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
   const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
-
-  // save to cache
-  sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
-  sessionStorage.removeItem(`${SERVER}_community`);
 
   if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
     OVERLAY_MAP[KEYS.CFI_B].remove();
@@ -777,30 +769,6 @@ async function loadProvince() {
   }
 }
 
-async function loadSavedOption() {
-  const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
-  const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
-
-  if (!savedProvince) { return; }
-
-  const provinceSelect = document.getElementById('provinceSelect');
-  const cacheEvent = new Event('cacheLoad', { bubbles: true });
-
-  // dont try to dispatch them separately or else u'll run into race cond 
-  provinceSelect.value = savedProvince;
-  provinceSelect.addEventListener('cacheLoad', async function (e) {
-    await handleProvinceSelect(e, { shouldNotAnimate: true });
-    if (!savedCommunity) { return; }
-
-    const cfiEvent = new Event('change');
-    const cfiSelect = document.getElementById('cfiSelect');
-    cfiSelect.value = savedCommunity;
-    cfiSelect.dispatchEvent(cfiEvent);
-  });
-
-  provinceSelect.dispatchEvent(cacheEvent);
-}
-
 async function init() {
   await I18n.init();
   await loadProvince();
@@ -808,7 +776,6 @@ async function init() {
   const provinceSelect = document.getElementById('provinceSelect');
   provinceSelect.removeAttribute('disabled');
 
-  await loadSavedOption();
   toggleLoading(false);
 }
 

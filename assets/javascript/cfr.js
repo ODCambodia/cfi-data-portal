@@ -344,7 +344,6 @@ async function loadCFRSelect(options) {
     const val = e.currentTarget.value;
     const selectedCFR = cfr_data.features.find((item) => item.id === val);
 
-    sessionStorage.setItem(`${SERVER}_community`, val);
     document.querySelector('.about__body').innerHTML = '';
 
     if (OVERLAY_MAP[KEYS.CFR_A]) {
@@ -390,10 +389,6 @@ async function handleProvinceSelect(e, options = {}) {
   const overlay = await loadCFRSelect({ CQL_FILTER });
   const bounds = overlay.getBounds();
 
-  sessionStorage.setItem(`${SERVER}_province`, val);
-  sessionStorage.removeItem(`${SERVER}_community`);
-
-  console.log('out side')
   if (Object.keys(bounds).length > 0) {
     map.flyToBounds(bounds, { maxZoom: 9, animate: !options.shouldNotAnimate });
   }
@@ -437,34 +432,6 @@ async function loadProvinceCFR() {
   }
 }
 
-async function loadSavedOption() {
-  const savedProvince = sessionStorage.getItem(`${SERVER}_province`);
-  const savedCommunity = sessionStorage.getItem(`${SERVER}_community`);
-  if (!savedProvince) {
-    toggleLoading(false);
-    return;
-  }
-
-  const provinceSelect = document.getElementById('provinceSelect');
-  const cacheEvent = new Event('cacheLoad', { bubbles: true });
-
-  // dont try to dispatch them separately or else u'll run into race cond 
-  provinceSelect.value = savedProvince;
-  provinceSelect.addEventListener('cacheLoad', async function (e) {
-    await handleProvinceSelect(e, { shouldNotAnimate: true });
-    if (!savedCommunity) {
-      toggleLoading(false);
-      return;
-    }
-
-    const cfiEvent = new Event('change');
-    const cfiSelect = document.getElementById('cfiSelect');
-    cfiSelect.value = savedCommunity;
-    cfiSelect.dispatchEvent(cfiEvent);
-  });
-
-  provinceSelect.dispatchEvent(cacheEvent);
-}
 
 async function init() {
   await I18n.init();
@@ -472,8 +439,7 @@ async function init() {
 
   const provinceSelect = document.getElementById('provinceSelect');
   provinceSelect.removeAttribute('disabled');
-
-  await loadSavedOption();
+  toggleLoading(false);
 }
 
 if (document.readyState !== 'loading') {
