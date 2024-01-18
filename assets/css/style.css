@@ -439,6 +439,10 @@ td span {
   white-space: nowrap;
 }
 
+.about__table__wrapper table tr td:nth-child(2) {
+  padding-left: 3px;
+}
+
 .about__table__wrapper table {
   border-collapse: collapse;
   margin: 0;

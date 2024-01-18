@@ -69,23 +69,36 @@ function switchCRS() {
   const currentCRS = document.getElementById('espgToggleBtn').textContent;
   const gCRS = '+proj=longlat +datum=WGS84 +no_defs +type=crs'  //WGS 84
   const lCRS = "+proj=utm +zone=48 +datum=WGS84 +units=m +no_defs +type=crs"; //WGS 84/UTM Zone 48N
-  let currentCoord = document.getElementById('espgCoordDOM').textContent;
-  let newCorrdinate = '';
-  let decimalsPos = 2;
-  if (!currentCoord) { return }
 
-  currentCoord = currentCoord.split(' ').map(x => Number(x));
-  if (currentCRS === 'WGS 84') {
-    currentCoord.reverse();
-    newCorrdinate = proj4(gCRS, lCRS, currentCoord); // but it take function as x,y ???
-    decimalsPos = 2;
-  } else {
-    newCorrdinate = proj4(lCRS, gCRS, currentCoord); // return as long, lat for some reason ???
-    newCorrdinate.reverse();
-    decimalsPos = 6;
+  const coordDOM = document.getElementById('espgCoordDOM');
+  const coordWGS84_UTM = coordDOM.dataset.coordWGS84_UTM;
+  const coordWGS84 = coordDOM.dataset.coordWGS84;
+
+  let displayCoord = coordWGS84_UTM.replace(' ', '   '); // show WGS 84 / UTM as default
+
+  // check if have default WGS 84 UTM
+  if (typeof coordWGS84_UTM === 'string' && !coordWGS84_UTM.trim()) {
+    return false;
   }
 
-  document.getElementById('espgCoordDOM').innerText = newCorrdinate.map(x => Number(x).toFixed(decimalsPos)).join(' ');
+  // convert to WGS84
+  if (currentCRS === 'WGS 84 / UTM zone 48N') {
+    if (Utils.isEmptyString(coordWGS84)) {
+      const coordArr = coordWGS84_UTM.split(' ').map(x => Number(x));
+      try {
+        displayCoord = proj4(lCRS, gCRS, coordArr).reverse().map(x => x.toFixed(6)).join(' ');
+        coordDOM.dataset.coordWGS84 = displayCoord;
+      } catch (e) {
+        coordDOM.dataset.coordWGS84 = '';
+        displayCoord = I18n.translate('no_data');
+      }
+    } else {
+      displayCoord = coordWGS84;
+    }
+  }
+
+
+  document.getElementById('espgCoordDOM').innerText = displayCoord;
 }
 
 function getESPGToggleBtn(text) {
@@ -251,17 +264,16 @@ async function loadConservationAreas(cfiId) {
     conservationArea.features.forEach((item) => {
       const tr = document.createElement('tr');
 
-      ItemsToShowKeys.forEach((key) => {
+      ItemsToShowKeys.forEach((key,i) => {
         const td = document.createElement('td');
         const val = item.properties[key];
         td.style.width = '50%';
 
         if (Utils.isNumeric(val)) {
-          td.innerText = Utils.toFixed(Number(val), 2) + ` ${I18n.translate('hectare')}`;
+          td.innerText = Utils.formatNum(Number(val), ' ') + ` ${I18n.translate('hectare')}`;
         } else if (key === 'name') {
           td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
         }
-
         tr.append(td);
       });
 
@@ -517,19 +529,28 @@ async function showCFI_B(data, defaultCrs) {
 
   // careful about changing key
   // change the listener as well
+  const isValidCoord = !Utils.isEmptyString(x_coordinate) && !Utils.isEmptyString(y_coordinate);
 
-  const coordSpanDOM = document.createElement('span');
-  coordSpanDOM.id = 'espgCoordDOM'
-  coordSpanDOM.innerText = `${x_coordinate} ${y_coordinate}`;
+  const coordSpanDOM = document.createElement('pre');
+  coordSpanDOM.id = 'espgCoordDOM';
+  coordSpanDOM.innerHTML = `${x_coordinate}   ${y_coordinate}`;
+  if (isValidCoord) {
+    coordSpanDOM.dataset.coordWGS84_UTM = `${x_coordinate} ${y_coordinate}`;
+    coordSpanDOM.dataset.coordWGS84 = '';
+  }
 
   const cfi_b = {};
-  cfi_b.area_ha = data.feature.properties.area_ha + ' ' + I18n.translate('hectare');
+  cfi_b.area_ha = data.feature.properties.area_ha;
   cfi_b.cfi_code = data.feature.properties.cfi_code;
   cfi_b.creation_date = Utils.formatDate(data.feature.properties.creation_date);
   cfi_b.registration_date = Utils.formatDate(data.feature.properties.registration_date)
-  cfi_b.coordinate_system = getESPGToggleBtn((espg && espg.name) || I18n.translate('no_data'));
+  cfi_b.coordinate_system = (espg && espg.name) || I18n.translate('no_data');
   cfi_b.referencing_coordinate = coordSpanDOM;
   cfi_b.province = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+
+  if (isValidCoord && espg && espg.name) {
+    cfi_b.coordinate_system = getESPGToggleBtn(cfi_b.coordinate_system);
+  }
 
   if (districts && districts.length > 0) {
     cfi_b.district = getDistrictTagDom(districts);
@@ -539,25 +560,23 @@ async function showCFI_B(data, defaultCrs) {
     const coloumns = [I18n.translate(key), cfi_b[key]];
     const tr = document.createElement('tr');
 
-    if (I18n.getLang() === 'kh') {
-      const span = document.createElement('span');
-      span.innerText = ':';
-      span.style.margin = '0 3px';
-      coloumns.splice(1, 0, span); // inserting semi
-    }
-
     coloumns.forEach((x, i) => {
       const td = document.createElement('td');
+      const isKeyCol = i === 0;
 
       if (x instanceof Element) {
         td.append(x);
       } else if (Utils.isNumeric(x)) {
-        td.innerText = Utils.toFixed(Number(x), 2);
+        td.innerText = Utils.formatNum(Number(x), ' ');
       } else {
         td.innerText = x;
       }
 
-      if (i > 0 && !x) {
+      if (isKeyCol) {
+        td.innerText += ':';
+      }
+
+      if (!isKeyCol && !x) {
         td.innerText = I18n.translate('no_data');
       }
 

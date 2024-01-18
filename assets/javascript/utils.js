@@ -141,11 +141,22 @@ const Utils = {
     return day + separator + (I18n.translate(month)) + separator + year;
   },
   isNumeric: function (str) {
-    if (typeof str === 'string' && str[0] === '0' && (str[1] !== '.' || str[1] !== ',')) {
+    // number with 0 infront and is not float is not numeric
+    // EX: 0234234 (not numeric), 0.2 (numeric)
+    if (typeof str === 'string' && str[0] === '0' && !(str[1] === '.' || str[1] === ',')) {
       return false;
     }
 
     return /^-?[0-9][0-9,\.]+$/.test(str);
+  },
+  isEmptyString: function (str) {
+    return !str || (typeof str === 'string' && !str.trim());
+  },
+  formatNum: function (num, separator = ',', fraction = '.') {
+    const n = this.toFixed(Number(num));
+    return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
+      .replace(/\./, fraction)
+      .replace(/,/g, separator);
   },
   toFixed: function (num, fixed = 2) {
     const regex = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
