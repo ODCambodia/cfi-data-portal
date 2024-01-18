@@ -1,4 +1,8 @@
 {
+  "demography": "Demography",
+  "cfr_status": "Status",
+  "area_rainy_season": "Area size rainy season",
+  "area_dry_season": "Area size dry season",
   "file_english_or_khmer_needed": "Filename english or khmer required",
   "hectare": "hectare",
   "select_a_conservation_to_show": "Select a conservation layer to show",
@@ -71,7 +75,8 @@
   "in_province": "Within Province",
   "about": "About",
   "area_ha": "Area Hectare",
-  "cfi_code": "CFi code",
+  "cfi_code": "CFI code",
+  "cfr_code": "CFR Code",
   "type": "Type",
   "registration_date": "Registration date",
   "creation_date": "Establishment date",

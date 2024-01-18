@@ -510,50 +510,39 @@ async function showCFI_B(data, defaultCrs) {
   const {
     x_coordinate,
     y_coordinate,
-    area,
-    updated_by,
-    name,
-    name_en,
     sub_name,
-    created_by,
-    created_date,
-    updated_date,
-    province,
-    province_en,
-    app,
-    ...cfi_b
   } = data.feature.properties;
   const tbody = document.createElement('tbody');
 
+
   // careful about changing key
   // change the listener as well
-  cfi_b['coordinate_system'] = (espg && espg.name) || I18n.translate('no_data');
-  cfi_b['referencing_coordinate'] = `${x_coordinate} ${y_coordinate}`;
-  cfi_b['province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+
+  const coordSpanDOM = document.createElement('span');
+  coordSpanDOM.id = 'espgCoordDOM'
+  coordSpanDOM.innerText = `${x_coordinate} ${y_coordinate}`;
+
+  const cfi_b = {};
+  cfi_b.area_ha = data.feature.properties.area_ha + ' ' + I18n.translate('hectare');
+  cfi_b.cfi_code = data.feature.properties.cfi_code;
+  cfi_b.creation_date = Utils.formatDate(data.feature.properties.creation_date);
+  cfi_b.registration_date = Utils.formatDate(data.feature.properties.registration_date)
+  cfi_b.coordinate_system = getESPGToggleBtn((espg && espg.name) || I18n.translate('no_data'));
+  cfi_b.referencing_coordinate = coordSpanDOM;
+  cfi_b.province = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
 
   if (districts && districts.length > 0) {
-    cfi_b['district'] = getDistrictTagDom(districts);
+    cfi_b.district = getDistrictTagDom(districts);
   }
 
   for (const key in cfi_b) {
+    const coloumns = [I18n.translate(key), cfi_b[key]];
     const tr = document.createElement('tr');
 
-    if (key === 'creation_date' || key === 'registration_date') {
-      cfi_b[key] = Utils.formatDate(cfi_b[key]);
-    } else if (key === 'coordinate_system') {
-      cfi_b[key] = getESPGToggleBtn(cfi_b[key]);
-    } else if (key === 'referencing_coordinate') {
-      const span = document.createElement('span');
-      span.id = 'espgCoordDOM'
-      span.innerText = cfi_b[key];
-      cfi_b[key] = span;
-    }
-
-    const coloumns = [I18n.translate(key), , cfi_b[key]];
     if (I18n.getLang() === 'kh') {
       const span = document.createElement('span');
       span.innerText = ':';
-      span.style.margin = '0 2px';
+      span.style.margin = '0 3px';
       coloumns.splice(1, 0, span); // inserting semi
     }
 
@@ -734,7 +723,7 @@ async function handleProvinceSelect(e, options = {}) {
 
   // load number of CFI
   const label = document.getElementById('cfiCount');
-  label.textContent = `[${cfiBoundary.features.length || 0}]`;
+  label.textContent = `(${cfiBoundary.features.length || 0})`;
 }
 
 async function loadProvince() {

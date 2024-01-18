@@ -118,7 +118,6 @@ const DemoGraphyChart = (function () {
     return Promise.all([
       loadChart(cfr, CHARTS_CONF.committee),
       loadChart(cfr, CHARTS_CONF.population),
-      // loadChart(cfiId, CHARTS_CONF.member),
     ]);
   }
 
@@ -192,74 +191,36 @@ function drawAboutSection() {
   body.append(chartWrapper);
 }
 
-function getDistrictTagDom(districts) {
-  if (!Array.isArray(districts) && districts.length < 0) {
-    return '';
-  }
-
-  if (districts.length === 1) {
-    return districts[0].properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })]
-  }
-
-  const div = document.createElement('div');
-  districts.forEach((item) => {
-    const span = document.createElement('span');
-    span.classList.add('badge-pill', 'badge-secondary');
-    span.innerText = item.properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })];
-    span.style.marginRight = '2px';
-    div.append(span);
-  });
-
-  return div;
-}
-
-async function showCFR_A(data) {
+async function showCFR(data) {
   document.querySelector('.about__body').innerHTML = '';
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
 
-  const districts = await Utils.fetchGeoJson({
-    data: {
-      typeName: 'cfr:District_kh',
-      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('${defaultProfileTypeName}', 'geom', 'IN(''${data.feature.id}'')')))`,
-    },
-  });
-
-  const {
-    x_coordinate,
-    y_coordinate,
-    area,
-    updated_by,
-    name_en,
-    cfr_name,
-    created_by,
-    created_date,
-    updated_date,
-    province_en,
-    app,
-    _validation_status,
-    _id,
-    _uuid,
-    ...cfi_b
-  } = data.feature.properties;
-  const tbody = document.createElement('tbody');
-
-  // modify without affecting other translation
-  cfi_b['in_province'] = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
-
-  if (districts && districts.length > 0) {
-    cfi_b['district'] = getDistrictTagDom(districts);
+  if (data.feature.properties.length <= 0) {
+    return;
   }
 
+  const tbody = document.createElement('tbody');
+  const cfr = {};
+  cfr.name = data.feature.properties[I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' })];
+  cfr.cfr_code = data.feature.properties.code;
+  cfr.type = data.feature.properties.cfr_type;
+  cfr.district = data.feature.properties.district;
+  cfr.province = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+  cfr.area_dry_season = data.feature.properties.dry_season_area_ha + ' ' + I18n.translate('hectare');
+  cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha + ' ' + I18n.translate('hectare');
+  cfr.creation_date = data.feature.properties.creation_date;
+  cfr.registration_date = data.feature.properties.registration_date;
+  cfr.status = data.feature.properties.status;
 
-  for (const key in cfi_b) {
+  for (const key in cfr) {
     const tr = document.createElement('tr');
 
     if (key === 'creation_date' || key === 'registration_date') {
-      cfi_b[key] = Utils.formatDate(cfi_b[key]);
+      cfr[key] = Utils.formatDate(cfr[key]);
     }
 
-    [key, cfi_b[key]].forEach((x, i) => {
+    [key, cfr[key]].forEach((x, i) => {
       const td = document.createElement('td');
 
       if (i > 0) {
@@ -282,7 +243,7 @@ async function showCFR_A(data) {
   }
 
   const header = document.querySelector('.about__header');
-  header.innerText = I18n.translate('community_fish_refuge') + ' ' + cfr_name;
+  header.innerText = I18n.translate('community_fish_refuge') + ' ' + cfr.name;
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
@@ -306,7 +267,7 @@ async function loadCFRMap(options) {
     const cfiId = e.layer.feature.id;
     document.getElementById('cfiSelect').value = cfiId;
 
-    showCFR_A(e.layer);
+    showCFR(e.layer);
     showActivePoint(e.layer);
   });
 
@@ -357,7 +318,7 @@ async function loadCFRSelect(options) {
     }
 
     if (selectedCFR) {
-      await showCFR_A({ feature: selectedCFR });
+      await showCFR({ feature: selectedCFR });
     }
 
     toggleLoading(false);
