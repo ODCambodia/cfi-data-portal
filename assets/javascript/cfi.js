@@ -135,6 +135,9 @@ function drawAboutSection() {
   const chartWrapper = document.createElement('div');
   chartWrapper.classList.add('chart__wrapper');
 
+  const chartWrapperBody = document.createElement('div');
+  chartWrapperBody.classList.add('chart__wrapper__body');
+
   /* Draw chart */
   const memberPieChart = document.createElement('canvas');
   memberPieChart.id = 'memberPieChart';
@@ -145,9 +148,10 @@ function drawAboutSection() {
   const populationPieChart = document.createElement('canvas');
   populationPieChart.id = 'populationPieChart';
 
-  chartWrapper.append(committeePieChart);
-  chartWrapper.append(memberPieChart);
-  chartWrapper.append(populationPieChart);
+  chartWrapperBody.append(committeePieChart);
+  chartWrapperBody.append(memberPieChart);
+  chartWrapperBody.append(populationPieChart);
+  chartWrapper.append(chartWrapperBody);
 
   // Appending everything
   const body = document.querySelector('.about__body');
@@ -220,17 +224,31 @@ const DemoGraphyChart = (function () {
     }
   }
 
+  function loadHeader() {
+    const chartWrapper = document.querySelector('.about__body .chart__wrapper .chart__wrapper__body');
+    if (chartWrapper.childNodes.length > 0) {
+      const chartHeader = document.createElement('h2');
+      chartHeader.innerText = I18n.translate('demography');
+      chartHeader.classList.add('about__header');
+      chartWrapper.parentNode.prepend(chartHeader);
+    }
+  }
+
   function loadAllChart(cfiId) {
-    return Promise.all([
+    const promise = Promise.all([
       loadChart(cfiId, CHARTS_CONF.committee),
       loadChart(cfiId, CHARTS_CONF.member),
       loadChart(cfiId, CHARTS_CONF.population),
     ]);
+    promise.then(loadHeader);
+
+    return promise;
   }
 
   return {
     loadAllChart,
     loadChart,
+    loadHeader,
   };
 })();
 
@@ -264,7 +282,7 @@ async function loadConservationAreas(cfiId) {
     conservationArea.features.forEach((item) => {
       const tr = document.createElement('tr');
 
-      ItemsToShowKeys.forEach((key,i) => {
+      ItemsToShowKeys.forEach((key, i) => {
         const td = document.createElement('td');
         const val = item.properties[key];
         td.style.width = '50%';
@@ -614,7 +632,7 @@ function addBoundaryClickEvent() {
 
     drawAboutSection();
 
-    const [cfiProfile] = await Promise.all([  // mostly unrelated function but run them in sync to speed things up
+    const [cfiProfile, defaultCrs] = await Promise.all([  // mostly unrelated function but run them in sync to speed things up
       Utils.fetchGeoJson({
         data: {
           typeName: defaultProfileTypeName,
@@ -622,12 +640,12 @@ function addBoundaryClickEvent() {
           CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
         },
       }),
+      loadRelatedLayers(cfiId),
       loadConservationAreas(cfiId),
       loadRelatedDocuments(cfiId),
       DemoGraphyChart.loadAllChart(cfiId),
     ]);
 
-    const defaultCrs = await loadRelatedLayers(cfiId);
     await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
     toggleLoading(false);
   });

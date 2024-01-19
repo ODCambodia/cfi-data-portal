@@ -193,7 +193,24 @@ const CustomCharts = {
         ],
         hoverOffset: 4,
         borderWidth: 0,
-      }]
+      }],
+    };
+    const options = {
+      legend: { reverse: true },
+      plugins: {
+        datalabels: {
+          formatter: (value, ctx) => {
+            const dataArr = ctx.chart.data.datasets[0].data;
+            const sum = dataArr.reduce((total, item) => total + item, 0);
+            const percentage = (value * 100 / sum).toFixed(2);
+
+            return `${percentage}%`;
+          },
+          color: '#fff',
+          font: { size: 14},
+
+        }
+      }
     };
 
     const pieHeader = document.createElement('p');
@@ -207,7 +224,7 @@ const CustomCharts = {
     canvas.style.paddingBottom = '10px';
     canvas.style.borderBottom = '1px dashed #000';
 
-    return new Chart(canvas, { type: 'pie', data: pieData });
+    return new Chart(canvas, { type: 'pie', data: pieData, options });
   },
   barChart: function (selectorId) {
     const barData = {

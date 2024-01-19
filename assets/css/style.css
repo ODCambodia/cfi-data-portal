@@ -199,7 +199,6 @@ td span {
 .about__header {
   margin-bottom: 0.5rem;
   flex: 0 0 auto;
-  display: inline;
   border: none;
   border-bottom: 1px dashed;
   text-align: center;
@@ -226,20 +225,13 @@ td span {
 }
 
 .about__table__wrapper,
-.contact__table__wrapper,
 .conservation__area__wrapper {
   border-bottom: 1.5px solid #000;
   line-height: 20px;
 }
 
-.contact__table__wrapper {
-  text-align: center;
-  flex: 0 1 100px;
-}
-
 .about__table__wrapper,
-.contact__table__wrapper,
-.chart__wrapper {
+.chart__wrapper__body {
   flex: 1;
   overflow-y: auto;
 }
@@ -254,7 +246,8 @@ td span {
   flex: 0 1 auto;
 }
 
-.conservation__area__wrapper .about__header {
+.conservation__area__wrapper .about__header,
+.chart__wrapper .about__header {
   display: block;
   line-height: 2rem;
   font-size: 18px;
@@ -270,6 +263,7 @@ td span {
 
 .conservation__area__wrapper table {
   padding: 2px 0;
+  border-collapse: collapse;
 }
 
 .conservation__area__wrapper table thead {
@@ -278,6 +272,17 @@ td span {
 
 .conservation__area__wrapper table tbody td {
   width: 50%;
+}
+
+.chart__wrapper {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
+.chart__wrapper .chart__wrapper__body {
+  overflow-y: auto;
+  flex: 1;
 }
 
 .document__body {
