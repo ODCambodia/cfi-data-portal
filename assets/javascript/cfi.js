@@ -163,7 +163,7 @@ function drawAboutSection() {
 const DemoGraphyChart = (function () {
   const CHARTS_CONF = {
     committee: {
-      typeName: 'cfi:cfi_status_assessment_2018',
+      typeName: defaultChartTypeName,
       id: 'committeePieChart',
       title: 'committees',
       labels: ['female', 'male'],
@@ -173,7 +173,7 @@ const DemoGraphyChart = (function () {
       },
     },
     member: {
-      typeName: 'cfi:cfi_status_assessment_2018',
+      typeName: defaultChartTypeName,
       id: 'memberPieChart',
       title: 'members',
       labels: ['female', 'male'],
@@ -198,7 +198,7 @@ const DemoGraphyChart = (function () {
     const response = await Utils.fetchGeoJson({
       data: {
         typeName: chartConfig.typeName,
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
       },
     });
 
@@ -256,7 +256,7 @@ async function loadConservationAreas(cfiId) {
   const conservationArea = await Utils.fetchGeoJson({
     data: {
       typeName: defaultConservationTypeName,
-      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')))`,
+      CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022', 'geom', 'IN(''${cfiId}'')')))`,
     },
   });
 
@@ -321,7 +321,7 @@ async function handleRelatedLayerClick(e) {
     baseUrl: '/geoserver/cfi/wfs',
     data: {
       typeName,
-      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
     },
   });
 
@@ -436,7 +436,7 @@ async function loadRelatedLayers(cfiId) {
         typeName,
         version: '1.1.0',
         request: 'GetFeature',
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
         resultType: 'hits',
       },
     });
@@ -473,7 +473,7 @@ async function loadRelatedDocuments(cfiId) {
   const releatedDocuments = await Utils.fetchGeoJson({
     data: {
       typeName: '	cfi:documents',
-      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi','geom','IN(''${cfiId}'')')), 0, meters)`,
+      CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
     },
   });
 
@@ -532,7 +532,7 @@ async function showCFI_B(data, defaultCrs) {
 
   const fetchDistrict = Utils.fetchGeoJson({
     data: {
-      typeName: 'cfi:District_kh',
+      typeName: 'cfi:district_boundary_2014',
       CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('${defaultProfileTypeName}', 'geom', 'IN(''${data.feature.id}'')')))`,
     },
   });
@@ -628,7 +628,6 @@ async function showCFI_B(data, defaultCrs) {
   const profileTblCell = document.querySelector('.about__table__wrapper table tr td');
   const conservationTblCells = document.querySelectorAll('.conservation__area__wrapper table tr td:first-child');
 
-  console.log(profileTblCell, profileTblCell.scrollWidth + 1, conservationTblCells)
   if (profileTblCell && conservationTblCells.length > 0) {
     conservationTblCells.forEach(el => {
       el.style.width = `${profileTblCell.scrollWidth + 1}px`;
@@ -645,8 +644,6 @@ function addBoundaryClickEvent() {
     map.setView(e.latlng);
     showActivePolygon(e.layer);
 
-    console.log(e.layer);
-
     const cfiId = e.layer.feature.id;
     document.querySelector('.about__body').innerHTML = '';
     document.getElementById('cfiSelect').value = cfiId;
@@ -659,7 +656,7 @@ function addBoundaryClickEvent() {
         data: {
           typeName: defaultProfileTypeName,
           SORTBY: 'name ASC',
-          CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+          CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
         },
       }),
       loadRelatedLayers(cfiId),
@@ -686,7 +683,7 @@ async function handleCfiSelect(e) {
     Utils.fetchGeoJson({
       data: {
         typeName: defaultProfileTypeName,
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
       },
     }),
     DemoGraphyChart.loadAllChart(cfiId),
@@ -757,7 +754,7 @@ async function handleProvinceSelect(e, options = {}) {
 
   toggleLoading(true);
   const CQL_FILTER = selectedProvinceId
-    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cambodian_provincial', 'geom', 'IN(''${selectedProvinceId}'')')))`
+    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014', 'geom', 'IN(''${selectedProvinceId}'')')))`
     : '';
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
@@ -791,7 +788,7 @@ async function loadProvince() {
   try {
     const res = await Utils.fetchGeoJson({
       data: {
-        typeName: 'cfi:cambodian_provincial',
+        typeName: 'cfi:province_boundary_2014',
         srsname: 'EPSG:32648',
         outputFormat: 'application/json',
         propertyname: 'pro_name_k,hrname,pro_code',

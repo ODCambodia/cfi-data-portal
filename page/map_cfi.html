@@ -122,8 +122,8 @@
         const SERVER = 'cfi';
         const GEOSERVER = `/geoserver/${SERVER}/ows`;
         let defaultProfileTypeName = 'cfi:cfi_profiles_2023';
-        let defaultChartTypeName = 'cfi:cfi_demography_2018';
-        let defaultConservationTypeName = 'cfi:cfi_conservation_sites_2018';
+        let defaultChartTypeName = 'cfi:cfi_profiles_2023';
+        let defaultConservationTypeName = 'cfi:cfi_boundary_2022_conservation_sites_2018';
 
         (async function loadSettings() {
             const settings = await Utils.fetchJson({ baseUrl: '/api/default-layer/' + SERVER });

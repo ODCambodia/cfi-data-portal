@@ -145,7 +145,7 @@ async function loadRelatedDocuments(cfiId) {
   const releatedDocuments = await Utils.fetchGeoJson({
     data: {
       typeName: '	cfr:documents',
-      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_wf_assessment_2022','geom','IN(''${cfiId}'')')), 1, meters)`,
+      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_status_assessment_2022','geom','IN(''${cfiId}'')')), 1, meters)`,
     },
   });
 
@@ -363,7 +363,7 @@ async function handleProvinceSelect(e, options = {}) {
   toggleLoading(true);
 
   const val = e.currentTarget.value;
-  const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)` : '';
+  const CQL_FILTER = val ? `DWITHIN(geom, collectGeometries(queryCollection('cfr:province_boundary_2014','geom','IN(''${val}'')')), 0, meters)` : '';
   const overlay = await loadCFRSelect({ CQL_FILTER });
   const bounds = overlay.getBounds();
 
@@ -381,7 +381,7 @@ async function loadProvinceCFR() {
   try {
     const data = await Utils.fetchGeoJson({
       data: {
-        typeName: 'cfr:cambodian_provincial',
+        typeName: 'cfr:province_boundary_2014',
         outputFormat: 'application/json',
         propertyname: 'pro_name_k,hrname,pro_code',
         SORTBY: 'pro_code ASC'

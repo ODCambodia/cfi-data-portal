@@ -262,7 +262,7 @@
     async function loadProvincesSelect() {
       const data = await Utils.fetchGeoJson({
         data: {
-          typeName: 'cfr:cambodian_provincial',
+          typeName: 'cfr:province_boundary_2014',
           outputFormat: 'application/json',
           propertyname: 'hrname,pro_name_k,pro_code',
           SORTBY: 'pro_code ASC',
@@ -290,8 +290,8 @@
         const cfrResponse = await Utils.fetchGeoJson({
           data: {
             srsname: 'EPSG:32648',
-            typeName: 'cfr:cfr_wf_assessment_2022',
-            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfr:cambodian_provincial','geom','IN(''${val}'')')), 0, meters)`,
+            typeName: 'cfr:cfr_status_assessment_2022',
+            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfr:province_boundary_2014','geom','IN(''${val}'')')), 0, meters)`,
           }
         });
 
@@ -366,7 +366,7 @@
       const documentLayer = await Utils.fetchGeoJson({
         data: {
           typeName: '	cfr:documents',
-          CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_wf_assessment_2022','geom','IN(''${btn.dataset.id}'')')), 1, meters)`,
+          CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_status_assessment_2022','geom','IN(''${btn.dataset.id}'')')), 1, meters)`,
         }
       });
 

@@ -8,9 +8,9 @@ const KEYS = {
 };
 
 const TYPENAME = {
-  [KEYS.CFR_A]: 'cfr:cfr_wf_assessment_2022',
+  [KEYS.CFR_A]: 'cfr:cfr_status_assessment_2022',
   [KEYS.CFI_A]: 'cfi:Effectiveness_Assessment_2022',
-  [KEYS.CFI_B]: 'cfi:cfi',
+  [KEYS.CFI_B]: 'cfi:cfi_boundary_2022',
 }
 
 const POLYGON_STYLE = {
