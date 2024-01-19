@@ -53,14 +53,14 @@ const BASE_MAP = {
   ).addTo(map)
 };
 
-L.control.scale().addTo(map);
-L.control.layers(BASE_MAP).addTo(map);
 L.control.resetView({
   position: "topleft",
   title: "Reset view",
   latlng: L.latLng(DEFAULT_COORD),
   zoom: 7,
 }).addTo(map);
+L.control.layers(BASE_MAP, null, { position: 'topleft' }).addTo(map);
+L.control.scale().addTo(map);
 
 const OVERLAY_MAP = {};
 const DemoGraphyChart = (function () {
@@ -114,11 +114,24 @@ const DemoGraphyChart = (function () {
     }
   }
 
+  function loadHeader() {
+    const chartWrapper = document.querySelector('.about__body .chart__wrapper .chart__wrapper__body');
+    if (chartWrapper.childNodes.length > 0) {
+      const chartHeader = document.createElement('h2');
+      chartHeader.innerText = I18n.translate('demography');
+      chartHeader.classList.add('about__header');
+      chartWrapper.parentNode.prepend(chartHeader);
+    }
+  }
+
   function loadAllChart(cfr) {
-    return Promise.all([
+    const promise = Promise.all([
       loadChart(cfr, CHARTS_CONF.committee),
       loadChart(cfr, CHARTS_CONF.population),
     ]);
+
+    promise.then(loadHeader);
+    return promise;
   }
 
   return {
@@ -171,9 +184,8 @@ function drawAboutSection() {
   const chartWrapper = document.createElement('div');
   chartWrapper.classList.add('chart__wrapper');
 
-  /* Draw chart */
-  // const memberPieChart = document.createElement('canvas');
-  // memberPieChart.id = 'memberPieChart';
+  const chartWrapperBody = document.createElement('div');
+  chartWrapperBody.classList.add('chart__wrapper__body');
 
   const committeePieChart = document.createElement('canvas');
   committeePieChart.id = 'committeePieChart';
@@ -182,8 +194,9 @@ function drawAboutSection() {
   populationPieChart.id = 'populationPieChart';
 
   // chartWrapper.append(memberPieChart);
-  chartWrapper.append(committeePieChart);
-  chartWrapper.append(populationPieChart);
+  chartWrapperBody.append(committeePieChart);
+  chartWrapperBody.append(populationPieChart);
+  chartWrapper.append(chartWrapperBody);
 
   // Appending everything
   const body = document.querySelector('.about__body');
@@ -263,12 +276,15 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].off('click');
-  OVERLAY_MAP[KEYS.CFR_A].on('click', function (e) {
+  OVERLAY_MAP[KEYS.CFR_A].on('click', async function (e) {
+    toggleLoading(true);
     const cfiId = e.layer.feature.id;
     document.getElementById('cfiSelect').value = cfiId;
+    sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
-    showCFR(e.layer);
+    await showCFR(e.layer);
     showActivePoint(e.layer);
+    toggleLoading(false);
   });
 
   map.on('zoomend', function () {
@@ -283,7 +299,7 @@ async function loadCFRMap(options) {
 
   // load number of CFR
   const label = document.getElementById('cfiCount');
-  label.textContent = `[${cfr_data.features.length || 0}]`;
+  label.textContent = `(${cfr_data.features.length || 0})`;
 
   return cfr_data;
 }
@@ -354,7 +370,6 @@ async function handleProvinceSelect(e, options = {}) {
   sessionStorage.setItem(`${SERVER}_province`, val);
   sessionStorage.removeItem(`${SERVER}_community`);
 
-  console.log('out side')
   if (Object.keys(bounds).length > 0) {
     map.flyToBounds(bounds, { maxZoom: 9, animate: !options.shouldNotAnimate });
   }

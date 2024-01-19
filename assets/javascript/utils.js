@@ -154,9 +154,14 @@ const Utils = {
   },
   formatNum: function (num, separator = ',', fraction = '.') {
     const n = this.toFixed(Number(num));
-    return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
-      .replace(/\./, fraction)
-      .replace(/,/g, separator);
+    const fmtNum = Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
+    const res = fmtNum.split('.');
+
+    if (res.length === 1 || res[1].length <= 1) {
+      return num.toFixed(2);
+    }
+
+    return fmtNum.replace(/\./, fraction).replace(/,/g, separator);
   },
   toFixed: function (num, fixed = 2) {
     const regex = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
@@ -202,12 +207,15 @@ const CustomCharts = {
           formatter: (value, ctx) => {
             const dataArr = ctx.chart.data.datasets[0].data;
             const sum = dataArr.reduce((total, item) => total + item, 0);
-            const percentage = (value * 100 / sum).toFixed(2);
+            const percentage = (value * 100 / sum);
+            if (percentage === 0) {
+              return '';
+            }
 
-            return `${percentage}%`;
+            return `${percentage.toFixed(2)}%`;
           },
           color: '#fff',
-          font: { size: 14},
+          font: { size: 12 },
 
         }
       }

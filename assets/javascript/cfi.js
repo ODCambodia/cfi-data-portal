@@ -285,13 +285,18 @@ async function loadConservationAreas(cfiId) {
       ItemsToShowKeys.forEach((key, i) => {
         const td = document.createElement('td');
         const val = item.properties[key];
-        td.style.width = '50%';
 
         if (Utils.isNumeric(val)) {
           td.innerText = Utils.formatNum(Number(val), ' ') + ` ${I18n.translate('hectare')}`;
         } else if (key === 'name') {
           td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
+          const colon = document.createElement('strong');
+          colon.innerText = ':';
+          colon.style.fontWeight = '600';
+          colon.style.marginLeft = '4px';
+          td.append(colon);
         }
+
         tr.append(td);
       });
 
@@ -591,7 +596,11 @@ async function showCFI_B(data, defaultCrs) {
       }
 
       if (isKeyCol) {
-        td.innerText += ':';
+        const colon = document.createElement('strong');
+        colon.innerText = ':';
+        colon.style.fontWeight = '600';
+        colon.style.marginLeft = '4px';
+        td.append(colon);
       }
 
       if (!isKeyCol && !x) {
@@ -614,6 +623,17 @@ async function showCFI_B(data, defaultCrs) {
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
+
+  // set conservation table cell width
+  const profileTblCell = document.querySelector('.about__table__wrapper table tr td');
+  const conservationTblCells = document.querySelectorAll('.conservation__area__wrapper table tr td:first-child');
+
+  console.log(profileTblCell, profileTblCell.scrollWidth + 1, conservationTblCells)
+  if (profileTblCell && conservationTblCells.length > 0) {
+    conservationTblCells.forEach(el => {
+      el.style.width = `${profileTblCell.scrollWidth + 1}px`;
+    })
+  }
 }
 
 function addBoundaryClickEvent() {
@@ -624,6 +644,8 @@ function addBoundaryClickEvent() {
 
     map.setView(e.latlng);
     showActivePolygon(e.layer);
+
+    console.log(e.layer);
 
     const cfiId = e.layer.feature.id;
     document.querySelector('.about__body').innerHTML = '';
@@ -744,7 +766,9 @@ async function handleProvinceSelect(e, options = {}) {
     },
   });
 
-  cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
+  if (provinceName) {
+    cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
+  }
 
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
