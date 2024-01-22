@@ -506,7 +506,7 @@
       });
     }
 
-    async function loadSettings(baseUrl, formId, listDomType, validateNameCallBack) {
+    async function loadSettings(baseUrl, formId, listDomType, validateKeywordCallback) {
       const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
         Utils.fetchXml({
           baseUrl: '/geoserver/cfr/wfs',
@@ -522,9 +522,16 @@
       for (let i = 0; i < featureTypes.length; i++) {
         const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
         const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
-        if (validateNameCallBack(name)) {
+        const keywordTag = featureTypes[i].getElementsByTagName('ows:Keyword');
+        if (!keywordTag.length > 0) {
+          continue
+        }
+
+        const hasKeyword = [...keywordTag].map((item) => item.textContent).some(validateKeywordCallback);
+        if (!hasKeyword) {
           continue;
         }
+
 
         const isActiveLayer = typeof activeLayersObj[name] !== 'undefined';
         const listInput = getCheckBoxDOM(isActiveLayer, name, title, i, formId, listDomType);
@@ -652,7 +659,7 @@
           header.innerText = I18n.translate('select_related_data_to_show')
           const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
           listGroupDom.parentElement.prepend(header);
-          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'));
+          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (keyword) => typeof keyword === 'string' && keyword.includes('related_layer'));
         }
       })
 
@@ -667,18 +674,10 @@
           header.innerText = I18n.translate('select_a_profile_to_show');
           const profileList = document.querySelector(`#defaultProfileForm .list-group`);
           profileList.parentElement.prepend(header);
-          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
+          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (keyword) => typeof keyword === 'string' && keyword.includes('active_layer'));
 
           const defaultProfileForm = document.getElementById('defaultProfileForm');
           defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
-
-          // const demographyHeader = document.createTextNode('ជ្រើសរើសChartដើម្បីបង្ហាញ');
-          // const demographyList = document.querySelector(`#defaultChartForm .list-group`);
-          // demographyList.parentElement.prepend(demographyHeader);
-          // loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (name) => !REGEX_YEAR.test(name) || !name.includes('assessment'));
-
-          // const defaultChartForm = document.getElementById('defaultChartForm');
-          // defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
         }
       });
 

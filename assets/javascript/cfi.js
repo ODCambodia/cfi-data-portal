@@ -163,7 +163,6 @@ function drawAboutSection() {
 const DemoGraphyChart = (function () {
   const CHARTS_CONF = {
     committee: {
-      typeName: defaultProfileTypeName,
       id: 'committeePieChart',
       title: 'committees',
       labels: ['female', 'male'],
@@ -173,7 +172,6 @@ const DemoGraphyChart = (function () {
       },
     },
     member: {
-      typeName: defaultProfileTypeName,
       id: 'memberPieChart',
       title: 'members',
       labels: ['female', 'male'],
@@ -183,7 +181,6 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: defaultProfileTypeName,
       id: 'populationPieChart',
       title: 'population',
       labels: ['female', 'male'],
@@ -194,23 +191,10 @@ const DemoGraphyChart = (function () {
     }
   };
 
-  async function loadChart(cfiId, chartConfig) {
-    const response = await Utils.fetchGeoJson({
-      data: {
-        typeName: chartConfig.typeName,
-        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
-      },
-    });
-
-    if (!response.features.length > 0) {
-      document.getElementById(chartConfig.id).remove();
-      return;
-    }
-
-    const data = response.features[0];
+  async function loadChart(chartData, chartConfig) {
     // maybe a callback to calculate chould be better (more dynamic code)
-    const femaleCount = data.properties[chartConfig.propertyKeys.female];
-    const maleCount = data.properties[chartConfig.propertyKeys.total] - femaleCount;
+    const femaleCount = chartData[chartConfig.propertyKeys.female];
+    const maleCount = chartData[chartConfig.propertyKeys.total] - femaleCount;
 
     if (femaleCount && maleCount) {
       CustomCharts.pieChart(
@@ -234,15 +218,25 @@ const DemoGraphyChart = (function () {
     }
   }
 
-  function loadAllChart(cfiId) {
-    const promise = Promise.all([
-      loadChart(cfiId, CHARTS_CONF.committee),
-      loadChart(cfiId, CHARTS_CONF.member),
-      loadChart(cfiId, CHARTS_CONF.population),
-    ]);
-    promise.then(loadHeader);
+  async function loadAllChart(cfiId) {
+    const response = await Utils.fetchGeoJson({
+      data: {
+        typeName: defaultProfileTypeName,
+        CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
+      },
+    });
 
-    return promise;
+    if (!response.features.length > 0) {
+      document.getElementById(chartConfig.id).remove();
+      return;
+    }
+
+    const chartData = response.features[0].properties;
+
+    loadHeader();
+    loadChart(chartData, CHARTS_CONF.committee);
+    loadChart(chartData, CHARTS_CONF.member);
+    loadChart(chartData, CHARTS_CONF.population);
   }
 
   return {
@@ -343,9 +337,7 @@ async function handleRelatedLayerClick(e) {
   if (layerData.features.length > 1) {
     const thead = document.createElement('thead');
     const trHead = document.createElement('tr');
-    const headers = Object.keys(layerData.features[0].properties).map(
-      (key) => TRANSLATE[key] || key,
-    );
+    const headers = Object.keys(layerData.features[0].properties);
 
     headers.forEach((head) => {
       const th = document.createElement('th');
@@ -385,7 +377,7 @@ async function handleRelatedLayerClick(e) {
       const tdKey = document.createElement('td');
       const tdVal = document.createElement('td');
 
-      tdKey.innerText = TRANSLATE[key] || key;
+      tdKey.innerText = key;
       tr.append(tdKey);
 
       if (Utils.isNumeric(contentObj[key]) && !Utils.isCoordinate(key)) {

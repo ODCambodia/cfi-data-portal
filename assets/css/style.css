@@ -400,6 +400,16 @@ td span {
   border-collapse: collapse;
 }
 
+.modal__table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+.modal__table tr td,
+.modal__table tr th {
+  padding: 1px 4px;
+}
+
 .modal__table.vertical {
   align-self: flex-start;
 }

@@ -70,16 +70,6 @@
           </div>
         </form>
 
-        <form action="/api/default-chart-layer" id="defaultChartForm"
-          class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <div class="list-group my-2" data-i18n="loading...">
-            កំពុងដំណើរការ...
-          </div>
-          <div class="text-end">
-            <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
-          </div>
-        </form>
-
         <form action="/api/default-conservation-layer" id="defaultConservationForm"
           class="shadow border border-opacity-50 border-black rounded-3 p-3">
           <div class="list-group my-2" data-i18n="loading...">
@@ -528,7 +518,8 @@
       });
     }
 
-    async function loadSettings(baseUrl, formId, listDomType, validateNameCallBack) {
+    async function loadSettings(baseUrl, formId, listDomType, validateKeywordCallback) {
+      console.log('yooo')
       const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
         Utils.fetchXml({
           baseUrl: '/geoserver/cfi/wfs',
@@ -544,7 +535,13 @@
       for (let i = 0; i < featureTypes.length; i++) {
         const name = featureTypes[i].getElementsByTagName('Name')[0].textContent;
         const title = featureTypes[i].getElementsByTagName('Title')[0].textContent;
-        if (validateNameCallBack(name)) {
+        const keywordTag = featureTypes[i].getElementsByTagName('ows:Keyword');
+        if (!keywordTag.length > 0) {
+          continue
+        }
+
+        const hasKeyword = [...keywordTag].map((item) => item.textContent).some(validateKeywordCallback);
+        if (!hasKeyword) {
           continue;
         }
 
@@ -615,7 +612,7 @@
           loadDefaultFormToggle(
             'related_data',
             'toggleLayerForm',
-            (name) => !REGEX_YEAR.test(name) || name.includes('profile') || name.includes('contact'),
+            (keyword) => keyword.includes('related_layer'),
             `/api/active-layers/${SERVER}`,
             'checkbox',
           );
@@ -627,9 +624,8 @@
       defaultProfileTab.addEventListener('click', function (e) {
         if (!hasLoadedProfileTab) {
           hasLoadedProfileTab = true;
-          loadDefaultFormToggle('profile', 'defaultProfileForm', (name) => !REGEX_YEAR.test(name) || !name.includes('profile'));
-          loadDefaultFormToggle('chart', 'defaultChartForm', (name) => !REGEX_YEAR.test(name) || !name.includes('demography'));
-          loadDefaultFormToggle('conservation', 'defaultConservationForm', (name) => !name.includes('conservation'))
+          loadDefaultFormToggle('profile', 'defaultProfileForm', (keyword) => keyword.includes('active_layer'));
+          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keyword) => keyword.includes('conservation_layer'))
         }
       });
 
