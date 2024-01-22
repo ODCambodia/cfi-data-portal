@@ -163,7 +163,7 @@ function drawAboutSection() {
 const DemoGraphyChart = (function () {
   const CHARTS_CONF = {
     committee: {
-      typeName: defaultChartTypeName,
+      typeName: defaultProfileTypeName,
       id: 'committeePieChart',
       title: 'committees',
       labels: ['female', 'male'],
@@ -173,7 +173,7 @@ const DemoGraphyChart = (function () {
       },
     },
     member: {
-      typeName: defaultChartTypeName,
+      typeName: defaultProfileTypeName,
       id: 'memberPieChart',
       title: 'members',
       labels: ['female', 'male'],
@@ -183,13 +183,13 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: defaultChartTypeName,
+      typeName: defaultProfileTypeName,
       id: 'populationPieChart',
       title: 'population',
       labels: ['female', 'male'],
       propertyKeys: {
-        female: 'population_female',
-        total: 'population_total',
+        female: 'cfi_demography_2018_population_female',
+        total: 'cfi_demography_2018_population_total',
       },
     }
   };

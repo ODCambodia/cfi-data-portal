@@ -76,7 +76,7 @@ const DemoGraphyChart = (function () {
       },
     },
     population: {
-      typeName: defaultChartTypeName,
+      typeName: defaultProfileTypeName,
       id: 'populationPieChart',
       title: 'population',
       labels: ['female', 'male'],
