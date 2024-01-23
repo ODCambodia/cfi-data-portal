@@ -102,16 +102,21 @@ td span {
   right: 0;
 }
 
+.sidebar .related__layer__wrapper,
+.sidebar .related__document__wrapper,
 .sidebar .nav-list {
   visibility: hidden;
   opacity: 0;
-  margin-bottom: 15px;
-  padding-top: 0;
-  padding-left: 10px;
 
   -webkit-transition: opacity .5s ease;
   -o-transition: opacity .5s ease;
   transition: opacity .5s ease;
+}
+
+.sidebar .nav-list {
+  margin-bottom: 15px;
+  padding-top: 0;
+  padding-left: 10px;
 }
 
 .sidebar .nav-header {
@@ -121,6 +126,8 @@ td span {
   border-bottom: 1px solid #fff;
 }
 
+.sidebar.open .related__layer__wrapper,
+.sidebar.open .related__document__wrapper,
 .sidebar.open .nav-list {
   visibility: visible;
   opacity: 1;
