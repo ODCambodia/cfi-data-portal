@@ -184,7 +184,6 @@ td span {
 }
 
 .about__wrapper {
-  text-transform: capitalize;
   background: #101010;
   color: #fff;
   padding: 1rem;
