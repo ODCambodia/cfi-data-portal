@@ -161,7 +161,7 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = item.properties[I18n.translate({ kh: 'title', en: 'title_en' })] || item.properties.title || item.properties.title_en; // damn this is terrible code (sorry)
+    a.innerText = I18n.translate({ kh: 'title', en: 'title_en' }, item.properties);
     a.style.color = '#000';
     a.target = '_blank';
 
@@ -215,11 +215,11 @@ async function showCFR(data) {
 
   const tbody = document.createElement('tbody');
   const cfr = {};
-  cfr.name = data.feature.properties[I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' })];
+  cfr.name = I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties);
   cfr.cfr_code = data.feature.properties.code;
   cfr.type = data.feature.properties.cfr_type;
   cfr.district = data.feature.properties.district;
-  cfr.province = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+  cfr.province = I18n.translate({ en: 'province_en', kh: 'province' }, data.feature.properties);
   cfr.area_dry_season = data.feature.properties.dry_season_area_ha + ' ' + I18n.translate('hectare');
   cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha + ' ' + I18n.translate('hectare');
   cfr.creation_date = data.feature.properties.creation_date;
@@ -401,7 +401,7 @@ async function loadProvinceCFR() {
 
     data.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
+      option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
       provinceSelect.append(option);

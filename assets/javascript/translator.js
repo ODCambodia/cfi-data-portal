@@ -1,5 +1,6 @@
 class I18n {
-  static _defaultLang = 'en';
+  static _defaultLang = 'kh';
+  static _langs = ['kh', 'en'];
   static _isReady = false;
   static _translate = {};
 
@@ -31,7 +32,7 @@ class I18n {
 
   static _translateAllHtml() {
     document.querySelectorAll('[data-i18n]').forEach((element) => {
-      const key = element.getAttribute("data-i18n");
+      const key = element.getAttribute('data-i18n');
 
       if (!key) {
         return;
@@ -48,9 +49,23 @@ class I18n {
     });
   }
 
-  static translate(key) {
+  static translate(key, translateObj) {
     if (typeof key === 'object') {
-      return key[this._lang];
+      const translateKey = key[this._lang];
+
+      if (!translateObj) {
+        return translateKey;
+      }
+
+      if (translateObj[translateKey]) {
+        return translateObj[translateKey];
+      }
+
+      return (
+        this._langs
+          .find((lng) => key[lng] && translateObj[key[lng]])
+          .map((lng) => translateObj[key[lng]]) || key
+      );
     }
 
     if (!key || typeof this._translate[key] === 'undefined') {

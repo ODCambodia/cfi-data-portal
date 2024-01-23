@@ -283,7 +283,7 @@ async function loadConservationAreas(cfiId) {
         if (Utils.isNumeric(val)) {
           td.innerText = Utils.formatNum(Number(val), ' ') + ` ${I18n.translate('hectare')}`;
         } else if (key === 'name') {
-          td.innerText = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })] || item.properties.name;
+          td.innerText = I18n.translate({ en: 'name_en', kh: 'name' }, item.properties);
           const colon = document.createElement('strong');
           colon.innerText = ':';
           colon.style.fontWeight = '600';
@@ -481,7 +481,7 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = item.properties[I18n.translate({ kh: 'title', en: 'title_en' })] || item.properties.title || item.properties.title_en; // damn this is terrible code (sorry)
+    a.innerText = I18n.translate({ kh: 'title', en: 'title_en' }, item.properties);
     a.style.color = '#000';
     a.target = '_blank';
 
@@ -499,14 +499,14 @@ function getDistrictTagDom(districts) {
   }
 
   if (districts.length === 1) {
-    return districts[0].properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })]
+    return I18n.translate({ en: 'dis_name', kh: 'dis_name_k' }, districts[0].properties)
   }
 
   const div = document.createElement('div');
   districts.forEach((item) => {
     const span = document.createElement('span');
     span.classList.add('badge-pill', 'badge-secondary');
-    span.innerText = item.properties[I18n.translate({ en: 'dis_name', kh: 'dis_name_k' })];
+    span.innerText = I18n.translate({ en: 'dis_name', kh: 'dis_name_k' }, item.properties);
     span.style.marginRight = '2px';
     div.append(span);
   });
@@ -561,7 +561,7 @@ async function showCFI_B(data, defaultCrs) {
   cfi_b.registration_date = Utils.formatDate(data.feature.properties.registration_date)
   cfi_b.coordinate_system = (espg && espg.name) || I18n.translate('no_data');
   cfi_b.referencing_coordinate = coordSpanDOM;
-  cfi_b.province = data.feature.properties[I18n.translate({ en: 'province_en', kh: 'province' })];
+  cfi_b.province = I18n.translate({ en: 'province_en', kh: 'province' }, data.feature.properties);
 
   if (isValidCoord && espg && espg.name) {
     cfi_b.coordinate_system = getESPGToggleBtn(cfi_b.coordinate_system);
@@ -605,7 +605,7 @@ async function showCFI_B(data, defaultCrs) {
     tbody.append(tr);
   }
 
-  const cfi_name = data.feature.properties[I18n.translate({ en: 'name_en', kh: 'name' })]
+  const cfi_name = I18n.translate({ en: 'name_en', kh: 'name' }, data.feature.properties);
   const header = document.querySelector('.about__wrapper .about__header');
   if (I18n.getLang() === 'en') {
     header.innerText = `${sub_name || cfi_name} ${I18n.translate('fishing_community')}`;
@@ -717,7 +717,7 @@ async function loadCfiSelect(cfiBoundary) {
   cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fishing_community')));
   uniqueCfi.forEach((item) => {
     const option = document.createElement('option');
-    option.text = item.properties[I18n.translate({ en: 'name_en', kh: 'name' })];
+    option.text = I18n.translate({ en: 'name_en', kh: 'name' }, item.properties);
     option.value = item.id;
     cfiSelect.append(option);
   });
@@ -802,7 +802,7 @@ async function loadProvince() {
     );
     res.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
+      option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
       option.dataset.provinceCode = item.properties.pro_code;

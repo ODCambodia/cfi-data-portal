@@ -269,7 +269,7 @@
       provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province')));
       data.features.forEach((item) => {
         const option = document.createElement('option');
-        option.text = item.properties[I18n.translate({ en: 'hrname', kh: 'pro_name_k' })];
+        option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
         option.value = item.id;
         option.dataset.name = item.properties.pro_name_k;
         provinceSelect.append(option);
