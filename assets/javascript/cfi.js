@@ -233,10 +233,10 @@ const DemoGraphyChart = (function () {
 
     const chartData = response.features[0].properties;
 
-    loadHeader();
     loadChart(chartData, CHARTS_CONF.committee);
     loadChart(chartData, CHARTS_CONF.member);
     loadChart(chartData, CHARTS_CONF.population);
+    loadHeader();
   }
 
   return {
