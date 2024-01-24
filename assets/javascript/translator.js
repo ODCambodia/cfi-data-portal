@@ -61,11 +61,10 @@ class I18n {
         return translateObj[translateKey];
       }
 
-      return (
-        this._langs
-          .find((lng) => key[lng] && translateObj[key[lng]])
-          .map((lng) => translateObj[key[lng]]) || key
-      );
+      const hasKeyLang = this._langs.find((lng) => key[lng] && translateObj[key[lng]]);
+
+      return hasKeyLang && translateObj[key[hasKeyLang]] || key;
+      ;
     }
 
     if (!key || typeof this._translate[key] === 'undefined') {
