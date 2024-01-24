@@ -33,7 +33,11 @@ function showActivePoint(layer) {
   activePoint = layer;
 }
 
-map.setMaxBounds(map.getBounds());
+const MAX_BOUNDS = [
+  ['22.187404', '114.696289'],
+  ['6.569938', '96.274414']
+]
+map.setMaxBounds(MAX_BOUNDS);
 
 const mapLink = '<a href="http://www.esri.com/">Esri</a>';
 const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
