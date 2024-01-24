@@ -220,15 +220,17 @@ async function showCFR(data) {
   const tbody = document.createElement('tbody');
   const cfr = {};
   cfr.name = I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties);
-  cfr.cfr_code = data.feature.properties.code;
-  cfr.type = data.feature.properties.cfr_type;
+  cfr.cfr_code = data.feature.properties.cfr_code;
+  cfr.type = I18n.translate({ kh: 'cfr_type', en: 'cfr_type_en' }, data.feature.properties);
   cfr.district = data.feature.properties.district;
-  cfr.province = I18n.translate({ en: 'province_en', kh: 'province' }, data.feature.properties);
+  cfr.province = I18n.translate({ kh: 'province', en: 'province_en' }, data.feature.properties);
   cfr.area_dry_season = data.feature.properties.dry_season_area_ha + ' ' + I18n.translate('hectare');
   cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha + ' ' + I18n.translate('hectare');
   cfr.creation_date = data.feature.properties.creation_date;
   cfr.registration_date = data.feature.properties.registration_date;
   cfr.status = data.feature.properties.status;
+
+  const NO_FORMAT= ['cfr_code']
 
   for (const key in cfr) {
     const tr = document.createElement('tr');
@@ -245,9 +247,8 @@ async function showCFR(data) {
 
         if (!x) {
           td.innerText = I18n.translate('no_data');
-        } else if (Utils.isNumeric(x) && !Utils.isCoordinate(x)) {
-          const str = typeof x === 'string' ? x.replace(',', '') : x;
-          td.innerText = Utils.toFixed(Number(str), 2);
+        } else if (Utils.isNumeric(x) && !NO_FORMAT.includes(key)) {
+          td.innerText = Utils.formatNum(Number(x));
         }
       } else {
         td.innerText = I18n.translate(x);

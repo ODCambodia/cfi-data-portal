@@ -575,6 +575,8 @@ async function showCFI_B(data, defaultCrs) {
     cfi_b.district = getDistrictTagDom(districts);
   }
 
+  const NO_FORMATS = ['cfi_code'];
+
   for (const key in cfi_b) {
     const coloumns = [I18n.translate(key), cfi_b[key]];
     const tr = document.createElement('tr');
@@ -585,7 +587,7 @@ async function showCFI_B(data, defaultCrs) {
 
       if (x instanceof Element) {
         td.append(x);
-      } else if (Utils.isNumeric(x)) {
+      } else if (Utils.isNumeric(x) && !NO_FORMATS.includes(key)) {
         td.innerText = Utils.formatNum(Number(x), ' ');
       } else {
         td.innerText = x;
