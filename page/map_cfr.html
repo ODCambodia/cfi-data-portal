@@ -94,15 +94,18 @@
   </section>
 
 
-  <div id="cfiModal" class="modal">
+  <div id="cfrModal" class="modal">
     <div class="modal-content">
-      <div> <span class="close">&times;</span> </div>
-      <div class="modal__table__wrapper">
-        <table style="width: 98%;" class="modal__table">
-        </table>
-      </div>
+        <div class="modal-header">
+            <strong></strong>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal__table__wrapper">
+            <table style="width: 98%;" class="modal__table">
+            </table>
+        </div>
     </div>
-  </div>
+</div>
 
   <script src="https://cdn.jsdelivr.net/npm/@drustack/leaflet.resetview/dist/L.Control.ResetView.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
@@ -116,8 +119,7 @@
   <script>
     const SERVER = 'cfr';
     const GEOSERVER = `/geoserver/${SERVER}/ows`;
-    let defaultProfileTypeName = 'cfr:cfr_status_assessment_2022';
-    let defaultChartTypeName = 'cfr:cfr_status_assessment_2022';
+    let defaultProfileTypeName = 'cfr:cfr_profile_2023';
 
     (async function loadSettings() {
       const settings = await Promise.all([
@@ -126,7 +128,6 @@
       ]);
 
       defaultProfileTypeName = Object.keys(settings[0])[0];
-      defaultChartTypeName = Object.keys(settings[1])[0];
     })()
 
     function toggleLoading(shouldShow) {
@@ -136,7 +137,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      const modal = document.getElementById('cfiModal');
+      const modal = document.getElementById('cfrModal');
       document.getElementsByClassName("close")[0].onclick = function () {
         modal.style.display = "none";
       }

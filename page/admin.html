@@ -302,7 +302,7 @@
         const cfisId = cfiBoundary.features.map((item) => item.id.split('.')[1]).join(`'',''`);
         const cfiRefResponse = await Utils.fetchGeoJson({
           data: {
-            typeName: 'cfi:cfi_boundary_2022_reference',
+            typeName: 'cfi:cfi_reference',
             CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfisId}'')')), 0, meters)`,
             propertyname: 'name,x,y',
           }
@@ -375,7 +375,7 @@
       const cfiBoundary = await Utils.fetchGeoJson({
         data: {
           typeName: '	cfi:cfi_boundary_2022',
-          CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022_reference','geom','IN(''${btn.dataset.id}'')')))`,
+          CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:cfi_reference','geom','IN(''${btn.dataset.id}'')')))`,
           propertyname: 'name',
         }
       });
@@ -544,8 +544,8 @@
           continue
         }
 
-        const hasKeyword = [...keywordTag].map((item) => item.textContent).some(validateKeywordCallback);
-        if (!hasKeyword) {
+        const keywords = [...keywordTag].map((item) => item.textContent);
+        if (validateKeywordCallback(keywords)) {
           continue;
         }
 
@@ -608,7 +608,7 @@
       const form = document.getElementById('form');
       form.addEventListener('submit', handleFormSubmit);
 
-      // set active layers
+      // set related layers
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
       activeLayerTabBtn.addEventListener('click', function (e) {
         if (!hasLoadedActiveLayerTab) {
@@ -616,7 +616,7 @@
           loadDefaultFormToggle(
             'related_data',
             'toggleLayerForm',
-            (keyword) => keyword.includes('related_layer'),
+            (keywords) => keywords.some((key) => key === 'internal_layer'),
             `/api/active-layers/${SERVER}`,
             'checkbox',
           );
@@ -628,8 +628,8 @@
       defaultProfileTab.addEventListener('click', function (e) {
         if (!hasLoadedProfileTab) {
           hasLoadedProfileTab = true;
-          loadDefaultFormToggle('profile', 'defaultProfileForm', (keyword) => keyword.includes('active_layer'));
-          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keyword) => keyword.includes('conservation_layer'))
+          loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
+          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keywords) => keywords.every((key) => key !== 'conservation_layer'))
         }
       });
 

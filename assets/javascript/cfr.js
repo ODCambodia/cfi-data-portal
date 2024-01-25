@@ -144,12 +144,162 @@ const DemoGraphyChart = (function () {
   };
 })();
 
-async function loadRelatedDocuments(cfiId) {
+async function handleRelatedLayerClick(e) {
+  e.currentTarget.parentNode.childNodes.forEach((item) =>
+    item.classList.remove('active'),
+  );
+  e.currentTarget.classList.add('active');
+
+  const layerName = e.currentTarget.textContent;
+  const typeName = e.currentTarget.dataset.name;
+  const cfrId = e.currentTarget.dataset.cfrId;
+  const layerData = await Utils.fetchGeoJson({
+    data: {
+      typeName,
+      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 1, meters)`,
+    },
+  });
+
+  if (!layerData.features.length > 0) {
+    setTimeout(function () {
+      alert('មិនមានព័ត៌មាន');
+    }, 1);
+    return;
+  }
+
+  const modalHeader = document.querySelector('#cfrModal .modal-header strong');
+  modalHeader.innerText = layerName;
+
+  const table = document.querySelector('#cfrModal table');
+  const tbody = document.createElement('tbody');
+  table.innerHTML = '';
+  table.classList.remove('vertical');
+
+  if (layerData.features.length > 1) {
+    const thead = document.createElement('thead');
+    const trHead = document.createElement('tr');
+    const headers = Object.keys(layerData.features[0].properties);
+
+    headers.forEach((head) => {
+      const th = document.createElement('th');
+      th.innerText = head;
+      trHead.append(th);
+    });
+
+    layerData.features.forEach((layer) => {
+      const contents = Object.values(layer.properties);
+      const tr = document.createElement('tr');
+
+      for (key in contents) {
+        const item = contents[key]
+        const td = document.createElement('td');
+
+        if (Utils.isNumeric(item) && !Utils.isCoordinate(key)) {
+          td.innerText = Utils.toFixed(Number(item), 2);
+        } else {
+          td.append(item);
+        }
+
+        tr.append(td);
+      }
+
+      tbody.append(tr);
+    });
+
+    thead.append(trHead);
+    table.append(thead);
+  } else {
+    const contentObj = layerData.features[0].properties;
+    tbody.style.textAlign = 'left';
+    table.classList.add('vertical');
+
+    for (key in contentObj) {
+      const tr = document.createElement('tr');
+      const tdKey = document.createElement('td');
+      const tdVal = document.createElement('td');
+
+      tdKey.innerText = key;
+      tr.append(tdKey);
+      tdVal.innerText = contentObj[key];
+      tr.append(tdVal);
+
+      tbody.append(tr);
+    }
+  }
+
+  table.append(tbody);
+
+  const modal = document.getElementById('cfrModal');
+  modal.style.display = 'block';
+}
+
+async function loadRelatedLayers(cfrId) {
+  document.getElementById('relatedLayers').innerHTML = '';
+
+  const [cfrRelatedLayers, layersToShow] = await Promise.all([
+    Utils.fetchXml({
+      baseUrl: `/geoserver/${SERVER}/wfs`,
+      data: { request: 'GetCapabilities' },
+    }),
+    Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
+  ]);
+
+  const ul = document.createElement('ul');
+  const featureTypes = cfrRelatedLayers.getElementsByTagName('FeatureType');
+  const relatedFeatureTypes = Array.from(featureTypes).filter(featureType => {
+    const name = featureType.getElementsByTagName('Name')[0].textContent;
+    const keywordTag = featureType.getElementsByTagName('ows:Keyword');
+    if (!keywordTag.length > 0) {
+      return false;
+    }
+
+    const isInternalLayer = [...keywordTag].map((item) => item.textContent).some((keyword) => keyword === 'internal_layer');
+    return !isInternalLayer && layersToShow && layersToShow[name];
+  });
+
+  const relatedTypeName = relatedFeatureTypes.map((item => {
+    const typeName = item.getElementsByTagName('Name')[0].textContent;
+    return Utils.fetchXml({
+      baseUrl: `/geoserver/${SERVER}/wfs`,
+      data: {
+        typeName,
+        version: '1.1.0',
+        request: 'GetFeature',
+        CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 1, meters)`,
+        resultType: 'hits',
+      },
+    });
+  }));
+
+  const featureCountArr = await Promise.all(relatedTypeName);
+  const hasLayerToShow = featureCountArr.some(item => Number(item.childNodes[0].getAttribute('numberOfFeatures')) > 0);
+  if (hasLayerToShow) {
+    document.getElementById('relatedLayers').append(ul);
+    document.getElementById('relatedLayers').parentElement.classList.remove('d-none');
+
+    relatedFeatureTypes.forEach((featureType, i) => {
+      const hasRelatedData = Number(featureCountArr[i].childNodes[0].getAttribute('numberOfFeatures')) > 0;
+      if (hasRelatedData) {
+        const name = featureType.getElementsByTagName('Name')[0].textContent;
+        const title = featureType.getElementsByTagName('Title')[0].textContent;
+        const li = document.createElement('li');
+        li.textContent = title;
+        li.dataset.name = name;
+        li.dataset.cfrId = cfrId;
+        li.addEventListener('click', handleRelatedLayerClick);
+        ul.append(li);
+      }
+    });
+  }
+}
+
+
+async function loadRelatedDocuments(cfrId) {
   document.getElementById('relatedDocuments').innerHTML = '';
   const releatedDocuments = await Utils.fetchGeoJson({
     data: {
-      typeName: '	cfr:documents',
-      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('cfr:cfr_status_assessment_2022','geom','IN(''${cfiId}'')')), 1, meters)`,
+      typeName: 'cfr:documents',
+      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 1, meters)`,
     },
   });
 
@@ -219,18 +369,17 @@ async function showCFR(data) {
 
   const tbody = document.createElement('tbody');
   const cfr = {};
-  cfr.name = I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties);
-  cfr.cfr_code = data.feature.properties.cfr_code;
+  cfr.cfr_code = data.feature.properties.cfr_id;
   cfr.type = I18n.translate({ kh: 'cfr_type', en: 'cfr_type_en' }, data.feature.properties);
   cfr.district = data.feature.properties.district;
   cfr.province = I18n.translate({ kh: 'province', en: 'province_en' }, data.feature.properties);
   cfr.area_dry_season = data.feature.properties.dry_season_area_ha + ' ' + I18n.translate('hectare');
   cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha + ' ' + I18n.translate('hectare');
-  cfr.creation_date = data.feature.properties.creation_date;
-  cfr.registration_date = data.feature.properties.registration_date;
+  cfr.creation_date = data.feature.properties.year_establish_cfr_cmte;
+  cfr.registration_date = data.feature.properties.recognized_year;
   cfr.status = data.feature.properties.status;
 
-  const NO_FORMAT= ['cfr_code']
+  const NO_FORMAT = ['cfr_code']
 
   for (const key in cfr) {
     const tr = document.createElement('tr');
@@ -261,12 +410,13 @@ async function showCFR(data) {
   }
 
   const header = document.querySelector('.about__header');
-  header.innerText = I18n.translate('community_fish_refuge') + ' ' + cfr.name;
+  header.innerText = I18n.translate('community_fish_refuge') + ' ' + I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties);
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
 
   await loadRelatedDocuments(data.feature.id);
+  await loadRelatedLayers(data.feature.id);
   await DemoGraphyChart.loadAllChart(data.feature);
 }
 
@@ -283,9 +433,9 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A].off('click');
   OVERLAY_MAP[KEYS.CFR_A].on('click', async function (e) {
     toggleLoading(true);
-    const cfiId = e.layer.feature.id;
-    document.getElementById('cfiSelect').value = cfiId;
-    sessionStorage.setItem(`${SERVER}_community`, cfiId);
+    const cfrId = e.layer.feature.id;
+    document.getElementById('cfiSelect').value = cfrId;
+    sessionStorage.setItem(`${SERVER}_community`, cfrId);
 
     await showCFR(e.layer);
     showActivePoint(e.layer);

@@ -407,7 +407,7 @@ async function loadRelatedLayers(cfiId) {
 
   const [cfiRelatedLayers, layersToShow] = await Promise.all([
     Utils.fetchXml({
-      baseUrl: '/geoserver/cfi/wfs',
+      baseUrl: `/geoserver/${SERVER}/wfs`,
       data: { request: 'GetCapabilities' },
     }),
     Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
@@ -417,11 +417,13 @@ async function loadRelatedLayers(cfiId) {
   const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
   const relatedFeatureTypes = Array.from(featureTypes).filter(featureType => {
     const name = featureType.getElementsByTagName('Name')[0].textContent;
+    const keywordTag = featureType.getElementsByTagName('ows:Keyword');
+    if (!keywordTag.length > 0) {
+      return false;
+    }
 
-    return !(layersToShow[name] === undefined ||
-      !REGEX_YEAR.test(name) ||
-      name.includes('profile') ||
-      name.includes('contact'))
+    const isInternalLayer = [...keywordTag].map((item) => item.textContent).some((keyword) => keyword === 'internal_layer');
+    return !isInternalLayer && layersToShow && layersToShow[name];
   });
 
   const relatedTypeName = relatedFeatureTypes.map((item => {
