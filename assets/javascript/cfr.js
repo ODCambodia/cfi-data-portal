@@ -156,7 +156,7 @@ async function handleRelatedLayerClick(e) {
   const layerData = await Utils.fetchGeoJson({
     data: {
       typeName,
-      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 1, meters)`,
+      CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 10, meters)`,
     },
   });
 
@@ -265,7 +265,7 @@ async function loadRelatedLayers(cfrId) {
         typeName,
         version: '1.1.0',
         request: 'GetFeature',
-        CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 1, meters)`,
+        CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 10, meters)`,
         resultType: 'hits',
       },
     });
