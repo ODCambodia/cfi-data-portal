@@ -126,11 +126,11 @@
           <div class="modal-body ">
             <div class="row g-3 mb-3">
               <div class="col-6">
-                <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
+                <label for="titleInput" class="form-label required" data-i18n="filename">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
               </div>
               <div class="col-6">
-                <label for="titleInput" class="form-label" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
+                <label for="titleInput" class="form-label required" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
                 <input type="text" class="form-control" id="titleEnInput">
               </div>
               <div class="col-12">
@@ -140,7 +140,7 @@
               </div>
             </div>
             <div>
-              <label for="formFile" class="d-block form-label text-start" data-i18n="file">ឯកសារ</label>
+              <label for="formFile" class="d-block form-label text-start required" data-i18n="file">ឯកសារ</label>
               <div class="d-flex flex-column justify-content-center align-items-center text-center">
                 <label for="formFile" class="form-label text-center mb-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
@@ -609,9 +609,14 @@
 
         if (pendingUsers.length > 0) {
           pendingUsers.forEach((user) => {
+            if (!user) { return; }
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
+            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
+            if (user.username) {
+              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
+            }
 
             const approveBtn = document.createElement('button');
             approveBtn.dataset.href = '/api/users/' + user.user_id + '/approve';
@@ -643,9 +648,14 @@
 
         if (approvedUsers.length > 0) {
           approvedUsers.forEach((user) => {
+            if (!user) { return; }
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
+            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
+            if (user.username) {
+              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
+            }
             const removeBtn = createUserDeleteBtn(user.user_id, ['ms-auto']);
             li.append(removeBtn);
             document.querySelector(`#userDeletionForm .list-group`).append(li);
