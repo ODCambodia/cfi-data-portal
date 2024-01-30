@@ -15,7 +15,7 @@
     <button id="btnLogout" class="btn btn-sm btn-primary" type="button" data-i18n="logout">ចេញពីទំព័រគ្រប់គ្រង</button>
     <nav>
       <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
-        <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
+        <button class="nav-link" id="nav-file-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
           role="tab" aria-controls="nav-home" aria-selected="true"
           data-i18n="manage_related_document">កំណត់ឯកសារពាក់ព័ន្ធ</button>
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
@@ -31,7 +31,7 @@
     </nav>
     <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
       <!-- Related document forms -->
-      <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+      <div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-file-tab">
         <div class="row mb-3">
           <div class="col-auto">
             <label class="fs-5" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
@@ -199,6 +199,27 @@
     const GEOSERVER = `/geoserver/cfi/ows`;
     let hasLoadedActiveLayerTab = false;
     let hasLoadedProfileTab = false;
+
+    function saveActiveTab() {
+      const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
+      tabElArray.forEach((tabs) => {
+        tabs.addEventListener('shown.bs.tab', function (event) {
+          if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.set('active-tab', event.currentTarget.id);
+            window.history.replaceState({}, null, url.toString());
+          }
+        });
+      });
+
+      const url = new URL(window.location);
+      const tabId = url.searchParams.get('active-tab');
+      const currentTab = document.getElementById(tabId);
+      if (currentTab) {
+        const bsTab = new bootstrap.Tab(currentTab);
+        bsTab.show();
+      } 
+    }
 
     function createActionBtns(cfi) {
       const btn = document.createElement('button');
@@ -526,7 +547,6 @@
     }
 
     async function loadSettings(baseUrl, formId, listDomType, validateKeywordCallback) {
-      console.log('yooo')
       const [cfiRelatedLayers, activeLayersObj] = await Promise.all([
         Utils.fetchXml({
           baseUrl: '/geoserver/cfi/wfs',
@@ -595,65 +615,7 @@
       return removeBtn;
     }
 
-    // main
-    document.addEventListener('DOMContentLoaded', async function () {
-      await loadProvincesSelect();
-
-      const addModal = document.getElementById('addDocumentModal');
-      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
-
-      const listModal = document.getElementById('listDocumentModal');
-      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
-      listModal.addEventListener('shown.bs.modal', function (e) {
-        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
-      })
-
-      const form = document.getElementById('form');
-      form.addEventListener('submit', handleFormSubmit);
-
-      // set related layers
-      const activeLayerTabBtn = document.getElementById('nav-layer-tab');
-      activeLayerTabBtn.addEventListener('click', function (e) {
-        if (!hasLoadedActiveLayerTab) {
-          hasLoadedActiveLayerTab = true;
-          loadDefaultFormToggle(
-            'related_data',
-            'toggleLayerForm',
-            (keywords) => keywords.some((key) => key === 'internal_layer'),
-            `/api/active-layers/${SERVER}`,
-            'checkbox',
-          );
-        }
-      })
-
-      // set default profile layer
-      const defaultProfileTab = document.getElementById('nav-profile-tab');
-      defaultProfileTab.addEventListener('click', function (e) {
-        if (!hasLoadedProfileTab) {
-          hasLoadedProfileTab = true;
-          loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
-          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keywords) => keywords.every((key) => key !== 'conservation_layer'))
-        }
-      });
-
-      const btnLogout = document.getElementById('btnLogout');
-      btnLogout.addEventListener('click', handleLogout);
-
-      const formInput = document.getElementById('formFile');
-      formInput.addEventListener('change', function () {
-        if (formInput.files && formInput.files[0]) {
-          const label = document.querySelector('.btn[for="formFile"]');
-          label.innerText = I18n.translate('loading...');
-
-          const reader = new FileReader();
-          reader.readAsDataURL(formInput.files[0]);
-          reader.onload = function (e) {
-            const fileName = formInput.value.split("\\").slice('-1') || 'ឯកសារ';
-            label.innerText = fileName;
-          }
-        }
-      })
-
+    async function loadUsers() {
       // load users
       try {
         const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
@@ -718,6 +680,69 @@
       } catch (e) {
         // nothing
       }
+    }
+    // main
+    document.addEventListener('DOMContentLoaded', async function () {
+      console.log('sdfsfsf');
+      await loadProvincesSelect();
+
+      const addModal = document.getElementById('addDocumentModal');
+      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
+
+      const listModal = document.getElementById('listDocumentModal');
+      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
+      listModal.addEventListener('shown.bs.modal', function (e) {
+        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
+      })
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleFormSubmit);
+
+      // set related layers
+      const activeLayerTabBtn = document.getElementById('nav-layer-tab');
+      activeLayerTabBtn.addEventListener('click', function (e) {
+        if (!hasLoadedActiveLayerTab) {
+          hasLoadedActiveLayerTab = true;
+          loadDefaultFormToggle(
+            'related_data',
+            'toggleLayerForm',
+            (keywords) => keywords.some((key) => key === 'internal_layer'),
+            `/api/active-layers/${SERVER}`,
+            'checkbox',
+          );
+        }
+      })
+
+      // set default profile layer
+      const defaultProfileTab = document.getElementById('nav-profile-tab');
+      defaultProfileTab.addEventListener('click', function (e) {
+        if (!hasLoadedProfileTab) {
+          hasLoadedProfileTab = true;
+          loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
+          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keywords) => keywords.every((key) => key !== 'conservation_layer'))
+        }
+      });
+
+      const btnLogout = document.getElementById('btnLogout');
+      btnLogout.addEventListener('click', handleLogout);
+
+      const formInput = document.getElementById('formFile');
+      formInput.addEventListener('change', function () {
+        if (formInput.files && formInput.files[0]) {
+          const label = document.querySelector('.btn[for="formFile"]');
+          label.innerText = I18n.translate('loading...');
+
+          const reader = new FileReader();
+          reader.readAsDataURL(formInput.files[0]);
+          reader.onload = function (e) {
+            const fileName = formInput.value.split("\\").slice('-1') || 'ឯកសារ';
+            label.innerText = fileName;
+          }
+        }
+      })
+
+      await loadUsers();
+      saveActiveTab();
     });
   </script>
 </body>

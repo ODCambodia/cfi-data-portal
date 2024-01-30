@@ -203,6 +203,27 @@
     let hasLoadedActiveLayerTab = false;
     let hasLoadedProfileTab = false;
 
+    function saveActiveTab() {
+      const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
+      tabElArray.forEach((tabs) => {
+        tabs.addEventListener('shown.bs.tab', function (event) {
+          if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.set('active-tab', event.currentTarget.id);
+            window.history.replaceState({}, null, url.toString());
+          }
+        });
+      });
+
+      const url = new URL(window.location);
+      const tabId = url.searchParams.get('active-tab');
+      const currentTab = document.getElementById(tabId);
+      if (currentTab) {
+        const bsTab = new bootstrap.Tab(currentTab);
+        bsTab.show();
+      }
+    }
+
     function createActionBtns(cfi) {
       const btn = document.createElement('button');
       btn.type = "button";
@@ -568,22 +589,7 @@
       return removeBtn;
     }
 
-    // main
-    document.addEventListener('DOMContentLoaded', async function () {
-      await loadProvincesSelect();
-
-      const addModal = document.getElementById('addDocumentModal');
-      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
-
-      const listModal = document.getElementById('listDocumentModal');
-      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
-      listModal.addEventListener('shown.bs.modal', function (e) {
-        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
-      })
-
-      const form = document.getElementById('form');
-      form.addEventListener('submit', handleFormSubmit);
-
+    async function loadUsers() {
       // load users
       try {
         const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
@@ -650,6 +656,23 @@
       } catch (e) {
         // nothing
       }
+    }
+
+    // main
+    document.addEventListener('DOMContentLoaded', async function () {
+      await loadProvincesSelect();
+
+      const addModal = document.getElementById('addDocumentModal');
+      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
+
+      const listModal = document.getElementById('listDocumentModal');
+      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
+      listModal.addEventListener('shown.bs.modal', function (e) {
+        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
+      })
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleFormSubmit);
 
       // set active layers
       const activeLayerForm = document.getElementById('toggleLayerForm');
@@ -701,6 +724,9 @@
           }
         }
       })
+
+      await loadUsers();
+      saveActiveTab();
     });
   </script>
 </body>
