@@ -1,4 +1,6 @@
 {
+  "no": "ទេ",
+  "yes": "បាទ/ចាស៎",
   "demography": "ប្រជាសាស្រ្ត",
   "status": "ស្ថានភាព",
   "area_rainy_season": "ទំហំនារដូវវស្សា",
@@ -58,6 +60,7 @@
   "members": "ចំនួនសមាជិកសហគមន៍",
   "committees": "ចំនួនគណៈកម្មការសហគមន៍",
   "population": "ចំនួនប្រជាពលរដ្ឋក្នុងសហគមន៍",
+  "population_related_village": "ចំនួនប្រជាពលរដ្ឋក្នុងភូមិពាក់ព័ន្ធ",
   "coordinate_system": "ប្រព័ន្ធនិយាមកា",
   "referencing_coordinate": "និយាមកាយោង",
   "homepage": "ទំព័រដើម",
@@ -115,6 +118,7 @@
   "num_commune_women": "ស្ត្រីឃុំ",
   "num_commune_young": "ឃុំ ក្មេង",
   "is_official_cfr": "គឺជា CFR ផ្លូវការ",
+  "recognized_by_law": "លក្ខន្តិកៈផ្លូរការ",
   "recognized_year": "ឆ្នាំទទួលស្គាល់",
   "recognized_by": "ទទួលស្គាល់ដោយ",
   "inactive_date": "កាលបរិច្ឆេទអសកម្ម",

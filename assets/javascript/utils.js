@@ -130,15 +130,38 @@ const Utils = {
     return this.getLayer(data, key);
   },
   formatDate: function (dateStr, separator = ' ') {
-    if (!dateStr) {
+    if (typeof dateStr !== 'string' || !dateStr.trim() || this.isEmptyString(dateStr)) {
       return I18n.translate('no_data');
     }
-    const d = new Date(dateStr);
-    const day = ("0" + d.getDate()).slice(-2);;
-    const month = d.toLocaleString('default', { month: 'short' });
-    const year = d.getFullYear();
 
-    return day + separator + (I18n.translate(month)) + separator + year;
+    const isYearOnly = /^\d{4}$/.test(dateStr);
+    const isYearMonth = /^((0?[1-9])|(1[0-2]))(\/|-| )(\d{4})$/.test(dateStr);
+
+    if (isYearMonth || isYearOnly) {
+      return dateStr;
+    }
+
+    let dateObj = dayjs(dateStr);
+    let formattedDate = dateObj.format('DD MMM YYYY');
+
+    if (I18n.getLang() === 'kh') {
+      try {
+        const dates = formattedDate.split(' ');
+
+        //month
+        dates[1] = I18n.translate(dates[1]);
+
+        return dates.join(separator || ' ');
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    if (formattedDate && separator !== ' ') {
+      formattedDate = formattedDate.replace(' ', separator);
+    }
+
+    return typeof formattedDate === 'string' ? formattedDate : dateStr;
   },
   isNumeric: function (str) {
     // number with 0 infront and is not float is not numeric
@@ -153,19 +176,29 @@ const Utils = {
     return !str || (typeof str === 'string' && !str.trim());
   },
   formatNum: function (num, separator = ',', fraction = '.') {
-    const n = this.toFixed(Number(num));
-    const fmtNum = Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
+    const n = this.toFixed(num);
+    const fmtNum = Number(n).toLocaleString('en-US', {
+      maximumFractionDigits: 2,
+    });
     const res = fmtNum.split('.');
 
     if (res.length === 1 || res[1].length <= 1) {
-      return num.toFixed(2);
+      return num;
     }
 
     return fmtNum.replace(/\./, fraction).replace(/,/g, separator);
   },
   toFixed: function (num, fixed = 2) {
-    const regex = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
-    return num.toString().match(regex)[0];
+    const regex = new RegExp('^-?\\d+(?:.\\d{0,' + (fixed || -1) + '})?');
+    if (typeof num === 'string' && num.indexOf(',') !== -1) {
+      return num.replace(/,/g, '').match(regex)[0];
+    }
+
+    if (typeof num === 'number') {
+      return num.toString().match(regex)[0];
+    }
+
+    return num;
   },
   isCoordinate: function (key) {
     const hashs = {
