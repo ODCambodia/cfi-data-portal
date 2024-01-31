@@ -126,11 +126,11 @@
           <div class="modal-body ">
             <div class="row g-3 mb-3">
               <div class="col-6">
-                <label for="titleInput" class="form-label" data-i18n="filename">ចំណងជើងឯកសារ</label>
+                <label for="titleInput" class="form-label required" data-i18n="filename">ចំណងជើងឯកសារ</label>
                 <input type="text" class="form-control" id="titleInput" required>
               </div>
               <div class="col-6">
-                <label for="titleInput" class="form-label" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
+                <label for="titleInput" class="form-label required" data-i18n="filename_english">ចំណងជើងឯកសារ(អង់គ្លេស)</label>
                 <input type="text" class="form-control" id="titleEnInput">
               </div>
               <div class="col-12">
@@ -140,7 +140,7 @@
               </div>
             </div>
             <div>
-              <label for="formFile" class="d-block form-label text-start" data-i18n="file">ឯកសារ</label>
+              <label for="formFile" class="d-block form-label text-start required" data-i18n="file">ឯកសារ</label>
               <div class="d-flex flex-column justify-content-center align-items-center text-center">
                 <label for="formFile" class="form-label text-center mb-3">
                   <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
@@ -190,6 +190,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
     crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js"
+    integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="/javascript/utils.js"></script>
   <script>
     I18n.init();
@@ -199,6 +202,27 @@
     const GEOSERVER = `/geoserver/cfr/ows`;
     let hasLoadedActiveLayerTab = false;
     let hasLoadedProfileTab = false;
+
+    function saveActiveTab() {
+      const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
+      tabElArray.forEach((tabs) => {
+        tabs.addEventListener('shown.bs.tab', function (event) {
+          if (window.history.replaceState) {
+            const url = new URL(window.location);
+            url.searchParams.set('active-tab', event.currentTarget.id);
+            window.history.replaceState({}, null, url.toString());
+          }
+        });
+      });
+
+      const url = new URL(window.location);
+      const tabId = url.searchParams.get('active-tab');
+      const currentTab = document.getElementById(tabId);
+      if (currentTab) {
+        const bsTab = new bootstrap.Tab(currentTab);
+        bsTab.show();
+      }
+    }
 
     function createActionBtns(cfi) {
       const btn = document.createElement('button');
@@ -565,22 +589,7 @@
       return removeBtn;
     }
 
-    // main
-    document.addEventListener('DOMContentLoaded', async function () {
-      await loadProvincesSelect();
-
-      const addModal = document.getElementById('addDocumentModal');
-      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
-
-      const listModal = document.getElementById('listDocumentModal');
-      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
-      listModal.addEventListener('shown.bs.modal', function (e) {
-        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
-      })
-
-      const form = document.getElementById('form');
-      form.addEventListener('submit', handleFormSubmit);
-
+    async function loadUsers() {
       // load users
       try {
         const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
@@ -600,9 +609,14 @@
 
         if (pendingUsers.length > 0) {
           pendingUsers.forEach((user) => {
+            if (!user) { return; }
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
+            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
+            if (user.username) {
+              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
+            }
 
             const approveBtn = document.createElement('button');
             approveBtn.dataset.href = '/api/users/' + user.user_id + '/approve';
@@ -634,9 +648,14 @@
 
         if (approvedUsers.length > 0) {
           approvedUsers.forEach((user) => {
+            if (!user) { return; }
+
             const li = document.createElement('li');
             li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `Name:${user.firstname} ${user.lastname} Username: @${user.username}`;
+            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
+            if (user.username) {
+              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
+            }
             const removeBtn = createUserDeleteBtn(user.user_id, ['ms-auto']);
             li.append(removeBtn);
             document.querySelector(`#userDeletionForm .list-group`).append(li);
@@ -647,6 +666,23 @@
       } catch (e) {
         // nothing
       }
+    }
+
+    // main
+    document.addEventListener('DOMContentLoaded', async function () {
+      await loadProvincesSelect();
+
+      const addModal = document.getElementById('addDocumentModal');
+      addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
+
+      const listModal = document.getElementById('listDocumentModal');
+      listModal.addEventListener('shown.bs.modal', handleShownListDocumentModal);
+      listModal.addEventListener('shown.bs.modal', function (e) {
+        document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
+      })
+
+      const form = document.getElementById('form');
+      form.addEventListener('submit', handleFormSubmit);
 
       // set active layers
       const activeLayerForm = document.getElementById('toggleLayerForm');
@@ -698,6 +734,9 @@
           }
         }
       })
+
+      await loadUsers();
+      saveActiveTab();
     });
   </script>
 </body>

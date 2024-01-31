@@ -384,3 +384,8 @@ body {
 .modal .form-label {
   font-weight: 600;
 }
+
+.required:after {
+  content: " *";
+  color: red;
+}

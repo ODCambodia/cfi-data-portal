@@ -11,12 +11,12 @@ const MAX_BOUNDS = [
 ]
 map.setMaxBounds(MAX_BOUNDS);
 
-const mapLink = '<a href="http://www.esri.com/">Esri</a>';
+const mapLink = '<a href="https://www.esri.com/">Esri</a>';
 const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
 const BASE_MAP = {
   'ESRI WordImagery': L.tileLayer(
-    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
     maxZoom: 20,
   }).addTo(map),

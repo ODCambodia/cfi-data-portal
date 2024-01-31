@@ -8,9 +8,9 @@ const map = L.map('map', {
 let activePoint = null;
 
 function showActivePoint(layer) {
-  let radius = layer.getRadius();
-  if (activePoint && activePoint.feature.id !== layer.feature.id) {
-    radius *= 1.2;
+  let radius;
+  if (layer && activePoint && activePoint.feature.id !== layer.feature.id) {
+    radius = layer.getRadius() * 1.2;
   }
 
   if (activePoint !== null || !layer) {
@@ -39,12 +39,12 @@ const MAX_BOUNDS = [
 ]
 map.setMaxBounds(MAX_BOUNDS);
 
-const mapLink = '<a href="http://www.esri.com/">Esri</a>';
+const mapLink = '<a href="https://www.esri.com/">Esri</a>';
 const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
 const BASE_MAP = {
   'ESRI WordImagery': L.tileLayer(
-    'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
     maxZoom: 20,
   }),
@@ -82,11 +82,11 @@ const DemoGraphyChart = (function () {
     population: {
       typeName: defaultProfileTypeName,
       id: 'populationPieChart',
-      title: 'population',
+      title: 'population_related_village',
       labels: ['female', 'male'],
       propertyKeys: {
-        female: 'num_commune_women',
-        total: 'num_commune_ppl',
+        female: 'num_village_women',
+        total: 'num_village_ppl',
       },
     }
   };
@@ -373,21 +373,26 @@ async function showCFR(data) {
   cfr.type = I18n.translate({ kh: 'cfr_type', en: 'cfr_type_en' }, data.feature.properties);
   cfr.district = data.feature.properties.district;
   cfr.province = I18n.translate({ kh: 'province', en: 'province_en' }, data.feature.properties);
-  cfr.area_dry_season = data.feature.properties.dry_season_area_ha + ' ' + I18n.translate('hectare');
-  cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha + ' ' + I18n.translate('hectare');
-  cfr.creation_date = data.feature.properties.year_establish_cfr_cmte;
-  cfr.registration_date = data.feature.properties.recognized_year;
-  cfr.status = data.feature.properties.status;
+  cfr.area_dry_season = data.feature.properties.dry_season_area_ha;
+  cfr.area_rainy_season = data.feature.properties.rainy_season_area_ha;
+  cfr.recognized_by_law = data.feature.properties.is_official_cfr;
+  if (cfr.recognized_by_law === 'បាទ/ចាស៎') {
+    cfr.recognized_year = Utils.formatDate(data.feature.properties.recognized_year);
+  }
 
-  const NO_FORMAT = ['cfr_code']
+  console.log(cfr);
+  if (Utils.isNumeric(cfr.area_dry_season)) {
+    cfr.area_dry_season = Utils.formatNum(cfr.area_dry_season);
+  }
+  cfr.area_dry_season += ' ' + I18n.translate('hectare');
+
+  if (Utils.isNumeric(cfr.area_rainy_season)) {
+    cfr.area_rainy_season = Utils.formatNum(cfr.area_rainy_season);
+  }
+  cfr.area_rainy_season += ' ' + I18n.translate('hectare');
 
   for (const key in cfr) {
     const tr = document.createElement('tr');
-
-    if (key === 'creation_date' || key === 'registration_date') {
-      cfr[key] = Utils.formatDate(cfr[key]);
-    }
-
     [key, cfr[key]].forEach((x, i) => {
       const td = document.createElement('td');
 
@@ -396,8 +401,6 @@ async function showCFR(data) {
 
         if (!x) {
           td.innerText = I18n.translate('no_data');
-        } else if (Utils.isNumeric(x) && !NO_FORMAT.includes(key)) {
-          td.innerText = Utils.formatNum(Number(x));
         }
       } else {
         td.innerText = I18n.translate(x);
