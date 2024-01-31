@@ -47,4 +47,5 @@ jspm_packages/
 #eclipse project
 .project
 
+# db
 db.sqlite
