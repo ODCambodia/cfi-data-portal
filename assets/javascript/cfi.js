@@ -7,34 +7,39 @@ const map = L.map('map', {
 
 const MAX_BOUNDS = [
   ['22.187404', '114.696289'],
-  ['6.569938', '96.274414']
-]
+  ['6.569938', '96.274414'],
+];
 map.setMaxBounds(MAX_BOUNDS);
 
 const mapLink = '<a href="https://www.esri.com/">Esri</a>';
-const WHO_Link = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
+const WHO_Link =
+  'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
 const BASE_MAP = {
   'ESRI WordImagery': L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
-    maxZoom: 20,
-  }).addTo(map),
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
+      maxZoom: 20,
+    },
+  ).addTo(map),
   'Open Street Map': L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
-  )
+  ),
 };
 
-L.control.resetView({
-  position: "topleft",
-  title: "Reset view",
-  latlng: L.latLng(DEFAULT_COORD),
-  zoom: 7,
-}).addTo(map);
+L.control
+  .resetView({
+    position: 'topleft',
+    title: 'Reset view',
+    latlng: L.latLng(DEFAULT_COORD),
+    zoom: 7,
+  })
+  .addTo(map);
 L.control.layers(BASE_MAP, null, { position: 'topleft' }).addTo(map);
 L.control.scale().addTo(map);
 
@@ -43,13 +48,16 @@ const REGEX_YEAR = /(_(20)\d{2})/s;
 let activePolygon = null;
 
 function showActivePolygon(layer) {
-  if (activePolygon !== null || !layer) {
+  if (activePolygon !== null) {
     // Reset style|
     activePolygon.setStyle(POLYGON_STYLE.default);
     activePolygon = null;
   }
 
-  if (!layer) { return; }
+  if (!layer) {
+    activePolygon = null;
+    return;
+  }
 
   // set active in view with offset
   const center = { ...layer.getBounds().getCenter() };
@@ -71,8 +79,8 @@ function getDownloadDom(href) {
 
 function switchCRS() {
   const currentCRS = document.getElementById('espgToggleBtn').textContent;
-  const gCRS = '+proj=longlat +datum=WGS84 +no_defs +type=crs'  //WGS 84
-  const lCRS = "+proj=utm +zone=48 +datum=WGS84 +units=m +no_defs +type=crs"; //WGS 84/UTM Zone 48N
+  const gCRS = '+proj=longlat +datum=WGS84 +no_defs +type=crs'; //WGS 84
+  const lCRS = '+proj=utm +zone=48 +datum=WGS84 +units=m +no_defs +type=crs'; //WGS 84/UTM Zone 48N
 
   const coordDOM = document.getElementById('espgCoordDOM');
   const coordWGS84_UTM = coordDOM.dataset.coordWGS84_UTM;
@@ -88,9 +96,12 @@ function switchCRS() {
   // convert to WGS84
   if (currentCRS === 'WGS 84 / UTM zone 48N') {
     if (Utils.isEmptyString(coordWGS84)) {
-      const coordArr = coordWGS84_UTM.split(' ').map(x => Number(x));
+      const coordArr = coordWGS84_UTM.split(' ').map((x) => Number(x));
       try {
-        displayCoord = proj4(lCRS, gCRS, coordArr).reverse().map(x => x.toFixed(6)).join(' ');
+        displayCoord = proj4(lCRS, gCRS, coordArr)
+          .reverse()
+          .map((x) => x.toFixed(6))
+          .join(' ');
         coordDOM.dataset.coordWGS84 = displayCoord;
       } catch (e) {
         coordDOM.dataset.coordWGS84 = '';
@@ -100,7 +111,6 @@ function switchCRS() {
       displayCoord = coordWGS84;
     }
   }
-
 
   document.getElementById('espgCoordDOM').innerText = displayCoord;
 }
@@ -112,7 +122,7 @@ function getESPGToggleBtn(text) {
   btn.addEventListener('click', function (e) {
     let text = e.currentTarget.textContent;
     if (text === 'WGS 84') {
-      text = 'WGS 84 / UTM zone 48N'
+      text = 'WGS 84 / UTM zone 48N';
     } else if (text === 'WGS 84 / UTM zone 48N') {
       text = 'WGS 84';
     }
@@ -192,13 +202,14 @@ const DemoGraphyChart = (function () {
         female: 'cfi_demography_2018_population_female',
         total: 'cfi_demography_2018_population_total',
       },
-    }
+    },
   };
 
   async function loadChart(chartData, chartConfig) {
     // maybe a callback to calculate chould be better (more dynamic code)
     const femaleCount = chartData[chartConfig.propertyKeys.female];
     const maleCount = chartData[chartConfig.propertyKeys.total] - femaleCount;
+    const chartDom = $(`#${chartConfig.id}`);
 
     if (femaleCount && maleCount) {
       CustomCharts.pieChart(
@@ -207,13 +218,15 @@ const DemoGraphyChart = (function () {
         chartConfig.labels,
         [femaleCount, maleCount],
       );
-    } else {
-      document.getElementById(chartConfig.id).remove();
+    } else if (chartDom.length) {
+      chartDom.remove();
     }
   }
 
   function loadHeader() {
-    const chartWrapper = document.querySelector('.about__body .chart__wrapper .chart__wrapper__body');
+    const chartWrapper = document.querySelector(
+      '.about__body .chart__wrapper .chart__wrapper__body',
+    );
     if (chartWrapper.childNodes.length > 0) {
       const chartHeader = document.createElement('h2');
       chartHeader.innerText = I18n.translate('demography');
@@ -231,7 +244,6 @@ const DemoGraphyChart = (function () {
     });
 
     if (!response.features.length > 0) {
-      document.getElementById(chartConfig.id).remove();
       return;
     }
 
@@ -264,7 +276,9 @@ async function loadConservationAreas(cfiId) {
   }
 
   const header = document.createElement('h2');
-  const conservationWrapperDom = document.querySelector('.conservation__area__wrapper');
+  const conservationWrapperDom = document.querySelector(
+    '.conservation__area__wrapper',
+  );
   header.classList.add('about__header');
   header.innerText = I18n.translate('conservation_area_in_community');
   conservationWrapperDom.prepend(header);
@@ -285,9 +299,13 @@ async function loadConservationAreas(cfiId) {
         const val = item.properties[key];
 
         if (Utils.isNumeric(val)) {
-          td.innerText = Utils.formatNum(Number(val), ' ') + ` ${I18n.translate('hectare')}`;
+          td.innerText =
+            Utils.formatNum(Number(val), ' ') + ` ${I18n.translate('hectare')}`;
         } else if (key === 'name') {
-          td.innerText = I18n.translate({ en: 'name_en', kh: 'name' }, item.properties);
+          td.innerText = I18n.translate(
+            { en: 'name_en', kh: 'name' },
+            item.properties,
+          );
           const colon = document.createElement('strong');
           colon.innerText = ':';
           colon.style.fontWeight = '600';
@@ -299,9 +317,11 @@ async function loadConservationAreas(cfiId) {
       });
 
       tbody.append(tr);
-    })
+    });
 
-    const conservationTable = document.querySelector('.conservation__area__wrapper table');
+    const conservationTable = document.querySelector(
+      '.conservation__area__wrapper table',
+    );
     conservationTable.append(tbody);
   }
 }
@@ -354,7 +374,7 @@ async function handleRelatedLayerClick(e) {
       const tr = document.createElement('tr');
 
       for (key in contents) {
-        const item = contents[key]
+        const item = contents[key];
         const td = document.createElement('td');
 
         if (Utils.isNumeric(item) && !Utils.isCoordinate(key)) {
@@ -410,23 +430,25 @@ async function loadRelatedLayers(cfiId) {
       baseUrl: `/geoserver/${SERVER}/wfs`,
       data: { request: 'GetCapabilities' },
     }),
-    Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
+    Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER }),
   ]);
 
   const ul = document.createElement('ul');
   const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
-  const relatedFeatureTypes = Array.from(featureTypes).filter(featureType => {
+  const relatedFeatureTypes = Array.from(featureTypes).filter((featureType) => {
     const name = featureType.getElementsByTagName('Name')[0].textContent;
     const keywordTag = featureType.getElementsByTagName('ows:Keyword');
     if (!keywordTag.length > 0) {
       return false;
     }
 
-    const isInternalLayer = [...keywordTag].map((item) => item.textContent).some((keyword) => keyword === 'internal_layer');
+    const isInternalLayer = [...keywordTag]
+      .map((item) => item.textContent)
+      .some((keyword) => keyword === 'internal_layer');
     return !isInternalLayer && layersToShow && layersToShow[name];
   });
 
-  const relatedTypeName = relatedFeatureTypes.map((item => {
+  const relatedTypeName = relatedFeatureTypes.map((item) => {
     const typeName = item.getElementsByTagName('Name')[0].textContent;
     return Utils.fetchXml({
       baseUrl: '/geoserver/cfi/wfs',
@@ -438,16 +460,23 @@ async function loadRelatedLayers(cfiId) {
         resultType: 'hits',
       },
     });
-  }));
+  });
 
   const featureCountArr = await Promise.all(relatedTypeName);
-  const hasLayerToShow = featureCountArr.some(item => Number(item.childNodes[0].getAttribute('numberOfFeatures')) > 0);
+  const hasLayerToShow = featureCountArr.some(
+    (item) => Number(item.childNodes[0].getAttribute('numberOfFeatures')) > 0,
+  );
   if (hasLayerToShow) {
     document.getElementById('relatedLayers').append(ul);
-    document.getElementById('relatedLayers').parentElement.classList.remove('d-none');
+    document
+      .getElementById('relatedLayers')
+      .parentElement.classList.remove('d-none');
 
     relatedFeatureTypes.forEach((featureType, i) => {
-      const hasRelatedData = Number(featureCountArr[i].childNodes[0].getAttribute('numberOfFeatures')) > 0;
+      const hasRelatedData =
+        Number(
+          featureCountArr[i].childNodes[0].getAttribute('numberOfFeatures'),
+        ) > 0;
       if (hasRelatedData) {
         const name = featureType.getElementsByTagName('Name')[0].textContent;
         const title = featureType.getElementsByTagName('Title')[0].textContent;
@@ -487,7 +516,10 @@ async function loadRelatedDocuments(cfiId) {
     const li = document.createElement('li');
     const a = document.createElement('a');
     a.href = item.properties.url;
-    a.innerText = I18n.translate({ kh: 'title', en: 'title_en' }, item.properties);
+    a.innerText = I18n.translate(
+      { kh: 'title', en: 'title_en' },
+      item.properties,
+    );
     a.style.color = '#000';
     a.target = '_blank';
 
@@ -505,14 +537,20 @@ function getDistrictTagDom(districts) {
   }
 
   if (districts.length === 1) {
-    return I18n.translate({ en: 'dis_name', kh: 'dis_name_k' }, districts[0].properties)
+    return I18n.translate(
+      { en: 'dis_name', kh: 'dis_name_k' },
+      districts[0].properties,
+    );
   }
 
   const div = document.createElement('div');
   districts.forEach((item) => {
     const span = document.createElement('span');
     span.classList.add('badge-pill', 'badge-secondary');
-    span.innerText = I18n.translate({ en: 'dis_name', kh: 'dis_name_k' }, item.properties);
+    span.innerText = I18n.translate(
+      { en: 'dis_name', kh: 'dis_name_k' },
+      item.properties,
+    );
     span.style.marginRight = '2px';
     div.append(span);
   });
@@ -535,22 +573,24 @@ async function showCFI_B(data, defaultCrs) {
     },
   });
 
-  const [espg, instersectingDistricts] = await Promise.all([fetchEspg, fetchDistrict]);
+  const [espg, instersectingDistricts] = await Promise.all([
+    fetchEspg,
+    fetchDistrict,
+  ]);
 
-  const provinceCode = document.querySelector('#provinceSelect option:checked').dataset.provinceCode;
-  const districts = instersectingDistricts.features.filter((item) => item.properties.pro_code === Number(provinceCode));
+  const provinceCode = document.querySelector('#provinceSelect option:checked')
+    .dataset.provinceCode;
+  const districts = instersectingDistricts.features.filter(
+    (item) => item.properties.pro_code === Number(provinceCode),
+  );
 
-  const {
-    x_coordinate,
-    y_coordinate,
-    sub_name,
-  } = data.feature.properties;
+  const { x_coordinate, y_coordinate, sub_name } = data.feature.properties;
   const tbody = document.createElement('tbody');
-
 
   // careful about changing key
   // change the listener as well
-  const isValidCoord = !Utils.isEmptyString(x_coordinate) && !Utils.isEmptyString(y_coordinate);
+  const isValidCoord =
+    !Utils.isEmptyString(x_coordinate) && !Utils.isEmptyString(y_coordinate);
 
   const coordSpanDOM = document.createElement('pre');
   coordSpanDOM.id = 'espgCoordDOM';
@@ -564,10 +604,15 @@ async function showCFI_B(data, defaultCrs) {
   cfi_b.area_ha = data.feature.properties.area_ha;
   cfi_b.cfi_code = data.feature.properties.cfi_code;
   cfi_b.creation_date = Utils.formatDate(data.feature.properties.creation_date);
-  cfi_b.registration_date = Utils.formatDate(data.feature.properties.registration_date)
+  cfi_b.registration_date = Utils.formatDate(
+    data.feature.properties.registration_date,
+  );
   cfi_b.coordinate_system = (espg && espg.name) || I18n.translate('no_data');
   cfi_b.referencing_coordinate = coordSpanDOM;
-  cfi_b.province = I18n.translate({ en: 'province_en', kh: 'province' }, data.feature.properties);
+  cfi_b.province = I18n.translate(
+    { en: 'province_en', kh: 'province' },
+    data.feature.properties,
+  );
 
   if (isValidCoord && espg && espg.name) {
     cfi_b.coordinate_system = getESPGToggleBtn(cfi_b.coordinate_system);
@@ -613,25 +658,35 @@ async function showCFI_B(data, defaultCrs) {
     tbody.append(tr);
   }
 
-  const cfi_name = I18n.translate({ en: 'name_en', kh: 'name' }, data.feature.properties);
+  const cfi_name = I18n.translate(
+    { en: 'name_en', kh: 'name' },
+    data.feature.properties,
+  );
   const header = document.querySelector('.about__wrapper .about__header');
   if (I18n.getLang() === 'en') {
-    header.innerText = `${sub_name || cfi_name} ${I18n.translate('fishing_community')}`;
+    header.innerText = `${sub_name || cfi_name} ${I18n.translate(
+      'fishing_community',
+    )}`;
   } else {
-    header.innerText = `${I18n.translate('fishing_community')}${sub_name || cfi_name}`;
+    header.innerText = `${I18n.translate('fishing_community')}${sub_name || cfi_name
+      }`;
   }
 
   const profileTable = document.querySelector('.about__table__wrapper table');
   profileTable.append(tbody);
 
   // set conservation table cell width
-  const profileTblCell = document.querySelector('.about__table__wrapper table tr td');
-  const conservationTblCells = document.querySelectorAll('.conservation__area__wrapper table tr td:first-child');
+  const profileTblCell = document.querySelector(
+    '.about__table__wrapper table tr td',
+  );
+  const conservationTblCells = document.querySelectorAll(
+    '.conservation__area__wrapper table tr td:first-child',
+  );
 
   if (profileTblCell && conservationTblCells.length > 0) {
-    conservationTblCells.forEach(el => {
+    conservationTblCells.forEach((el) => {
       el.style.width = `${profileTblCell.scrollWidth + 1}px`;
-    })
+    });
   }
 }
 
@@ -645,28 +700,10 @@ function addBoundaryClickEvent() {
     showActivePolygon(e.layer);
 
     const cfiId = e.layer.feature.id;
-    document.querySelector('.about__body').innerHTML = '';
-    document.getElementById('cfiSelect').value = cfiId;
     sessionStorage.setItem(`${SERVER}_community`, cfiId);
 
-    drawAboutSection();
-
-    const [cfiProfile, defaultCrs] = await Promise.all([  // mostly unrelated function but run them in sync to speed things up
-      Utils.fetchGeoJson({
-        data: {
-          typeName: defaultProfileTypeName,
-          SORTBY: 'name ASC',
-          CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022', 'geom', 'IN(''${cfiId}'')')), 0, meters)`,
-        },
-      }),
-      loadRelatedLayers(cfiId),
-      loadConservationAreas(cfiId),
-      loadRelatedDocuments(cfiId),
-      DemoGraphyChart.loadAllChart(cfiId),
-    ]);
-
-    await showCFI_B({ feature: cfiProfile.features[0] }, defaultCrs);
-    toggleLoading(false);
+    $('.about__body').innerHTML = '';
+    $('#cfiSelect').val(cfiId).trigger('change');
   });
 }
 
@@ -709,40 +746,32 @@ async function handleCfiSelect(e) {
 }
 
 async function loadCfiSelect(cfiBoundary) {
-  const tmpCfiSelect = document.getElementById('cfiSelect');
-  tmpCfiSelect.innerHTML = '';
+  const cfiSelect = $('#cfiSelect');
+  cfiSelect.append(new Option());
 
-  const clone = tmpCfiSelect.cloneNode(true);
-  tmpCfiSelect.replaceWith(clone);
-
-  const uniqueCfi = [
-    ...new Map(
-      cfiBoundary.features.map((item) => [item.properties.name, item]),
-    ).values(),
-  ].sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
-
-  const cfiSelect = document.getElementById('cfiSelect');
-  cfiSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_fishing_community')));
-  uniqueCfi.forEach((item) => {
-    const option = document.createElement('option');
-    option.text = I18n.translate({ en: 'name_en', kh: 'name' }, item.properties);
-    option.value = item.id;
+  cfiBoundary.features.forEach((item) => {
+    const text = I18n.translate({ en: 'name_en', kh: 'name' }, item.properties);
+    const option = new Option(text, item.id, false, false);
     cfiSelect.append(option);
   });
 
-  cfiSelect.addEventListener('change', handleCfiSelect);
-  cfiSelect.removeAttribute('disabled');
+  cfiSelect.on('change', handleCfiSelect);
+  cfiSelect.prop('disabled', false);
 }
 
 async function handleProvinceSelect(e, options = {}) {
-  document.body.querySelector('.about__wrapper').classList.remove('active');
-  document.getElementById('relatedLayers').parentElement.classList.add('d-none');
-  document.getElementById('relatedDocuments').parentElement.classList.add('d-none');
-  document.querySelector('.province-tooltip .tooltip').classList.remove('active');
+  $('.about__wrapper').removeClass('active');
+  $('#relatedLayers').parent().addClass('d-none');
+  $('#relatedDocuments').parent().addClass('d-none');
+  $('.province-tooltip .tooltip').removeClass('active');
+  $('#cfiSelect')
+    .html('')
+    .select2({ placeholder: I18n.translate('select_a_fishing_community') });
 
   const provinceSelect = e.currentTarget;
   const selectedProvinceId = provinceSelect.value;
-  const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+  const provinceName =
+    provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
 
   // save to cache
   sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
@@ -753,9 +782,12 @@ async function handleProvinceSelect(e, options = {}) {
   }
 
   toggleLoading(true);
-  const CQL_FILTER = selectedProvinceId
-    ? `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014', 'geom', 'IN(''${selectedProvinceId}'')')))`
-    : '';
+  let CQL_FILTER = '';
+
+  if (selectedProvinceId && selectedProvinceId !== 'all') {
+    CQL_FILTER = `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014', 'geom', 'IN(''${selectedProvinceId}'')')))`
+  }
+
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
       typeName: TYPENAME[KEYS.CFI_B],
@@ -763,10 +795,23 @@ async function handleProvinceSelect(e, options = {}) {
     },
   });
 
-  if (provinceName) {
-    cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
+  // load number of CFI
+  const label = document.getElementById('cfiCount');
+  label.textContent = `(${cfiBoundary.features.length || 0})`;
+
+  if (!cfiBoundary.features.length) {
+    console.log('returned backed failed boundary fetch');
+    toggleLoading(false);
+    return;
   }
 
+  if (provinceName) {
+    cfiBoundary.features = cfiBoundary.features.filter(
+      (item) => item.properties.province.trim() === provinceName,
+    );
+  }
+
+  cfiBoundary.features.sort();
   OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
   OVERLAY_MAP[KEYS.CFI_B].addTo(map);
 
@@ -776,15 +821,15 @@ async function handleProvinceSelect(e, options = {}) {
   toggleLoading(false);
 
   if (Object.keys(OVERLAY_MAP[KEYS.CFI_B].getBounds()).length > 0) {
-    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds(), { animate: !options.shouldNotAnimate });
+    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds(), {
+      animate: !options.shouldNotAnimate,
+    });
   }
-
-  // load number of CFI
-  const label = document.getElementById('cfiCount');
-  label.textContent = `(${cfiBoundary.features.length || 0})`;
 }
 
 async function loadProvince() {
+  const provinceSelect = $('#provinceSelect');
+
   try {
     const res = await Utils.fetchGeoJson({
       data: {
@@ -796,21 +841,16 @@ async function loadProvince() {
       },
     });
 
-    const provinceSelect = document.getElementById('provinceSelect');
+    const allOption = new Option(I18n.translate('all_province'), 'all');
+    provinceSelect.append(new Option());
+    provinceSelect.append(allOption).trigger('change');
 
-    // append options to select
-    provinceSelect.append(
-      Utils.defaultOptionDOM(I18n.translate('select_a_province'), {
-        disabled: true,
-        selected: true,
-      }),
-    );
-    provinceSelect.append(
-      Utils.defaultOptionDOM(I18n.translate('all_province'), { value: '' }),
-    );
     res.features.forEach((item) => {
       const option = document.createElement('option');
-      option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
+      option.text = I18n.translate(
+        { en: 'hrname', kh: 'pro_name_k' },
+        item.properties,
+      );
       option.value = item.id;
       option.dataset.name = item.properties.pro_name_k;
       option.dataset.provinceCode = item.properties.pro_code;
@@ -818,10 +858,13 @@ async function loadProvince() {
     });
 
     // const choices = new Choices(provinceSelect);
-    provinceSelect.addEventListener('change', handleProvinceSelect);
+    $(provinceSelect).on('change', handleProvinceSelect);
   } catch (e) {
     console.warn('Unable to load province select', e);
   }
+
+  $(provinceSelect).prop('disabled', false);
+  toggleLoading(false);
 }
 
 async function loadSavedOption() {
@@ -830,37 +873,37 @@ async function loadSavedOption() {
 
   if (!savedProvince) { return; }
 
-  const provinceSelect = document.getElementById('provinceSelect');
-  const cacheEvent = new Event('cacheLoad', { bubbles: true });
 
-  // dont try to dispatch them separately or else u'll run into race cond 
-  provinceSelect.value = savedProvince;
-  provinceSelect.addEventListener('cacheLoad', async function (e) {
+  $('#provinceSelect').val(savedProvince).trigger('change.select2');
+  $('#provinceSelect').on('cacheLoad', async function (e) {
     await handleProvinceSelect(e, { shouldNotAnimate: true });
     if (!savedCommunity) { return; }
 
-    const cfiEvent = new Event('change');
-    const cfiSelect = document.getElementById('cfiSelect');
-    cfiSelect.value = savedCommunity;
-    cfiSelect.dispatchEvent(cfiEvent);
+    $('#cfiSelect').val(savedCommunity).trigger('change');
   });
 
-  provinceSelect.dispatchEvent(cacheEvent);
+  $('#provinceSelect').trigger('cacheLoad');
 }
 
-async function init() {
-  await I18n.init();
+async function loadSettings() {
+  const settings = await Utils.fetchJson({
+    baseUrl: '/api/default-layer/' + SERVER,
+  });
+
+  defaultProfileTypeName = settings['profile'];
+  defaultChartTypeName = settings['chart'];
+  defaultConservationTypeName = settings['conservation'];
+}
+
+$(document).ready(async function () {
+  await Promise.all([loadSettings(), I18n.init()]);
+
+  $('#cfiSelect').select2({ placeholder: I18n.translate('select_a_province') });
+  $('#provinceSelect').select2({
+    placeholder: I18n.translate('select_a_fishing_community'),
+  });
+
   await loadProvince();
-
-  const provinceSelect = document.getElementById('provinceSelect');
-  provinceSelect.removeAttribute('disabled');
-
   await loadSavedOption();
-  toggleLoading(false);
-}
-
-if (document.readyState !== 'loading') {
-  init();
-} else {
-  document.addEventListener('DOMContentLoaded', init);
-}
+  // toggleLoading(false);
+});
