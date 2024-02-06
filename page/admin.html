@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <link rel="stylesheet" href="/css/admin.css">
@@ -183,6 +184,9 @@
     </div>
   </div>
 
+  <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+    integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <script src="/javascript/translator.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
@@ -287,13 +291,16 @@
           SORTBY: 'pro_code ASC',
         },
       });
-      const provinceSelect = document.getElementById('provinceSelect');
+      const provinceSelect = $('#provinceSelect');
+      provinceSelect.select2({ placeholder: I18n.translate('select_a_province') });
 
       if (!Array.isArray(data.features) || !data.features.length) {
         return;
       }
 
       // append options to select
+      provinceSelect.append(new Option());
+      provinceSelect.append(new Option(I18n.translate('all_province'), 'all'));
       provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province')));
       data.features.forEach((item) => {
         const option = document.createElement('option');
@@ -303,20 +310,25 @@
         provinceSelect.append(option);
       });
 
-      provinceSelect.addEventListener('change', async function (e) {
+      provinceSelect.on('change', async function (e) {
         const val = e.currentTarget.value;
-        const provinceName = provinceSelect.options[provinceSelect.selectedIndex].dataset.name;
+        const provinceName = $(provinceSelect).find(':selected').data('name');
         document.getElementById('tableProfile').classList.remove('d-none');
 
         const tbody = document.querySelector('#tableProfile table tbody');
         tbody.innerHTML = I18n.translate('loading...');
+
+        let CQL_FILTER = '';
+        if (val && val !== 'all') {
+          CQL_FILTER = `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014','geom','IN(''${val}'')')))`;
+        }
 
         // refactor this into 1 fetch with better CQL filter
         // fetching CFR directly would show cfi_reference in excluded cfi_boundary
         const cfiBoundary = await Utils.fetchGeoJson({
           data: {
             typeName: 'cfi:cfi_boundary_2022',
-            CQL_FILTER: `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014','geom','IN(''${val}'')')))`,
+            CQL_FILTER,
             propertyname: 'name,province',
           }
         });
