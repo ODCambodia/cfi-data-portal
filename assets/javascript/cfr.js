@@ -360,7 +360,7 @@ function drawAboutSection() {
 }
 
 async function showCFR(data) {
-  $('.about__body').innerHTML = '';
+  $('.about__body').empty();
   drawAboutSection();
   document.body.querySelector('.about__wrapper').classList.add('active');
 
@@ -468,13 +468,14 @@ async function loadCFRSelect(options) {
     cfrSelect.append(option);
   });
 
-  cfrSelect.on('change', async function (e) {
+  cfrSelect.off('change.cfr');
+  cfrSelect.on('change.cfr', async function (e) {
     toggleLoading(true);
     const val = e.currentTarget.value;
     const selectedCFR = cfr_data.features.find((item) => item.id === val);
 
     sessionStorage.setItem(`${SERVER}_community`, val);
-    $('.about__body').innerHTML = '';
+    $('.about__body').empty();
 
     if (OVERLAY_MAP[KEYS.CFR_A]) {
       const polygonsLayers = OVERLAY_MAP[KEYS.CFR_A].getLayers();
