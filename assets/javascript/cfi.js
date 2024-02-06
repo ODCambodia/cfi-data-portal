@@ -755,7 +755,8 @@ async function loadCfiSelect(cfiBoundary) {
     cfiSelect.append(option);
   });
 
-  cfiSelect.on('change', handleCfiSelect);
+  cfiSelect.off('change.cfi'); // namespace or it will remove select2 event as well
+  cfiSelect.on('change.cfi', handleCfiSelect);
   cfiSelect.prop('disabled', false);
 }
 
