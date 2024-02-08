@@ -71,7 +71,7 @@
           </div>
         </form>
 
-        <!-- <form action="/api/default-chart-layer" id="defaultChartForm"
+        <form action="/api/default-chart-layer" id="defaultChartForm"
           class="shadow border border-opacity-50 border-black rounded-3 p-3">
           <div class="list-group my-2">
             កំពុងដំណើរការ...
@@ -79,7 +79,7 @@
           <div class="text-end">
             <button type="submit" class="btn btn-primary">រក្សាទុក</button>
           </div>
-        </form> -->
+        </form>
       </div>
 
       <!-- Layer -->
@@ -205,8 +205,6 @@
     const REGEX_YEAR = /(_(20)\d{2})/s;
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfr/ows`;
-    let hasLoadedActiveLayerTab = false;
-    let hasLoadedProfileTab = false;
 
     function saveActiveTab() {
       const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
@@ -699,33 +697,33 @@
       const activeLayerForm = document.getElementById('toggleLayerForm');
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
       activeLayerForm.addEventListener('submit', handleSubmitLayerForm);
-      activeLayerTabBtn.addEventListener('click', function (e) {
-        if (!hasLoadedActiveLayerTab) {
-          hasLoadedActiveLayerTab = true;
-          const header = document.createElement('h5');
-          header.innerText = I18n.translate('select_related_data_to_show')
-          const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
-          listGroupDom.parentElement.prepend(header);
-          loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (keywords) => keywords.some((key) => key === 'internal_layer'));
-        }
+      activeLayerTabBtn.addEventListener('shown.bs.tab', function (e) {
+        const header = document.createElement('h5');
+        header.innerText = I18n.translate('select_related_data_to_show')
+        const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
+        listGroupDom.parentElement.prepend(header);
+        loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (keywords) => keywords.some((key) => key === 'internal_layer'));
       })
 
       // set default profile layer
       const defaultProfileForm = document.getElementById('defaultProfileForm');
       const defaultProfileTab = document.getElementById('nav-profile-tab');
       defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
-      defaultProfileTab.addEventListener('click', function (e) {
-        if (!hasLoadedProfileTab) {
-          hasLoadedProfileTab = true;
-          const header = document.createElement('h5');
-          header.innerText = I18n.translate('select_a_profile_to_show');
-          const profileList = document.querySelector(`#defaultProfileForm .list-group`);
-          profileList.parentElement.prepend(header);
-          loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (keywords) => keywords.every((key) => key !== 'profile_layer'));
+      defaultProfileTab.addEventListener('shown.bs.tab', function (e) {
+        const header = document.createElement('h5');
+        header.innerText = I18n.translate('select_a_profile_to_show');
+        const profileList = document.querySelector(`#defaultProfileForm .list-group`);
+        profileList.parentElement.prepend(header);
+        loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (keywords) => keywords.every((key) => key !== 'profile_layer'));
 
-          const defaultProfileForm = document.getElementById('defaultProfileForm');
-          defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
-        }
+        const demographyHeader = document.createElement('h5');
+        demographyHeader.innerText = I18n.translate('select_a_chart_to_show');
+        const DemographyList = document.querySelector(`#defaultChartForm .list-group`);
+        DemographyList.parentElement.prepend(demographyHeader);
+        loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (keywords) => keywords.every((key) => key !== 'demography_layer'));
+
+        const defaultProfileForm = document.getElementById('defaultProfileForm');
+        defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
       });
 
       const btnLogout = document.getElementById('btnLogout');

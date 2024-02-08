@@ -71,6 +71,16 @@
           </div>
         </form>
 
+        <form action="/api/default-chart-layer" id="defaultChartForm"
+          class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
+          <div class="list-group my-2" data-i18n="loading...">
+            កំពុងដំណើរការ...
+          </div>
+          <div class="text-end">
+            <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
+          </div>
+        </form>
+
         <form action="/api/default-conservation-layer" id="defaultConservationForm"
           class="shadow border border-opacity-50 border-black rounded-3 p-3">
           <div class="list-group my-2" data-i18n="loading...">
@@ -201,8 +211,6 @@
     const REGEX_YEAR = /(_(20)\d{2})/s;
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfi/ows`;
-    let hasLoadedActiveLayerTab = false;
-    let hasLoadedProfileTab = false;
 
     function saveActiveTab() {
       const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
@@ -594,12 +602,15 @@
 
     function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
       const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
-      const header = document.createElement('h4');
-      header.innerText = I18n.translate(`select_a_${key}_to_show`);
-      const list = document.querySelector(`#${formId} .list-group`);
-      list.parentElement.prepend(header);
-      loadSettings(apiUrl, formId, domType, validationCallback);
+      let header = document.querySelector(`#${formId} h4`);
+      if (header === null) {
+        const list = document.querySelector(`#${formId} .list-group`);
+        const header = document.createElement('h4');
+        header.innerText = I18n.translate(`select_a_${key}_to_show`);
+        list.parentElement.prepend(header);
+      }
 
+      loadSettings(apiUrl, formId, domType, validationCallback);
       document.getElementById(formId).addEventListener('submit', handleSubmitLayerForm);
     }
 
@@ -717,27 +728,22 @@
 
       // set related layers
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
-      activeLayerTabBtn.addEventListener('click', function (e) {
-        if (!hasLoadedActiveLayerTab) {
-          hasLoadedActiveLayerTab = true;
-          loadDefaultFormToggle(
-            'related_data',
-            'toggleLayerForm',
-            (keywords) => keywords.some((key) => key === 'internal_layer'),
-            `/api/active-layers/${SERVER}`,
-            'checkbox',
-          );
-        }
+      activeLayerTabBtn.addEventListener('shown.bs.tab', function (e) {
+        loadDefaultFormToggle(
+          'related_data',
+          'toggleLayerForm',
+          (keywords) => keywords.some((key) => key === 'internal_layer'),
+          `/api/active-layers/${SERVER}`,
+          'checkbox',
+        );
       })
 
       // set default profile layer
       const defaultProfileTab = document.getElementById('nav-profile-tab');
-      defaultProfileTab.addEventListener('click', function (e) {
-        if (!hasLoadedProfileTab) {
-          hasLoadedProfileTab = true;
-          loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
-          loadDefaultFormToggle('conservation', 'defaultConservationForm', (keywords) => keywords.every((key) => key !== 'conservation_layer'))
-        }
+      defaultProfileTab.addEventListener('shown.bs.tab', function (e) {
+        loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
+        loadDefaultFormToggle('chart', 'defaultChartForm', (keywords) => keywords.every((key) => key !== 'demography_layer'));
+        loadDefaultFormToggle('conservation', 'defaultConservationForm', (keywords) => keywords.every((key) => key !== 'conservation_layer'));
       });
 
       const btnLogout = document.getElementById('btnLogout');
