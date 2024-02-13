@@ -480,7 +480,11 @@
         const btnDel = document.createElement('button');
         btnDel.value = item.id;
         btnDel.dataset.url = doc.url;
-        btnDel.addEventListener('click', handleDeleteDocument);
+        btnDel.addEventListener('click', function (e) {
+          if (confirm(I18n.translate('confirm_file_delete'))) {
+            handleDeleteDocument(e);
+          }
+        });
         btnDel.classList.add('btn', 'btn-sm', 'btn-danger', 'float-end');
         btnDel.innerText = I18n.translate('delete');
 
