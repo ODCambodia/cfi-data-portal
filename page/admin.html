@@ -12,8 +12,16 @@
 </head>
 
 <body>
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-donut"></div>
+    <p id="loadingText"></p>
+  </div>
+
   <div class="card p-3 shadow w-100 h-100">
     <button id="btnLogout" class="btn btn-sm btn-primary" type="button" data-i18n="logout">ចេញពីទំព័រគ្រប់គ្រង</button>
+
+    <!-- Tabs Header -->
     <nav>
       <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
         <button class="nav-link" id="nav-file-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
@@ -30,7 +38,8 @@
           data-i18n="manage_user_login">កំណត់ការចូលរបស់អ្នកប្រើប្រាស់</button>
       </div>
     </nav>
-    <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
+
+    <div class="tab-content p-3 border bg-light h-100 overflow-y-auto" id="nav-tabContent">
       <!-- Related document forms -->
       <div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-file-tab">
         <div class="row mb-3">
@@ -59,7 +68,7 @@
         </div>
       </div>
 
-      <!-- Default Layer Toggle forms -->
+      <!-- Active Layer Toggle forms -->
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <form action="/api/default-profile-layer" id="defaultProfileForm"
           class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
@@ -92,7 +101,7 @@
         </form>
       </div>
 
-      <!-- Related Layer -->
+      <!-- Related Layer Checkbox form -->
       <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
         <form action="/api/active-layers" id="toggleLayerForm">
           <div class="list-group mb-2" data-i18n="loading...">
@@ -122,7 +131,7 @@
     </div>
   </div>
 
-  <!-- Add Modal -->
+  <!-- Add Document Modal -->
   <div class="modal fade" id="addDocumentModal" tabindex="-1" aria-labelledby="addDocumentModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -175,7 +184,7 @@
     </div>
   </div>
 
-  <!-- List Modal -->
+  <!-- List Document Files Modal -->
   <div class="modal fade" id="listDocumentModal" tabindex="-1" aria-labelledby="listDocumentModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
@@ -211,6 +220,13 @@
     const REGEX_YEAR = /(_(20)\d{2})/s;
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfi/ows`;
+
+    function toggleLoading(shouldShow) {
+      document
+        .getElementById('loadingOverlay')
+        .classList
+        .toggle('is-active', shouldShow);
+    }
 
     function saveActiveTab() {
       const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
@@ -500,22 +516,38 @@
       const submitBtn = document.querySelector('#addFormBtn');
       submitBtn.setAttribute('disabled', true);
 
-      fetch("/admin/documents/cfi", {
-        method: 'POST',
-        body: formData,
-      })
-        .then((res) => {
+      const xhr = new XMLHttpRequest();
+
+      // track upload progress
+      xhr.upload.onprogress = function (event) {
+        if (event.loaded === event.total) {
+          document.getElementById('loadingText').innerText = I18n.translate('saving_file');
+        } else {
+          document.getElementById('loadingText').innerText = I18n.translate('uploading_file') + '... ' + ((event.loaded / event.total) * 100).toFixed(2) + '%';
+        }
+      };
+
+      // track completion: both successful or not
+      xhr.onloadend = function () {
+        toggleLoading(false);
+
+        if (xhr.status == 200) {
           setTimeout(() => { alert(I18n.translate('file_uploaded_successfully')); })
-        })
-        .catch((err) => {
+        } else {
           setTimeout(() => { alert(I18n.translate('something_went_wrong_while_saving')); })
-        }).finally(() => {
-          const label = document.querySelector('.btn[for="formFile"]');
-          label.innerText = I18n.translate('choose_a_file');
-          currentForm.reset();
-          modal.hide();
-          submitBtn.removeAttribute('disabled');
-        });
+        }
+
+        const label = document.querySelector('.btn[for="formFile"]');
+        label.innerText = I18n.translate('choose_a_file');
+        currentForm.reset();
+        modal.hide();
+        submitBtn.removeAttribute('disabled');
+        document.getElementById('loadingText').innerText = '';
+      };
+
+      toggleLoading(true);
+      xhr.open("POST", "/admin/documents/cfi");
+      xhr.send(formData);
     }
 
     function handleSubmitLayerForm(e) {

@@ -389,3 +389,40 @@ body {
   content: " *";
   color: red;
 }
+
+.loading-overlay {
+  display: none;
+  background: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 9998;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-overlay #loadingText {
+  color: #fff;
+}
+
+.loading-overlay.is-active {
+  display: flex;
+}
+
+.loading-donut {
+  width: 4rem;
+  height: 4rem;
+  margin: 4rem;
+  border-radius: 50%;
+  border: 0.5rem solid rgba(151, 159, 208, 0.3);
+  border-top-color: #979fd0;
+  animation: 1.5s spin infinite linear;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

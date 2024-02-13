@@ -12,6 +12,12 @@
 </head>
 
 <body>
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-donut"></div>
+    <p id="loadingText"></p>
+  </div>
+
   <div class="card p-3 shadow w-100 h-100">
     <button id="btnLogout" class="btn btn-sm btn-primary" type="button" data-i18n="logout">ចេញពីទំព័រគ្រប់គ្រង</button>
     <nav>
@@ -30,7 +36,7 @@
           data-i18n="manage_user_login">កំណត់ការចូលរបស់អ្នកប្រើប្រាស់</button>
       </div>
     </nav>
-    <div class="tab-content p-3 border bg-light h-100" id="nav-tabContent">
+    <div class="tab-content p-3 border bg-light h-100 overflow-y-auto" id="nav-tabContent">
       <!-- Home -->
       <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <div class="row mb-3">
@@ -206,6 +212,13 @@
     const SERVER = Utils.getServer();
     const GEOSERVER = `/geoserver/cfr/ows`;
 
+    function toggleLoading(shouldShow) {
+      document
+        .getElementById('loadingOverlay')
+        .classList
+        .toggle('is-active', shouldShow);
+    }
+
     function saveActiveTab() {
       const tabElArray = document.querySelectorAll('button[data-bs-toggle="tab"]');
       tabElArray.forEach((tabs) => {
@@ -348,7 +361,6 @@
 
     function handleShowAddDocumentModal(e) {
       const btn = e.relatedTarget;
-      console.log(JSON.parse(decodeURIComponent(btn.dataset.val)));
       const form = document.querySelector(`#addDocumentModal form`);
       form.reset();
       form.dataset.x = btn.dataset.x;
@@ -468,27 +480,38 @@
       const submitBtn = document.querySelector('#addFormBtn');
       submitBtn.setAttribute('disabled', true);
 
-      fetch("/admin/documents/cfr", {
-        method: 'POST',
-        body: formData,
-      })
-        .then(function (response) {
-          if (response.ok) {
-            setTimeout(() => { alert(I18n.translate('file_uploaded_successfully')); }, 0)
-            return response.text();
-          }
+      const xhr = new XMLHttpRequest();
 
-          throw new Error('Something went wrong.');
-        })
-        .catch((err) => {
-          setTimeout(() => { alert(I18n.translate('something_went_wrong_while_saving')); }, 0)
-        }).finally(() => {
-          const label = document.querySelector('.btn[for="formFile"]');
-          label.innerText = I18n.translate('choose_a_file');
-          currentForm.reset();
-          modal.hide();
-          submitBtn.removeAttribute('disabled');
-        });
+      // track upload progress
+      xhr.upload.onprogress = function (event) {
+        if (event.loaded === event.total) {
+          document.getElementById('loadingText').innerText = I18n.translate('saving_file');
+        } else {
+          document.getElementById('loadingText').innerText = I18n.translate('uploading_file') + '... ' + ((event.loaded / event.total) * 100).toFixed(2) + '%';
+        }
+      };
+
+      // track completion: both successful or not
+      xhr.onloadend = function () {
+        toggleLoading(false);
+
+        if (xhr.status == 200) {
+          setTimeout(() => { alert(I18n.translate('file_uploaded_successfully')); })
+        } else {
+          setTimeout(() => { alert(I18n.translate('something_went_wrong_while_saving')); })
+        }
+
+        const label = document.querySelector('.btn[for="formFile"]');
+        label.innerText = I18n.translate('choose_a_file');
+        currentForm.reset();
+        modal.hide();
+        submitBtn.removeAttribute('disabled');
+        document.getElementById('loadingText').innerText = '';
+      };
+
+      toggleLoading(true);
+      xhr.open("POST", "/admin/documents/cfr");
+      xhr.send(formData);
     }
 
     function handleSubmitLayerForm(e) {
