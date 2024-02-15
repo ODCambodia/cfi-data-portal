@@ -91,23 +91,14 @@ const DemoGraphyChart = (function () {
     }
   };
 
-  async function loadChart(cfr, chartConfig) {
+  async function loadChart(chartData, chartConfig) {
     // maybe a callback to calculate chould be better (more dynamic code)
-    let femaleCount = cfr.properties[chartConfig.propertyKeys.female];
-    let totalCount = cfr.properties[chartConfig.propertyKeys.total];
-    let maleCount;
+    const femaleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.female]);
+    const maleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.total]) - femaleCount;
     const chartDom = $(`#${chartConfig.id}`);
+    console.log(femaleCount, maleCount)
 
-    // i cant think
-    if (typeof femaleCount === 'string' && typeof totalCount === 'string') {
-      femaleCount = Number(femaleCount.replaceAll(',', '')) || 0;
-      maleCount = (Number(totalCount.replaceAll(',', '')) || 0) - femaleCount;
-    } else {
-      femaleCount = Number(femaleCount) || 0;
-      maleCount = Number(totalCount) - femaleCount;
-    }
-
-    if (femaleCount > 0 || maleCount > 0) {
+    if (femaleCount && maleCount) {
       CustomCharts.pieChart(
         chartConfig.id,
         chartConfig.title,
@@ -129,14 +120,24 @@ const DemoGraphyChart = (function () {
     }
   }
 
-  function loadAllChart(cfr) {
-    const promise = Promise.all([
-      loadChart(cfr, CHARTS_CONF.committee),
-      loadChart(cfr, CHARTS_CONF.population),
-    ]);
+  async function loadAllChart(cfrId) {
+    const response = await Utils.fetchGeoJson({
+      data: {
+        typeName: defaultChartTypeName,
+        CQL_FILTER: `Dwithin(geom, collectGeometries(queryCollection('${defaultProfileTypeName}','geom','IN(''${cfrId}'')')), 10, meters)`,
+      },
+    });
 
-    promise.then(loadHeader);
-    return promise;
+    if (!response.features.length > 0) {
+      return;
+    }
+
+    const chartData = response.features[0].properties;
+    console.log(chartData);
+
+    loadChart(chartData, CHARTS_CONF.committee);
+    loadChart(chartData, CHARTS_CONF.population);
+    loadHeader();
   }
 
   return {
@@ -417,7 +418,7 @@ async function showCFR(data) {
 
   await loadRelatedDocuments(data.feature.id);
   await loadRelatedLayers(data.feature.id);
-  await DemoGraphyChart.loadAllChart(data.feature);
+  await DemoGraphyChart.loadAllChart(data.feature.id);
 }
 
 async function loadCFRMap(options) {
@@ -579,11 +580,12 @@ async function loadSavedOption() {
 }
 
 async function loadSettings() {
-  const settings = await Promise.all([
-    Utils.fetchJson({ baseUrl: '/api/default-profile-layer/' + SERVER })
-  ]);
+  const settings = await Utils.fetchJson({
+    baseUrl: '/api/default-layer/' + SERVER,
+  });
 
-  defaultProfileTypeName = Object.keys(settings[0])[0];
+  defaultProfileTypeName = settings['profile'];
+  defaultChartTypeName = settings['chart'];
 }
 
 $(document).ready(async function () {

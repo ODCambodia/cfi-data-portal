@@ -209,7 +209,7 @@
     I18n.init();
 
     const REGEX_YEAR = /(_(20)\d{2})/s;
-    const SERVER = Utils.getServer();
+    const SERVER = 'cfr';
     const GEOSERVER = `/geoserver/cfr/ows`;
 
     function toggleLoading(shouldShow) {
@@ -749,8 +749,8 @@
         DemographyList.parentElement.prepend(demographyHeader);
         loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (keywords) => keywords.every((key) => key !== 'demography_layer'));
 
-        const defaultProfileForm = document.getElementById('defaultProfileForm');
-        defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
+        const defaultChartForm = document.getElementById('defaultChartForm');
+        defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
       });
 
       const btnLogout = document.getElementById('btnLogout');

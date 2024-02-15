@@ -199,16 +199,16 @@ const DemoGraphyChart = (function () {
       title: 'population',
       labels: ['female', 'male'],
       propertyKeys: {
-        female: 'cfi_demography_2018_population_female',
-        total: 'cfi_demography_2018_population_total',
+        female: 'population_female',
+        total: 'population_total',
       },
     },
   };
 
   async function loadChart(chartData, chartConfig) {
     // maybe a callback to calculate chould be better (more dynamic code)
-    const femaleCount = chartData[chartConfig.propertyKeys.female];
-    const maleCount = chartData[chartConfig.propertyKeys.total] - femaleCount;
+    const femaleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.female]);
+    const maleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.total]) - femaleCount;
     const chartDom = $(`#${chartConfig.id}`);
 
     if (femaleCount && maleCount) {
@@ -238,7 +238,7 @@ const DemoGraphyChart = (function () {
   async function loadAllChart(cfiId) {
     const response = await Utils.fetchGeoJson({
       data: {
-        typeName: defaultProfileTypeName,
+        typeName: defaultChartTypeName,
         CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfiId}'')')), 0, meters)`,
       },
     });
@@ -248,7 +248,6 @@ const DemoGraphyChart = (function () {
     }
 
     const chartData = response.features[0].properties;
-
     loadChart(chartData, CHARTS_CONF.committee);
     loadChart(chartData, CHARTS_CONF.member);
     loadChart(chartData, CHARTS_CONF.population);

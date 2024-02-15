@@ -77,13 +77,14 @@ const Utils = {
     return urlParams.get(key);
   },
   getServer: function () {
-    const server = window.location.href.split('/').slice(-1)[0];
-
+    const laststr = window.location.href.split('/').slice(-1)[0];
+    const server = laststr.split(/[?#]/)[0];
+    console.log(server);
     if (server === 'cfi' || server === 'cfr') {
       return server;
     }
 
-    return 'cfi';
+    return '';
   },
   getRandom: function (min = 1, max = 100) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -187,6 +188,13 @@ const Utils = {
     }
 
     return fmtNum.replace(/\./, fraction).replace(/,/g, separator);
+  },
+  parseToNumber(n) {
+    if (typeof n === 'string') {
+      return parseFloat(n.replace(/,/g, ''))
+    }
+
+    return n;
   },
   toFixed: function (num, fixed = 2) {
     const regex = new RegExp('^-?\\d+(?:.\\d{0,' + (fixed || -1) + '})?');
