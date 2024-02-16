@@ -125,7 +125,7 @@
     aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
-        <form id="form">
+        <form id="fileForm">
           <div class="modal-header">
             <h5 class="modal-title" id="addDocumentModalLabel" data-i18n="manage_related_document">ឯកសារពាក់ព័ន្ធ</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -704,6 +704,20 @@
       }
     }
 
+    function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
+      const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
+      let header = document.querySelector(`#${formId} h5`);
+      if (header === null) {
+        const list = document.querySelector(`#${formId} .list-group`);
+        const header = document.createElement('h5');
+        header.innerText = I18n.translate(`select_a_${key}_to_show`);
+        list.parentElement.prepend(header);
+      }
+
+      loadSettings(apiUrl, formId, domType, validationCallback);
+      document.getElementById(formId).addEventListener('submit', handleSubmitLayerForm);
+    }
+
     // main
     document.addEventListener('DOMContentLoaded', async function () {
       await loadProvincesSelect();
@@ -717,40 +731,26 @@
         document.querySelector('#listDocumentModal .modal-body').innerHTML = I18n.translate('loading...');
       })
 
-      const form = document.getElementById('form');
-      form.addEventListener('submit', handleFormSubmit);
+      const fileForm = document.getElementById('fileForm');
+      fileForm.addEventListener('submit', handleFormSubmit);
 
       // set active layers
-      const activeLayerForm = document.getElementById('toggleLayerForm');
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
-      activeLayerForm.addEventListener('submit', handleSubmitLayerForm);
       activeLayerTabBtn.addEventListener('shown.bs.tab', function (e) {
-        const header = document.createElement('h5');
-        header.innerText = I18n.translate('select_related_data_to_show')
-        const listGroupDom = document.querySelector(`#toggleLayerForm .list-group`);
-        listGroupDom.parentElement.prepend(header);
-        loadSettings('/api/active-layers/' + SERVER, 'toggleLayerForm', 'checkbox', (keywords) => keywords.some((key) => key === 'internal_layer'));
-      })
+        loadDefaultFormToggle(
+          'related_data',
+          'toggleLayerForm',
+          (keywords) => keywords.some((key) => key === 'internal_layer'),
+          `/api/active-layers/${SERVER}`,
+          'checkbox',
+        );
+      });
 
       // set default profile layer
-      const defaultProfileForm = document.getElementById('defaultProfileForm');
       const defaultProfileTab = document.getElementById('nav-profile-tab');
-      defaultProfileForm.addEventListener('submit', handleSubmitLayerForm);
       defaultProfileTab.addEventListener('shown.bs.tab', function (e) {
-        const header = document.createElement('h5');
-        header.innerText = I18n.translate('select_a_profile_to_show');
-        const profileList = document.querySelector(`#defaultProfileForm .list-group`);
-        profileList.parentElement.prepend(header);
-        loadSettings('/api/default-profile-layer/' + SERVER, 'defaultProfileForm', 'radio', (keywords) => keywords.every((key) => key !== 'profile_layer'));
-
-        const demographyHeader = document.createElement('h5');
-        demographyHeader.innerText = I18n.translate('select_a_chart_to_show');
-        const DemographyList = document.querySelector(`#defaultChartForm .list-group`);
-        DemographyList.parentElement.prepend(demographyHeader);
-        loadSettings('/api/default-chart-layer/' + SERVER, 'defaultChartForm', 'radio', (keywords) => keywords.every((key) => key !== 'demography_layer'));
-
-        const defaultChartForm = document.getElementById('defaultChartForm');
-        defaultChartForm.addEventListener('submit', handleSubmitLayerForm);
+        loadDefaultFormToggle('profile', 'defaultProfileForm', (keywords) => keywords.every((key) => key !== 'profile_layer'));
+        loadDefaultFormToggle('chart', 'defaultChartForm', (keywords) => keywords.every((key) => key !== 'demography_layer'));
       });
 
       const btnLogout = document.getElementById('btnLogout');

@@ -638,10 +638,10 @@
 
     function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
       const apiUrl = url || `/api/default-${key}-layer/${SERVER}`
-      let header = document.querySelector(`#${formId} h4`);
+      let header = document.querySelector(`#${formId} h5`);
       if (header === null) {
         const list = document.querySelector(`#${formId} .list-group`);
-        const header = document.createElement('h4');
+        const header = document.createElement('h5');
         header.innerText = I18n.translate(`select_a_${key}_to_show`);
         list.parentElement.prepend(header);
       }
