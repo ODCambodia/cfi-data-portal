@@ -57,9 +57,13 @@ app.get('/template', function (req, res) {
 });
 
 app.get('/admin/:server', Auth.validate, function (req, res) {
-  let templatePath = 'page/admin.html';
-  if (req.params.sever === 'cfr') {
+  let templatePath = '';
+  if (req.params.server === 'cfr') {
     templatePath = 'page/admin_cfr.html';
+  } else if (req.params.server === 'cfi') {
+    templatePath = 'page/admin.html';
+  } else {
+    res.status(400).json({ error: 'Missing server param' });
   }
 
   res.sendFile(path.join(dirName, templatePath));
