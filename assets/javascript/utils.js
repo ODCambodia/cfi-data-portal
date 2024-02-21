@@ -69,6 +69,10 @@ const Utils = {
       })
       .catch((err) => {
         console.log(err);
+        if (typeof toggleLoading === 'function') {
+          toggleLoading(false);
+        }
+
         setTimeout(() => { alert(err.message); })
       });
   },
@@ -308,5 +312,7 @@ const CustomCharts = {
         }
       },
     });
+  },
+  alert: function () {
   }
 }

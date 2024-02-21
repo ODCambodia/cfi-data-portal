@@ -1,4 +1,9 @@
 {
+  "refresh_data": "Refresh user data",
+  "no_user_data": "No user found",
+  "approved_login": "Approved",
+  "approve": "Approve",
+  "revoke_acesss": "Revoke",
   "confirm_file_delete": "Confirm deleting this file?",
   "saving_file": "Saving File",
   "uploading_file": "Uploading File",

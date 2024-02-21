@@ -102,19 +102,22 @@
 
       <!-- User Management -->
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
-        <form id="userApprovalForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h4 data-i18n="pending_platform_login_request">សំណើចូលប្រព័ន្ធដែលកំពុងរង់ចាំ</h4>
-          <div class="list-group mt-3 mb-2" data-i18n="loading...">
-            កំពុងដំណើរការ...
-          </div>
-        </form>
+        <button id="userRefreshBtn" class="btn btn-primary mb-3 shadow" type="button">
+          <span data-i18n="refresh_data">Refresh</span>
+          &nbsp;⟳
+        </button>
 
-        <form id="userDeletionForm" class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
-          <h4 data-i18n="approved_user">អ្នកប្រើប្រាស់ដែលបានអនុញ្ញាត</h4>
-          <div class="list-group my-3" data-i18n="loading...">
-            កំពុងដំណើរការ...
-          </div>
-        </form>
+        <table id="userTable" class="table table-striped table-hover align-middle">
+          <thead>
+            <tr>
+              <th data-i18n="name">Name</th>
+              <th data-i18n="username">Username</th>
+              <th data-i18n="status">status</th>
+              <th data-i18n="action">action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
       </div>
 
     </div>
@@ -193,6 +196,8 @@
       </div>
     </div>
   </div>
+
+  <div id="alert" class="alert alert-success" role="alert" data-i18n="success">Success</div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
     integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
@@ -628,80 +633,92 @@
     async function loadUsers() {
       // load users
       try {
-        const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
+        toggleLoading(true);
+        const users = await Utils.fetchJson({ baseUrl: `/api/${SERVER}/users` });
+        const tbody = document.querySelector('#userTable tbody');
+        tbody.innerHTML = '';
 
-        if (isSuperAdminRes.status === 403) {
-          throw new Error('No Permission');
+        if (Array.isArray(users) && !users.length) {
+          const emptyTd = document.createElement('td');
+          emptyTd.innerText = I18n.translate('no_user_data') + '!';
+          emptyTd.colSpan = 4;
+          emptyTd.classList.add('text-center', 'fs-4', 'py-3');
+          tbody.append(emptyTd);
         }
 
-        const [approvedUsers, pendingUsers] = await Promise.all([
-          Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'true' } }),
-          Utils.fetchJson({ baseUrl: `/api/${SERVER}/users`, data: { approved: 'false' } }),
-        ]);
+        users.forEach((user) => {
+          const tr = document.createElement('tr');
+          const { username, firstname, lastname, approval_time, user_id } = user;
 
-        document.querySelector(`#userDeletionForm .list-group`).innerHTML = '';
-        document.querySelector(`#userApprovalForm .list-group`).innerHTML = '';
-        document.getElementById('user-approval-tab').classList.remove('invisible')
+          const tdUserName = document.createElement('td');
+          tdUserName.innerText = username ? '@' + username : '';
 
-        if (pendingUsers.length > 0) {
-          pendingUsers.forEach((user) => {
-            if (!user) { return; }
+          const tdFullName = document.createElement('td');
+          tdFullName.innerText = firstname || '' + lastname || '';
 
-            const li = document.createElement('li');
-            li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
-            if (user.username) {
-              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
-            }
+          const tdStatus = document.createElement('td');
+          tdStatus.innerText = I18n.translate(approval_time ? 'approved_login' : 'pending_login');
 
-            const approveBtn = document.createElement('button');
-            approveBtn.dataset.href = '/api/users/' + user.user_id + '/approve';
-            approveBtn.type = 'button';
-            approveBtn.classList.add('btn', 'btn-success', 'ms-auto', 'me-2');
-            approveBtn.innerText = 'approve';
-            approveBtn.addEventListener('click', function (e) {
+          const btnAction = document.createElement('button');
+          btnAction.type = "button";
+
+          if (!user.approval_time) {
+            btnAction.innerText = I18n.translate('approve');
+            btnAction.classList.add('btn', 'btn-primary')
+            btnAction.addEventListener('click', function (e) {
               e.preventDefault();
-              const url = e.currentTarget.dataset.href;
-              const res = fetch(url, {
+              toggleLoading(true);
+              const res = fetch('/api/users/' + user.user_id + '/approve', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
                 },
-              })
+              });
 
-              Utils.handleFetchPromise(res, () => {
-                window.location.reload();
+              Utils.handleFetchPromise(res, function () {
+                loadUsers();
+                alert(I18n.translate('success'));
               });
             });
+          } else {
+            btnAction.innerText = I18n.translate('revoke_access');
+            btnAction.classList.add('btn', 'btn-danger');
+            btnAction.addEventListener('click', function (e) {
+              e.preventDefault();
+              toggleLoading(true);
+              const url = e.currentTarget.dataset.href;
+              const res = fetch('/api/users/' + user.user_id, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              })
 
-            const removeBtn = createUserDeleteBtn(user.user_id);
-            li.append(approveBtn);
-            li.append(removeBtn);
-            document.querySelector(`#userApprovalForm .list-group`).append(li);
-          });
+              Utils.handleFetchPromise(res, function () {
+                loadUsers();
+                alert(I18n.translate('success'));
+              });
+            });
+          }
 
-        }
+          const tdAction = document.createElement('td');
+          tdAction.append(btnAction);
 
-        if (approvedUsers.length > 0) {
-          approvedUsers.forEach((user) => {
-            if (!user) { return; }
+          tr.append(tdFullName);
+          tr.append(tdUserName);
+          tr.append(tdStatus);
+          tr.append(tdAction);
+          document.querySelector('#userTable tbody').append(tr);
+        });
 
-            const li = document.createElement('li');
-            li.classList.add('list-group-item', 'd-flex');
-            li.innerText = `${I18n.translate('name')}: ${user.firstname} ${user.lastname}`;
-            if (user.username) {
-              li.innerText += ` ${I18n.translate('username')}: @${user.username}`;
-            }
-            const removeBtn = createUserDeleteBtn(user.user_id, ['ms-auto']);
-            li.append(removeBtn);
-            document.querySelector(`#userDeletionForm .list-group`).append(li);
-          });
-
-        }
+        toggleLoading(false);
 
       } catch (e) {
         // nothing
+        console.log('something wrong', e)
       }
+      toggleLoading(false);
+
     }
 
     function loadDefaultFormToggle(key, formId, validationCallback, url, domType = 'radio') { //formId = defaultChartForm //(name) => !REGEX_YEAR.test(name) || !name.includes('demography')
@@ -771,7 +788,24 @@
         }
       })
 
-      await loadUsers();
+      try {
+        const isSuperAdminRes = await fetch(`/api/${SERVER}/users`, { method: 'HEAD' });
+
+        if (isSuperAdminRes.status !== 403) {
+          const userTabBtn = document.getElementById('user-approval-tab');
+          userTabBtn.classList.remove('invisible');
+          userTabBtn.addEventListener('shown.bs.tab', loadUsers)
+        }
+      } catch (e) {
+        console.log('something_went_wrong');
+      }
+
+      const userRefreshBtn = document.getElementById('userRefreshBtn');
+      userRefreshBtn.addEventListener('click', async function () {
+        await loadUsers();
+        setTimeout(() => { alert(I18n.translate('success')) }, 100);
+      });
+
       saveActiveTab();
     });
   </script>
