@@ -67,7 +67,7 @@ function getLayer(req, res, key) {
 }
 
 function handleSaveLayer(req, res, key) {
-  const jsonKey = (req.params.key || 'cfi') + key;
+  const jsonKey = (req.params.server || 'cfi') + key;
 
   if (key) {
     return saveLayer(req, res, jsonKey);
@@ -77,7 +77,7 @@ function handleSaveLayer(req, res, key) {
 }
 
 function handleGetLayer(req, res, key) {
-  const jsonKey = (req.params.key || 'cfi') + key;
+  const jsonKey = (req.params.server || 'cfi') + key;
 
   if (key) {
     return getLayer(req, res, jsonKey);
@@ -87,7 +87,7 @@ function handleGetLayer(req, res, key) {
 }
 
 function handleGetDefaultLayers(req, res) {
-  const defaultKey = (req.params.key || 'cfi') + '_default_';
+  const defaultKey = (req.params.server || 'cfi') + '_default_';
 
   let layerHash = {};
   try {

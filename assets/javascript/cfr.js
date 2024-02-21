@@ -96,7 +96,6 @@ const DemoGraphyChart = (function () {
     const femaleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.female]);
     const maleCount = Utils.parseToNumber(chartData[chartConfig.propertyKeys.total]) - femaleCount;
     const chartDom = $(`#${chartConfig.id}`);
-    console.log(femaleCount, maleCount)
 
     if (femaleCount && maleCount) {
       CustomCharts.pieChart(

@@ -4,29 +4,43 @@ import UserDAO from '../database/user.js';
 
 // MIDDLEWARE FOR AUTHORIZATION 
 const validateSession = async (req, res, next, shouldBeSuperAdmin) => {
+  let server = '';
+  const lastPath = req.path.split('/').slice(-1)[0];
+  if (req.path.match(/\/cfr\//) || lastPath === 'cfr') {
+    server = 'cfr';
+  } else if (req.path.match(/\/cfi\//) || lastPath === 'cfi') {
+    server = 'cfi';
+  }
+
+  // validate token
   if (req.headers.authorization) {
-    // validate token
     const token = req.headers.authorization.split(' ')[1];
+
     if (token) {
       try {
         const payload = await jwt.verify(token, process.env.SECRET);
         const isSuperAdmin = payload && payload.isSuper;
         const isUser = !shouldBeSuperAdmin && payload && !payload.isSuper;
+        const isSamePlatform = payload.type === server;
 
-        if (isSuperAdmin || isUser) {
-          req.user = payload;
-          return next();
+        if (!isSamePlatform) {
+          return res.status(403).json({ error: 'Forbidden, Wrong Platform. Current user can only access ' + payload.type || '' });
         }
 
-        return res.status(403).json({ error: 'Forbidden' });
+        if (!isSuperAdmin && !isUser) {
+          return res.status(403).json({ error: 'Forbidden' })
+        }
+
+        req.user = payload;
+        return next();
       } catch (error) {
         console.log(error);
       }
     }
   }
 
-  if (req.params.key) {
-    return res.redirect('/login/' + req.params.key);
+  if (server) {
+    return res.redirect('/login/' + server);
   }
 
   res.redirect('/login/cfi');
@@ -40,10 +54,24 @@ const validateSuperAdmin = (req, res, next) => validateSession(req, res, next, t
  */
 const handleLogin = async function (req, res) {
   try {
-    const isNameMatch = req.body.username === process.env.LOGIN_USERNAME;
-    const isPassMatch = req.body.password === process.env.LOGIN_PASSWORD;
+    const type = req.body.type;
+    let loginENVKey = null, passENVKey = null;
+
+    if (type === 'cfi') {
+      loginENVKey = 'CFI_LOGIN_USERNAME';
+      passENVKey = 'CFI_LOGIN_PASSWORD'
+    } else if (type === 'cfr') {
+      loginENVKey = 'CFR_LOGIN_USERNAME';
+      passENVKey = 'CFR_LOGIN_PASSWORD'
+    } else {
+      throw new Error('no login type for specific platform');
+    }
+
+    const isNameMatch = req.body.username === process.env[loginENVKey];
+    const isPassMatch = req.body.password === process.env[passENVKey];
+
     if (isNameMatch && isPassMatch) {
-      const token = await jwt.sign({ username: req.body.username, isSuper: true }, process.env.SECRET);
+      const token = await jwt.sign({ username: req.body.username, isSuper: true, type }, process.env.SECRET);
       req.session.token = token;
       return res.json({ token });
     }
@@ -85,7 +113,7 @@ const handleTelegramVerification = async function (req, res) {
 
       return res.status(403).json({ error: 'sent_pending_login_request' });
     } else if (user && user.user_id && user.approval_time) {
-      const token = await jwt.sign({ username: data.username || data.id, isSuper: false }, process.env.SECRET);
+      const token = await jwt.sign({ username: data.username || data.id, isSuper: false, type }, process.env.SECRET);
       req.session.token = token;
       return res.json({ token });
     }

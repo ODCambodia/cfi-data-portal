@@ -83,7 +83,6 @@ const Utils = {
   getServer: function () {
     const laststr = window.location.href.split('/').slice(-1)[0];
     const server = laststr.split(/[?#]/)[0];
-    console.log(server);
     if (server === 'cfi' || server === 'cfr') {
       return server;
     }

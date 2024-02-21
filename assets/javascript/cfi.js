@@ -800,7 +800,6 @@ async function handleProvinceSelect(e, options = {}) {
   label.textContent = `(${cfiBoundary.features.length || 0})`;
 
   if (!cfiBoundary.features.length) {
-    console.log('returned backed failed boundary fetch');
     toggleLoading(false);
     return;
   }

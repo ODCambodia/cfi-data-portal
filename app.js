@@ -56,9 +56,9 @@ app.get('/template', function (req, res) {
   res.sendFile(path.join(dirName, 'page/template.html'));
 });
 
-app.get('/admin/:key', Auth.validate, function (req, res) {
+app.get('/admin/:server', Auth.validate, function (req, res) {
   let templatePath = 'page/admin.html';
-  if (req.params.key === 'cfr') {
+  if (req.params.sever === 'cfr') {
     templatePath = 'page/admin_cfr.html';
   }
 
@@ -96,29 +96,29 @@ app.delete('/admin/documents/:server/:id', Auth.validate, jsonParser, Document.h
 app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 app.post('/login/verify-telegram', rateLimiter, jsonParser, Auth.handleTelegramVerification);
 
-app.get('/login/:key', function (req, res) {
+app.get('/login/:server', function (req, res) {
   res.sendFile(path.join(dirName, 'page/login.html'));
 });
 
 app.post('/logout', Auth.handleLogout);
 
-app.get('/api/active-layers/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_related_layers'));
-app.post('/api/active-layers/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_related_layers'));
+app.get('/api/active-layers/:server', (req, res) => LayerSettings.handleGetLayer(req, res, '_related_layers'));
+app.post('/api/active-layers/:server', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_related_layers'));
 
-app.get('/api/default-profile-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_profile'));
-app.post('/api/default-profile-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_profile'));
+app.get('/api/default-profile-layer/:server', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_profile'));
+app.post('/api/default-profile-layer/:server', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_profile'));
 
-app.get('/api/default-chart-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_chart'));
-app.post('/api/default-chart-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_chart'));
+app.get('/api/default-chart-layer/:server', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_chart'));
+app.post('/api/default-chart-layer/:server', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_chart'));
 
-app.get('/api/default-conservation-layer/:key', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_conservation'));
-app.post('/api/default-conservation-layer/:key', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_conservation'));
+app.get('/api/default-conservation-layer/:server', (req, res) => LayerSettings.handleGetLayer(req, res, '_default_conservation'));
+app.post('/api/default-conservation-layer/:server', Auth.validate, jsonParser, (req, res) => LayerSettings.handleSaveLayer(req, res, '_default_conservation'));
 
-app.get('/api/default-layer/:key', LayerSettings.handleGetDefaultLayers);
+app.get('/api/default-layer/:server', LayerSettings.handleGetDefaultLayers);
 
 app.get('/api/:server/users', Auth.validateSuperAdmin, User.handleGetAllUsers);
-app.post('/api/users/:id/approve', Auth.validateSuperAdmin, User.handleApproveUser);
-app.delete('/api/users/:id', Auth.validateSuperAdmin, User.handleDeleteUser);
+app.post('/api/:server/users/:id/approve', Auth.validateSuperAdmin, User.handleApproveUser);
+app.delete('/api/:server/users/:id', Auth.validateSuperAdmin, User.handleDeleteUser);
 
 app.listen(port);
 console.log("NODE_PATH=" + process.env.NODE_PATH);

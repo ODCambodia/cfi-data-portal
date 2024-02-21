@@ -56,6 +56,7 @@
       const requestBody = {};
       requestBody.username = usernameInput.value;
       requestBody.password = passwordInput.value;
+      requestBody.type = Utils.getServer();
 
       const submitBtn = document.getElementById('loginBtn');
       submitBtn.setAttribute('disabled', true);

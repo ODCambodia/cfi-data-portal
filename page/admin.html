@@ -695,7 +695,7 @@
             btnAction.addEventListener('click', function (e) {
               e.preventDefault();
               toggleLoading(true);
-              const res = fetch('/api/users/' + user.user_id + '/approve', {
+              const res = fetch(`/api/${SERVER}/users/${user.user_id}/approve`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
@@ -714,7 +714,7 @@
               e.preventDefault();
               toggleLoading(true);
               const url = e.currentTarget.dataset.href;
-              const res = fetch('/api/users/' + user.user_id, {
+              const res = fetch(`/api/${SERVER}/users/${user.user_id}`, {
                 method: 'DELETE',
                 headers: {
                   'Content-Type': 'application/json',
