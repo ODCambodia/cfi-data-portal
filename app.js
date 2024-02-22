@@ -27,6 +27,7 @@ const COOKIE_SESSION = {
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 };
 
+app.set('view engine', 'ejs');
 app.set('trust proxy', 1) // trust first proxy
 app.use(express.static('assets'));
 app.use(cookieSession(COOKIE_SESSION));
@@ -101,7 +102,7 @@ app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 app.post('/login/verify-telegram', rateLimiter, jsonParser, Auth.handleTelegramVerification);
 
 app.get('/login/:server', function (req, res) {
-  res.sendFile(path.join(dirName, 'page/login.html'));
+  res.render(path.join(dirName, 'page/login'), { BOT_USERNAME: process.env.BOT_USERNAME });
 });
 
 app.post('/logout', Auth.handleLogout);
