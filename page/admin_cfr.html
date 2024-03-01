@@ -606,30 +606,6 @@
       }
     }
 
-    function createUserDeleteBtn(userId, classes = []) {
-      const removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.dataset.href = `/api/${SERVER}/users/${userId}`;
-      removeBtn.classList.add('btn', 'btn-danger', ...classes);
-      removeBtn.innerText = 'remove';
-      removeBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        const url = e.currentTarget.dataset.href;
-        const res = fetch(url, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-        })
-
-        Utils.handleFetchPromise(res, () => {
-          window.location.reload();
-        });
-      });
-
-      return removeBtn;
-    }
-
     async function loadUsers() {
       // load users
       try {
@@ -659,12 +635,34 @@
           const tdStatus = document.createElement('td');
           tdStatus.innerText = I18n.translate(approval_time ? 'approved_login' : 'pending_login');
 
-          const btnAction = document.createElement('button');
-          btnAction.type = "button";
+          const tdAction = document.createElement('td');
+          const btnDelete = document.createElement('button');
+          btnDelete.type = "button";
+          btnDelete.innerText = I18n.translate('revoke_access');
+          btnDelete.classList.add('btn', 'me-2', 'btn-danger');
+          btnDelete.addEventListener('click', function (e) {
+            e.preventDefault();
+            toggleLoading(true);
+            const url = e.currentTarget.dataset.href;
+            const res = fetch(`/api/${SERVER}/users/${user.user_id}`, {
+              method: 'DELETE',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            })
+
+            Utils.handleFetchPromise(res, function () {
+              loadUsers();
+              alert(I18n.translate('success'));
+            });
+          });
 
           if (!user.approval_time) {
+            btnDelete.innerText = I18n.translate('delete');
+            const btnAction = document.createElement('button');
+            btnAction.type = "button";
             btnAction.innerText = I18n.translate('approve');
-            btnAction.classList.add('btn', 'btn-primary')
+            btnAction.classList.add('btn', 'me-2', 'btn-primary')
             btnAction.addEventListener('click', function (e) {
               e.preventDefault();
               toggleLoading(true);
@@ -680,30 +678,11 @@
                 alert(I18n.translate('success'));
               });
             });
-          } else {
-            btnAction.innerText = I18n.translate('revoke_access');
-            btnAction.classList.add('btn', 'btn-danger');
-            btnAction.addEventListener('click', function (e) {
-              e.preventDefault();
-              toggleLoading(true);
-              const url = e.currentTarget.dataset.href;
-              const res = fetch(`/api/${SERVER}/users/${user.user_id}`, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              })
 
-              Utils.handleFetchPromise(res, function () {
-                loadUsers();
-                alert(I18n.translate('success'));
-              });
-            });
+            tdAction.append(btnAction);
           }
 
-          const tdAction = document.createElement('td');
-          tdAction.append(btnAction);
-
+          tdAction.append(btnDelete);
           tr.append(tdFullName);
           tr.append(tdUserName);
           tr.append(tdStatus);

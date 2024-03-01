@@ -205,7 +205,7 @@ const Utils = {
       return num.replace(/,/g, '').match(regex)[0];
     }
 
-    if (typeof num === 'number') {
+    if (typeof num === 'number' && !Number.isNaN(num)) {
       return num.toString().match(regex)[0];
     }
 

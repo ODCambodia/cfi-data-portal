@@ -415,7 +415,7 @@ td span {
 
 .modal__table tr td,
 .modal__table tr th {
-  padding: 1px 4px;
+  padding: 4px;
 }
 
 .modal__table.vertical {
