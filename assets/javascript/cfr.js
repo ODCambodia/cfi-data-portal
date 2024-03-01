@@ -381,6 +381,8 @@ async function showCFR(data) {
     cfr.recognized_year = Utils.formatDate(data.feature.properties.recognized_year);
   }
 
+  cfr.recognized_by_law = I18n.translate(cfr.recognized_by_law);
+
   if (Utils.isNumeric(cfr.area_dry_season)) {
     cfr.area_dry_season = Utils.formatNum(cfr.area_dry_season);
   }
@@ -412,7 +414,7 @@ async function showCFR(data) {
     tbody.append(tr);
   }
 
-  $('.about__header').innerText = I18n.translate('community_fish_refuge') + ' ' + I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties);
+  $('.about__header').text(I18n.translate('community_fish_refuge') + ' ' + I18n.translate({ kh: 'cfr_name', en: 'cfr_name_en' }, data.feature.properties));
   $('.about__table__wrapper table').append(tbody);
 
   await loadRelatedDocuments(data.feature.id);
