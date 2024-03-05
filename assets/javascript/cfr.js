@@ -434,14 +434,8 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].off('click');
   OVERLAY_MAP[KEYS.CFR_A].on('click', async function (e) {
-    toggleLoading(true);
     const cfrId = e.layer.feature.id;
-    $('#cfrSelect').value = cfrId;
-    sessionStorage.setItem(`${SERVER}_community`, cfrId);
-
-    await showCFR(e.layer);
-    showActivePoint(e.layer);
-    toggleLoading(false);
+    $('#cfrSelect').val(cfrId).trigger('change');
   });
 
   map.on('zoomend', function () {
