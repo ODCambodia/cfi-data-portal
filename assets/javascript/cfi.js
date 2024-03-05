@@ -244,6 +244,10 @@ const DemoGraphyChart = (function () {
     });
 
     if (!response.features.length > 0) {
+      $(`#${CHARTS_CONF.committee.id}`).remove();
+      $(`#${CHARTS_CONF.member.id}`).remove();
+      $(`#${CHARTS_CONF.population.id}`).remove();
+
       return;
     }
 
