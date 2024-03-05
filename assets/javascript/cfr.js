@@ -128,11 +128,13 @@ const DemoGraphyChart = (function () {
     });
 
     if (!response.features.length > 0) {
+      $(`#${CHARTS_CONF.committee.id}`).remove();
+      $(`#${CHARTS_CONF.population.id}`).remove();
+
       return;
     }
 
     const chartData = response.features[0].properties;
-    console.log(chartData);
 
     loadChart(chartData, CHARTS_CONF.committee);
     loadChart(chartData, CHARTS_CONF.population);
