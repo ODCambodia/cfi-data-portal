@@ -588,9 +588,12 @@ async function loadSettings() {
 $(document).ready(async function () {
   await Promise.all([loadSettings(), I18n.init()]);
 
-  $('#cfrSelect').select2({ placeholder: I18n.translate('select_a_province') });
   $('#provinceSelect').select2({
-    placeholder: I18n.translate('select_a_fish_reservation_community'),
+    placeholder: I18n.translate('select_a_province'),
+  });
+
+  $('#cfrSelect').select2({
+    placeholder: I18n.translate('select_a_fish_reservation_community')
   });
 
   await loadProvinceCFR();
