@@ -3,7 +3,11 @@ const map = L.map('map', {
   center: DEFAULT_COORD,
   zoom: 7,
   minZoom: 7,
+  attributionControl: false,
 });
+
+let customAttribControl = L.control.attribution().addTo(map);
+customAttribControl.setPrefix('<a href="https://leafletjs.com" target="_blank">Leaflet</a>');
 
 const MAX_BOUNDS = [
   ['22.187404', '114.696289'],
