@@ -8,7 +8,6 @@ body {
   font-family: 'Poppins', 'Khmer', sans-serif;
 }
 
-
 button:focus,
 input:focus {
   outline: none;
@@ -25,10 +24,6 @@ input:focus {
 a,
 a:hover {
   text-decoration: none;
-}
-
-body {
-  font-family: 'Nunito', sans-serif;
 }
 
 /*----------multiple-file-upload-----------*/
@@ -157,7 +152,7 @@ body {
 }
 
 .file-detail {
-  font-size: 14px;
+  font-size: 12px;
   height: auto;
   width: 100%;
   line-height: initial;
@@ -165,7 +160,7 @@ body {
 
 .file-detail .file-caption-name {
   color: #fff;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 600;
   margin-bottom: 6px;
 }
