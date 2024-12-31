@@ -69,7 +69,7 @@ const handleCreate = async function (req, res) {
     const builder = new xml2js.Builder();
     const xml = builder.buildObject(xmlData);
 
-    const uploadResponse = await fetch('https://staging.fia.db.opendevcam.net/geoserver/wfs', {
+    const uploadResponse = await fetch(process.env.HOSTNAME + '/geoserver/wfs', {
       method: 'POST',
       headers: {
         'Authorization': 'Basic ' + btoa(GEOSERVER_AUTH.user + ':' + GEOSERVER_AUTH.password)
@@ -121,7 +121,7 @@ const handleDelete = async function (req, res) {
   </wfs:Transaction>`;
 
   try {
-    const uploadResponse = await fetch('https://staging.fia.db.opendevcam.net/geoserver/wfs', {
+    const uploadResponse = await fetch(process.env.HOSTNAME + '/geoserver/wfs', {
       method: 'POST',
       headers: {
         'Authorization': 'Basic ' + btoa(GEOSERVER_AUTH.user + ':' + GEOSERVER_AUTH.password)
