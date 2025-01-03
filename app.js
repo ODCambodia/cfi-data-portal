@@ -34,7 +34,10 @@ app.use(cookieSession(COOKIE_SESSION));
 
 app.use(Auth.appendUserToken);
 
-app.use('/geoserver', createProxyMiddleware({ target: process.env.HOSTNAME, changeOrigin: true }));
+app.use('/geoserver', createProxyMiddleware({
+  target: process.env.HOSTNAME,
+  changeOrigin: true
+}));
 
 app.use('/api/v2', createProxyMiddleware({
   target: `https://kf.kobotoolbox.org/api/v2/assets`,
