@@ -174,10 +174,10 @@ async function handleRelatedLayerClick(e) {
     return;
   }
 
-  const modalHeader = $('#cfrModal .modal-header strong');
+  const modalHeader = document.querySelector('#cfrModal .modal-header strong');
   modalHeader.innerText = layerName;
 
-  const table = $('#cfrModal table');
+  const table = document.querySelector('#cfrModal table');
   const tbody = document.createElement('tbody');
   table.innerHTML = '';
   table.classList.remove('vertical');
