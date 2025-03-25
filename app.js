@@ -10,6 +10,7 @@ import Document from './modules/document.js';
 import Auth from './modules/auth.js';
 import LayerSettings from './modules/toggle_layer.js';
 import User from './modules/user.js';
+import cors from 'cors';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,8 +32,14 @@ app.set('view engine', 'ejs');
 app.set('trust proxy', 1) // trust first proxy
 app.use(express.static('assets'));
 app.use(cookieSession(COOKIE_SESSION));
-
 app.use(Auth.appendUserToken);
+app.use(cors())
+
+app.get('/api/config', (req, res) => {
+        res.json({
+                mapTiler_key: process.env.MapTiler_Key,
+        })
+});
 
 app.use('/geoserver', createProxyMiddleware({
   target: process.env.HOSTNAME,
@@ -106,6 +113,12 @@ app.post('/login/verify-telegram', rateLimiter, jsonParser, Auth.handleTelegramV
 
 app.get('/login/:server', function (req, res) {
   res.render(path.join(dirName, 'page/login'), { BOT_USERNAME: process.env.BOT_USERNAME });
+});
+
+app.get('/api/config', (req, res) => {
+    res.json({
+        mapTilerKey: process.env.MapTiler_key,
+    });
 });
 
 app.post('/logout', Auth.handleLogout);
