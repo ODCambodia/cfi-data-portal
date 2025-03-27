@@ -9,6 +9,7 @@ const map = L.map('map', {
 let customAttribControl = L.control.attribution().addTo(map);
 customAttribControl.setPrefix('<a href="https://leafletjs.com" target="_blank">Leaflet</a>');
 
+
 const MAX_BOUNDS = [
   ['22.187404', '114.696289'],
   ['6.569938', '96.274414'],
@@ -569,10 +570,10 @@ async function showCFI_B(data, defaultCrs) {
   document.body.querySelector('.about__wrapper').classList.add('active');
 
   const fetchEspg = Utils.fetchGeoJson(
-    { baseUrl: `https://epsg.io/${defaultCrs}.json` },
+    { baseUrl: `https://api.maptiler.com/coordinates/search/${defaultCrs}.json` },
     false,
+    true,
   );
-
   const fetchDistrict = Utils.fetchGeoJson({
     data: {
       typeName: 'cfi:district_boundary_2014',
@@ -614,14 +615,14 @@ async function showCFI_B(data, defaultCrs) {
   cfi_b.registration_date = Utils.formatDate(
     data.feature.properties.registration_date,
   );
-  cfi_b.coordinate_system = (espg && espg.name) || I18n.translate('no_data');
+  cfi_b.coordinate_system = (espg && espg.results[0].name) || I18n.translate('no_data');
   cfi_b.referencing_coordinate = coordSpanDOM;
   cfi_b.province = I18n.translate(
     { en: 'province_en', kh: 'province' },
     data.feature.properties,
   );
 
-  if (isValidCoord && espg && espg.name) {
+  if (isValidCoord && espg && espg.results[0].name) {
     cfi_b.coordinate_system = getESPGToggleBtn(cfi_b.coordinate_system);
   }
 

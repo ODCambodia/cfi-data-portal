@@ -2,7 +2,7 @@ const Utils = {
   fetchJson: function (options) {
     return this.fetchGeoJson(options, false);
   },
-  fetchGeoJson: async function (options = {}, hasDefault = true) {
+  fetchGeoJson: async function (options = {}, hasDefault = true, needApiKey = false) {
     const defaultSetting = hasDefault ? {
       service: 'WFS',
       version: '1.0.0',
@@ -11,12 +11,18 @@ const Utils = {
       srsname: 'EPSG:4326',
     } : {};
 
-    const defaultParams = Object.assign(defaultSetting, options.data);
+    const defaultParams = Object.assign(defaultSetting, options.data); 
+    let MapTiler_Api_Key = '';
+    if (needApiKey === true){
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        MapTiler_Api_Key = `key=${config.mapTiler_key}`;
+    };
 
     delete options.data;
     const baseUrl = options.baseUrl || GEOSERVER;
 
-    const res = await fetch(baseUrl + '?' + new URLSearchParams(defaultParams), options);
+    const res = await fetch(baseUrl + '?' + MapTiler_Api_Key + new URLSearchParams(defaultParams), options);
     if (res && (res.status === 200 || res.status === 201)) {
       return res.json();
     }
