@@ -50,6 +50,7 @@ class I18n {
   }
 
   static translate(key, translateObj) {
+
     if (typeof key === 'object') {
       const translateKey = key[this._lang];
 

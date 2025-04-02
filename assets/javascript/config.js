@@ -1,17 +1,26 @@
 // CONFIG OVERLAY NAME/KEY
-// NOTE:: should ONLY need to change key here so everything is consistent 
+// NOTE:: should ONLY need to change key here so everything is consistent
 // should translate here
+
 const KEYS = {
-  CFR_A: 'CFR Status Assessment 2022-2023',
-  CFI_A: 'CFi Effectiveness Assessment 2022',
-  CFI_B: 'CFi Boundary',
+  CFR_A: { en: 'CFR Status Assessment 2022-2023', kh: 'ការវាយតម្លៃស្ថានភាព CFR ឆ្នាំ ២០២២-២០២៣' },
+  CFI_A: { en: 'CFi Effectiveness Assessment 2022', kh: 'ការវាយតម្លៃប្រសិទ្ធភាព CFi ឆ្នាំ ២០២២' },
+  CFI_B: { en: 'CFi Boundary', kh: 'ព្រំដែន CFi' }
+};
+
+// This will be used by the translator
+const TRANSLATE_KEYS = {
+  [KEYS.CFR_A.en]: KEYS.CFR_A,
+  [KEYS.CFI_A.en]: KEYS.CFI_A,
+  [KEYS.CFI_B.en]: KEYS.CFI_B
 };
 
 const TYPENAME = {
-  [KEYS.CFR_A]: 'cfr:cfr_status_assessment_2022',
-  [KEYS.CFI_A]: 'cfi:Effectiveness_Assessment_2022',
-  [KEYS.CFI_B]: 'cfi:cfi_boundary_2022',
-}
+  [KEYS.CFR_A.en]: 'cfr:cfr_status_assessment_2022',
+  [KEYS.CFI_A.en]: 'cfi:Effectiveness_Assessment_2022',
+  [KEYS.CFI_B.en]: 'cfi:cfi_boundary_2022'
+};
+
 
 const POLYGON_STYLE = {
   default: {
@@ -51,7 +60,7 @@ const POINT_STYLE = {
 
 // CONFIG OVERLAY STYLES
 const STYLES = {
-  [KEYS.CFI_A]: () => ({
+  [KEYS.CFI_A.en]: () => ({
     color: '#000',
     fillColor: "#FFD04B",
     radius: 5,
@@ -59,15 +68,16 @@ const STYLES = {
     opacity: 1,
     fillOpacity: 0.8
   }),
-  [KEYS.CFI_B]: () => POLYGON_STYLE.default,
-  [KEYS.CFR_A]: () => POINT_STYLE.default,
+  [KEYS.CFI_B.en]: () => POLYGON_STYLE.default,
+  [KEYS.CFR_A.en]: () => POINT_STYLE.default,
 }
 
 // MAIN CONFIG
 const CONFIGS = {
   keys: KEYS,
   styles: STYLES,
-}
+  translateKeys: TRANSLATE_KEYS
+};
 
 // remove this later and use translation.js
 const TRANSLATE = {

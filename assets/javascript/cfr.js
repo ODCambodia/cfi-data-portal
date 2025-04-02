@@ -436,10 +436,10 @@ async function loadCFRMap(options) {
     cfr_data.features = cfr_data.features.filter((item) => item.properties.province.trim() === provinceName);
   }
 
-  OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
-  OVERLAY_MAP[KEYS.CFR_A].addTo(map);
-  OVERLAY_MAP[KEYS.CFR_A].off('click');
-  OVERLAY_MAP[KEYS.CFR_A].on('click', async function (e) {
+  OVERLAY_MAP[I18n.translate(CFR_A)] = Utils.getLayer(cfr_data, TYPENAME[KEYS.CFR_A.en]);
+  OVERLAY_MAP[I18n.translate(CFR_A)].addTo(map);
+  OVERLAY_MAP[I18n.translate(CFR_A)].off('click');
+  OVERLAY_MAP[I18n.translate(CFR_A)].on('click', async function (e) {
     const cfrId = e.layer.feature.id;
     $('#cfrSelect').val(cfrId).trigger('change');
   });
@@ -451,7 +451,7 @@ async function loadCFRMap(options) {
       radius *= 0.85;
     }
 
-    OVERLAY_MAP[KEYS.CFR_A].setStyle({ radius: radius });
+    OVERLAY_MAP[I18n.translate(CFR_A)].setStyle({ radius: radius });
   });
 
   // load number of CFR
@@ -479,8 +479,8 @@ async function loadCFRSelect(options) {
     sessionStorage.setItem(`${SERVER}_community`, val);
     $('.about__body').empty();
 
-    if (OVERLAY_MAP[KEYS.CFR_A]) {
-      const polygonsLayers = OVERLAY_MAP[KEYS.CFR_A].getLayers();
+    if (OVERLAY_MAP[I18n.translate(CFR_A)]) {
+      const polygonsLayers = OVERLAY_MAP[I18n.translate(CFR_A)].getLayers();
       const activeLayer = polygonsLayers.find(
         (layer) => layer.feature.id === val,
       );
@@ -497,7 +497,7 @@ async function loadCFRSelect(options) {
 
   cfrSelect.prop('disabled', false);
 
-  return OVERLAY_MAP[KEYS.CFR_A];
+  return OVERLAY_MAP[I18n.translate(CFR_A)];
 }
 
 async function handleProvinceSelect(e, options = {}) {
@@ -509,8 +509,8 @@ async function handleProvinceSelect(e, options = {}) {
   const cfrSelect = $('#cfrSelect');
   cfrSelect.html('').select2({ placeholder: I18n.translate('select_a_fish_reservation_community') });
 
-  if (typeof OVERLAY_MAP[KEYS.CFR_A] !== 'undefined') {
-    OVERLAY_MAP[KEYS.CFR_A].remove();
+  if (typeof OVERLAY_MAP[I18n.translate(CFR_A)] !== 'undefined') {
+    OVERLAY_MAP[I18n.translate(CFR_A)].remove();
   }
 
   toggleLoading(true);
@@ -603,4 +603,3 @@ $(document).ready(async function () {
   await loadProvinceCFR();
   await loadSavedOption();
 });
-

@@ -699,9 +699,9 @@ async function showCFI_B(data, defaultCrs) {
 }
 
 function addBoundaryClickEvent() {
-  OVERLAY_MAP[KEYS.CFI_B].off('click');
+  OVERLAY_MAP[I18n.translate(CFI_B)].off('click');
 
-  OVERLAY_MAP[KEYS.CFI_B].on('click', async function (e) {
+  OVERLAY_MAP[I18n.translate(CFI_B)].on('click', async function (e) {
     toggleLoading(true);
 
     map.setView(e.latlng);
@@ -736,8 +736,8 @@ async function handleCfiSelect(e) {
     loadRelatedDocuments(cfiId),
   ]);
 
-  if (OVERLAY_MAP[KEYS.CFI_B]) {
-    const polygonsLayers = OVERLAY_MAP[KEYS.CFI_B].getLayers();
+  if (OVERLAY_MAP[I18n.translate(CFI_B)]) {
+    const polygonsLayers = OVERLAY_MAP[I18n.translate(CFI_B)].getLayers();
     const activeLayer = polygonsLayers.find(
       (layer) => layer.feature.id === cfiId,
     );
@@ -786,8 +786,8 @@ async function handleProvinceSelect(e, options = {}) {
   sessionStorage.setItem(`${SERVER}_province`, selectedProvinceId);
   sessionStorage.removeItem(`${SERVER}_community`);
 
-  if (typeof OVERLAY_MAP[KEYS.CFI_B] !== 'undefined') {
-    OVERLAY_MAP[KEYS.CFI_B].remove();
+  if (typeof OVERLAY_MAP[I18n.translate(CFI_B)] !== 'undefined') {
+    OVERLAY_MAP[I18n.translate(CFI_B)].remove();
   }
 
   toggleLoading(true);
@@ -799,7 +799,7 @@ async function handleProvinceSelect(e, options = {}) {
 
   const cfiBoundary = await Utils.fetchGeoJson({
     data: {
-      typeName: TYPENAME[KEYS.CFI_B],
+      typeName: TYPENAME[KEYS.CFI_B.en],
       CQL_FILTER,
     },
   });
@@ -820,16 +820,16 @@ async function handleProvinceSelect(e, options = {}) {
   }
 
   cfiBoundary.features.sort();
-  OVERLAY_MAP[KEYS.CFI_B] = Utils.getLayer(cfiBoundary, KEYS.CFI_B);
-  OVERLAY_MAP[KEYS.CFI_B].addTo(map);
+  OVERLAY_MAP[I18n.translate(CFI_B)] = Utils.getLayer(cfiBoundary, KEYS.CFI_B.en);
+  OVERLAY_MAP[I18n.translate(CFI_B)].addTo(map);
 
   await loadCfiSelect(cfiBoundary);
 
   addBoundaryClickEvent();
   toggleLoading(false);
 
-  if (Object.keys(OVERLAY_MAP[KEYS.CFI_B].getBounds()).length > 0) {
-    map.flyToBounds(OVERLAY_MAP[KEYS.CFI_B].getBounds(), {
+  if (Object.keys(OVERLAY_MAP[I18n.translate(CFI_B)].getBounds()).length > 0) {
+    map.flyToBounds(OVERLAY_MAP[I18n.translate(CFI_B)].getBounds(), {
       animate: !options.shouldNotAnimate,
     });
   }
@@ -909,7 +909,7 @@ $(document).ready(async function () {
   $('#provinceSelect').select2({
     placeholder: I18n.translate('select_a_province'),
   });
-  
+
   $('#cfiSelect').select2({
     placeholder: I18n.translate('select_a_fishing_community')
   });
