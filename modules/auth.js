@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import UserDAO from '../database/user.js';
 
-// MIDDLEWARE FOR AUTHORIZATION 
+// MIDDLEWARE FOR AUTHORIZATION
 const validateSession = async (req, res, next, shouldBeSuperAdmin) => {
   let server = '';
   const lastPath = req.path.split('/').slice(-1)[0];
@@ -84,10 +84,18 @@ const handleLogin = async function (req, res) {
 };
 
 const handleTelegramVerification = async function (req, res) {
-  const secretKey = crypto.createHash('sha256')
-    .update(process.env.BOT_TOKEN)
-    .digest();
   const { hash, type, ...data } = req.body;
+
+  let botToken;
+  if (type === 'cfi') {
+    botToken = process.env.CFI_BOT_TOKEN;
+  } else if (type === 'cfr') {
+    botToken = process.env.CFR_BOT_TOKEN;
+  }
+  const secretKey = crypto.createHash('sha256')
+    .update(botToken)
+    .digest();
+
 
   const checkString = Object.keys(data)
     .sort()
