@@ -11,12 +11,12 @@ const Utils = {
       srsname: 'EPSG:4326',
     } : {};
 
-    const defaultParams = Object.assign(defaultSetting, options.data); 
+    const defaultParams = Object.assign(defaultSetting, options.data);
     let MapTiler_Api_Key = '';
-    if (needApiKey === true){
-        const response = await fetch('/api/config');
-        const config = await response.json();
-        MapTiler_Api_Key = `key=${config.mapTiler_key}`;
+    if (needApiKey === true) {
+      const response = await fetch('/api/config');
+      const config = await response.json();
+      MapTiler_Api_Key = `key=${config.MapTiler_Key}`;
     };
 
     delete options.data;

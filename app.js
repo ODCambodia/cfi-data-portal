@@ -35,11 +35,7 @@ app.use(cookieSession(COOKIE_SESSION));
 app.use(Auth.appendUserToken);
 app.use(cors())
 
-app.get('/api/config', (req, res) => {
-        res.json({
-                mapTiler_key: process.env.MapTiler_Key,
-        })
-});
+
 
 app.use('/geoserver', createProxyMiddleware({
   target: process.env.HOSTNAME,
@@ -112,13 +108,22 @@ app.post('/login', rateLimiter, jsonParser, Auth.handleLogin);
 app.post('/login/verify-telegram', rateLimiter, jsonParser, Auth.handleTelegramVerification);
 
 app.get('/login/:server', function (req, res) {
-  res.render(path.join(dirName, 'page/login'), { BOT_USERNAME: process.env.BOT_USERNAME });
+
+  const server = req.params.server;
+  let bot_username;
+  if (server === 'cfi')
+    bot_username = process.env.CFI_BOT_USERNAME;
+  else if (server === 'cfr')
+    bot_username = process.env.CFR_BOT_USERNAME;
+  else return res.status(400).send('Invalid server specified');
+
+  res.render(path.join(dirName, 'page/login'), { BOT_USERNAME: bot_username });
 });
 
 app.get('/api/config', (req, res) => {
-    res.json({
-        mapTilerKey: process.env.MapTiler_key,
-    });
+  res.json({
+    MapTiler_Key: process.env.MapTiler_Key,
+  })
 });
 
 app.post('/logout', Auth.handleLogout);
