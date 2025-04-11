@@ -19,6 +19,7 @@
     <p id="loadingText"></p>
   </div>
 
+  <!-- Section Main -->
   <div class="card p-3 shadow w-100 h-100">
     <button id="btnLogout" class="btn btn-sm btn-primary" type="button" data-i18n="logout">ចេញពីទំព័រគ្រប់គ្រង</button>
 
@@ -28,6 +29,11 @@
         <button class="nav-link" id="nav-file-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button"
           role="tab" aria-controls="nav-home" aria-selected="true"
           data-i18n="manage_related_document">កំណត់ឯកសារពាក់ព័ន្ធ</button>
+
+        <button class="nav-link" id="nav-cfamp-tab" data-bs-toggle="tab" data-bs-target="#nav-cfamp" type="button"
+          role="tab" aria-controls="nav-cfamp" aria-selected="true"
+          data-i18n="manage_cfamp_document">កំណត់ផែនការគ្រប់គ្រងសហគមន៍</button>
+
         <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button"
           role="tab" aria-controls="nav-profile" aria-selected="false"
           data-i18n="manage_community_profile">កំណត់ផ្ទំាងពត៌មានសហគមន៍</button>
@@ -41,11 +47,12 @@
     </nav>
 
     <div class="tab-content p-3 border bg-light h-100 overflow-y-auto" id="nav-tabContent">
-      <!-- Related document forms -->
+      
+      <!-- Related Document Management -->
       <div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-file-tab">
         <div class="row mb-3">
           <div class="col-auto">
-            <label class="fs-5" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
+            <label class="fs-6" for="provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្ត</label>
           </div>
           <div class="col-auto">
             <select class="form-select" name="provinceSelect" id="provinceSelect"></select>
@@ -54,7 +61,7 @@
 
         <div id="tableProfile" class="table-wrapper d-none">
           <div class="table-title mb-2">
-            <h2 data-i18n="fishing_community">សហគមន៍នេសាទ</h2>
+            <h2 data-i18n="community_fisheries">សហគមន៍នេសាទ</h2>
           </div>
           <table class="table table-striped table-hover">
             <thead>
@@ -63,13 +70,52 @@
                 <th data-i18n="action">សកម្មភាព</th>
               </tr>
             </thead>
-            <tbody>
-            </tbody>
+
+            <tbody></tbody>
+            
           </table>
         </div>
       </div>
 
-      <!-- Active Layer Toggle forms -->
+      <!-- CFAMP Management -->
+      <div class="tab-pane fade" id="nav-cfamp" role="tabpanel" aria-labelledby="nav-cfamp-tab">
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-6" for="cfamp-layerSelect" data-i18n="select_a_layer">
+              ជ្រើសរើសទិន្នន័យ</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select" name="cfamp-layerSelect" id="cfamp-layerSelect"></select>
+          </div>
+
+          <div class="col-auto">
+            <label class="fs-6" for="cfamp-provinceSelect" data-i18n="select_a_province">ជ្រើសរើសខេត្ត</label>
+          </div>
+          <div class="col-auto">
+            <select class="form-select" name="cfamp-provinceSelect" id="cfamp-provinceSelect"></select>
+          </div>
+        </div>
+
+        <div id="cfamp-community-table" class="table-wrapper d-none">
+          <div class="table-title mb-2">
+            <h2 data-i18n="community_fisheries">សហគមន៍នេសាទ</h2>
+          </div>
+          
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th data-i18n="community_name">ឈ្មោះសហគមន៍</th>
+                <th data-i18n="action">សកម្មភាព</th>
+              </tr>
+            </thead>
+
+            <tbody></tbody>
+
+          </table>
+        </div>
+      </div>
+
+      <!-- Community Profile Management -->
       <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <form action="/api/default-profile-layer" id="defaultProfileForm"
           class="shadow border border-opacity-50 border-black rounded-3 mb-4 p-3">
@@ -102,7 +148,7 @@
         </form>
       </div>
 
-      <!-- Related Layer Checkbox form -->
+      <!-- Related Dataset Management -->
       <div class="tab-pane fade" id="nav-layer" role="tabpanel" aria-labelledby="nav-layer-tab">
         <form action="/api/active-layers" id="toggleLayerForm">
           <div class="list-group mb-2" data-i18n="loading...">
@@ -114,6 +160,7 @@
         </form>
       </div>
 
+      <!-- User Management -->
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
         <button id="userRefreshBtn" class="btn btn-primary mb-3 shadow" type="button">
           <span data-i18n="refresh_data">Refresh</span>
@@ -255,25 +302,25 @@
       }
     }
 
-    function createActionBtns(cfi) {
+    function createActionButton(community, btnClass, btnLabel, hasModal, modalId) {
       const btn = document.createElement('button');
-      btn.type = "button";
-      btn.classList.add('btn', 'btn-primary');
-      btn.innerText = I18n.translate('add_file');
-      btn.dataset.bsToggle = 'modal';
-      btn.dataset.bsTarget = '#addDocumentModal';
-      btn.dataset.x = cfi.properties.x;
-      btn.dataset.y = cfi.properties.y;
+      
+      btn.type = 'button';
+      
+      btn.classList.add('btn', 'mx-1', btnClass);
+      btn.setAttribute('id', btnLabel);
+      
+      btn.innerHTML   = I18n.translate(btnLabel);
+      btn.dataset.x   = community.properties.x;
+      btn.dataset.y   = community.properties.y;
+      btn.dataset.id  = community.id;
 
-      const btnList = btn.cloneNode();
-      btnList.innerText = I18n.translate('edit_file');
-      btnList.dataset.bsTarget = '#listDocumentModal';
-      btnList.dataset.id = cfi.id;
+      if (hasModal) {
+        btn.dataset.bsToggle = 'modal';
+        btn.dataset.bsTarget = modalId;
+      }
 
-      btn.classList.add('btn-primary', 'me-2');
-      btnList.classList.add('btn-warning');
-
-      return [btn, btnList];
+      return btn;
     }
 
     function getCheckBoxDOM(isChecked, value, title, index, typeName, inputType) {
@@ -293,26 +340,38 @@
       return { input: checkBox, label };
     }
 
-    function createRow(cfi) {
+    function createRow(communities, tableId) {
       const rows = [];
-      for (let i = 0; i < cfi.length; i++) {
-        const tr = document.createElement('tr');
-        const tdName = document.createElement('td');
-        tdName.innerText = cfi[i].properties.name;
+      
+      for (let i = 0; i < communities.length; i++) {
+        const tr      = document.createElement('tr');
+        const tdName  = document.createElement('td');
+        const tdBtns  = document.createElement('td');
+        
+        tdName.innerText = communities[i].properties.name;
 
-        const tdBtns = document.createElement('td');
-        const btns = createActionBtns(cfi[i]);
-        btns.forEach((btn) => tdBtns.append(btn));
+        if (tableId == 'tableProfile') {
+          const btnAddFile  = createActionButton(communities[i], 'btn-primary', 'add_file', true, '#addDocumentModal');
+          const btnEditFile = createActionButton(communities[i], 'btn-warning', 'edit_file', true, '#listDocumentModal');
+
+          tdBtns.append(btnAddFile);
+          tdBtns.append(btnEditFile);
+        } else if (tableId == 'cfamp-tableProfile') {
+          const btnViewFile  = createActionButton(communities[i], 'btn-primary', 'view_file', false, '');
+
+          tdBtns.append(btnViewFile);
+        }
 
         tr.append(tdName);
         tr.append(tdBtns);
+
         rows.push(tr);
       }
 
       return rows;
     }
 
-    async function loadProvincesSelect() {
+    async function loadProvincesSelect(selectId, tableId) {
       const data = await Utils.fetchGeoJson({
         data: {
           typeName: 'cfi:province_boundary_2014',
@@ -321,7 +380,9 @@
           SORTBY: 'pro_code ASC',
         },
       });
-      const provinceSelect = $('#provinceSelect');
+      
+      selectId = '#' + selectId;
+      const provinceSelect = $(selectId);
       provinceSelect.select2({ placeholder: I18n.translate('select_a_province') });
 
       if (!Array.isArray(data.features) || !data.features.length) {
@@ -330,8 +391,9 @@
 
       // append options to select
       provinceSelect.append(new Option());
-      provinceSelect.append(new Option(I18n.translate('all_province'), 'all'));
+      // provinceSelect.append(new Option(I18n.translate('all_province'), 'all'));
       provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province')));
+
       data.features.forEach((item) => {
         const option = document.createElement('option');
         option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
@@ -343,12 +405,16 @@
       provinceSelect.on('change', async function (e) {
         const val = e.currentTarget.value;
         const provinceName = $(provinceSelect).find(':selected').data('name');
-        document.getElementById('tableProfile').classList.remove('d-none');
 
-        const tbody = document.querySelector('#tableProfile table tbody');
+        document.getElementById(tableId).classList.remove('d-none');
+
+        const tbodyProfile = '#' + tableId + ' table tbody';
+        const tbody = document.querySelector(tbodyProfile);
+
         tbody.innerHTML = I18n.translate('loading...');
 
         let CQL_FILTER = '';
+
         if (val && val !== 'all') {
           CQL_FILTER = `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014','geom','IN(''${val}'')')))`;
         }
@@ -366,6 +432,7 @@
         cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
 
         const cfisId = cfiBoundary.features.map((item) => item.id.split('.')[1]).join(`'',''`);
+        
         const cfiRefResponse = await Utils.fetchGeoJson({
           data: {
             typeName: 'cfi:cfi_reference',
@@ -373,19 +440,224 @@
             propertyname: 'name,x,y',
           }
         });
-
+        
         const cfiReference = cfiRefResponse.features;
+        
         if (cfiReference.length > 0) {
           cfiReference.sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
           tbody.innerHTML = '';
 
-          const tableRows = createRow(cfiReference);
+          const tableRows = createRow(cfiReference, tableId);
+          
           tableRows.forEach((tr) => {
             tbody.append(tr);
           });
         } else {
           tbody.innerHTML = I18n.translate('this_province_does_not_have_cfi');
         }
+      });
+    }
+
+    async function getLayerCollection() {
+      const layerCollection = await Promise.resolve(
+        Utils.fetchXml({
+          baseUrl: '/geoserver/cfi/wfs',
+          data: { request: 'GetCapabilities' },
+        }),
+      )
+
+      return layerCollection;
+    }
+
+    async function getLayerByKeyword(keyword) {
+      const layerCollection     = await getLayerCollection();
+      const layerFeatureTypeCollection = layerCollection.getElementsByTagName('FeatureType');
+      const layerList = [];
+
+      for (let i = 0; i < layerFeatureTypeCollection.length; i++) {
+        const name              = layerFeatureTypeCollection[i].getElementsByTagName('Name')[0].textContent;
+        const title             = layerFeatureTypeCollection[i].getElementsByTagName('Title')[0].textContent;
+        const keywordCollection = layerFeatureTypeCollection[i].getElementsByTagName('ows:Keyword');
+        const keywords          = [...keywordCollection].map((item) => item.textContent);
+
+        if (keywords.some((key) => key === keyword)) {
+          layerList.push({'label': title, 'value': name});
+        }
+      }
+
+      return layerList;
+    }
+
+    function renderLayerSelection(layerList, layerSelectId) {
+      const layerSelect = $(layerSelectId);
+      let selectedLayer;
+      
+      layerSelect.select2({ 
+        placeholder: I18n.translate('select_a_layer'),
+      });
+      
+      layerSelect.append(new Option());
+
+      layerList.forEach((layer) => {
+        const option        = document.createElement('option');
+
+        option.text         = layer.label;
+        option.value        = layer.value;
+        option.dataset.name = layer.value;
+
+        layerSelect.append(option);
+      });
+
+      return layerSelect;
+    }
+
+    // async function getProvinceListByLayer(layer, attribute) {
+    //   console.log(layer);
+    //   options = {
+    //     data: {
+    //       typeName: layer,
+    //       outputFormat: 'application/json',
+    //       propertyname: attribute,
+    //       SORTBY: attribute + ' ASC',
+    //     }
+    //   }
+
+    //   console.log(options)
+
+    //   const data = await Utils.fetchGeoJson(options);
+
+    //   console.log(data)
+    // }
+
+    async function getProvinceList(layer) {
+      const provinceList = [];
+      
+      const properties = [
+        'pro_name_k',
+        'hrname',
+        'pro_code'
+      ];
+      
+      const options = {
+        data: {
+            typeName: layer,
+            outputFormat: 'application/json',
+            propertyname: properties.toString(),
+            SORTBY: 'pro_code ASC',
+          }
+        }
+      
+      provinceCollection = await Utils.fetchGeoJson(options);
+
+      for (let i = 0; i < provinceCollection.features.length; i++) {
+        let province = {
+          code: '',
+          name: {
+            en: '',
+            km: ''
+          }
+        };
+        province.name.en = provinceCollection.features[i].properties.hrname;
+        province.name.km = provinceCollection.features[i].properties.pro_name_k;
+        province.code = provinceCollection.features[i].properties.pro_code;
+
+        provinceList.push(province);
+      }
+
+      return provinceList;
+    }
+
+    function renderProvinceSelection(provinceList, provinceSelectId) {
+      const provinceSelect = $(provinceSelectId);
+      
+      provinceSelect.select2({
+        placeholder: I18n.translate('select_a_province'),
+      })
+
+      provinceSelect.append(new Option());
+
+      provinceList.forEach((province) => {
+        const option        = document.createElement('option');
+
+        option.text         = province.name.km;
+        option.value        = province.code;
+        option.dataset.name = province.name.km;
+
+        provinceSelect.append(option);
+      });
+
+      return provinceSelect;
+    }
+
+    async function getCommunityCollectionByProvince(selectedLayer, selectedProvince) {
+      const communityCollection = await Utils.fetchGeoJson({
+        data: {
+          typeName: selectedLayer,
+          CQL_FILTER: `"cfi_province" IN ('${selectedProvince}')`,
+          propertyname: 'cfi_name'
+        }
+      });
+
+      return communityCollection;
+    }
+
+    async function renderCommunityTable(tableId, selectedLayer, selectedProvince) {
+      const communityTable = $(tableId);
+      communityTable.removeClass('d-none');
+
+      const tbodyProfile = tableId + ' table tbody';
+      const tbody = document.querySelector(tbodyProfile);
+
+      tbody.innerHTML = I18n.translate('Loading...');
+
+      const communityCollection = await getCommunityCollectionByProvince(selectedLayer, selectedProvince);
+      const communityFeatureCollection = communityCollection.features;
+
+      console.log(communityFeatureCollection)
+
+      if (communityFeatureCollection.length > 0) {
+        communityFeatureCollection.sort((a, b) => a.properties.id - b.properties.id);
+
+        console.log(communityFeatureCollection);
+
+        const tableRows = createRow(communityFeatureCollection, tableId);
+
+        console.log(tableRows)
+
+        tbody.innerHTML = '';
+
+        tableRows.forEach((tr) => {
+          tbody.append(tr);
+        });
+      } else {
+        tbody.innerHTML = I18n.translate('this_province_does_not_have_cfi');
+      }
+    }
+
+    async function renderCfampTab(keyword, layerSelectId, provinceSelectId) {
+      const layerList = await getLayerByKeyword(keyword);
+      const layerSelect = renderLayerSelection(layerList, layerSelectId);
+
+      const provinceList = await getProvinceList('cfi:province_boundary_2014');
+      const provinceSelect = renderProvinceSelection(provinceList, provinceSelectId).prop('disabled', true);
+
+      let selectedLayer = '';
+      let selectedProvince = '';
+      let communityList = '';
+
+      const tableId = '#cfamp-community-table';
+
+      layerSelect.on('select2:select', function () {
+        provinceSelect.val('').trigger('change');
+        provinceSelect.prop('disabled', false);
+      })
+
+      provinceSelect.on('select2:select', function () {
+        selectedLayer = layerSelect.find(':selected').data('name');
+        selectedProvince = provinceSelect.find(':selected').data('name');
+        console.log(selectedLayer + selectedProvince)
+
+        renderCommunityTable(tableId, selectedLayer, selectedProvince)
       });
     }
 
@@ -618,6 +890,7 @@
       ]);
 
       const featureTypes = cfiRelatedLayers.getElementsByTagName('FeatureType');
+      
       const listGroupDom = document.querySelector(`#${formId} .list-group`);
       listGroupDom.innerHTML = '';
 
@@ -630,6 +903,7 @@
         }
 
         const keywords = [...keywordTag].map((item) => item.textContent);
+        
         if (validateKeywordCallback(keywords)) {
           continue;
         }
@@ -745,9 +1019,10 @@
         // nothing
       }
     }
+    
     // main
     document.addEventListener('DOMContentLoaded', async function () {
-      await loadProvincesSelect();
+      await loadProvincesSelect('provinceSelect', 'tableProfile');
 
       const addModal = document.getElementById('addDocumentModal');
       addModal.addEventListener('show.bs.modal', handleShowAddDocumentModal);
@@ -760,6 +1035,10 @@
 
       const form = document.getElementById('form');
       form.addEventListener('submit', handleFormSubmit);
+
+      // Setup for CFAMP Management
+      // await loadProvincesSelect('cfamp-provinceSelect', 'cfamp-tableProfile');
+      await renderCfampTab('cfamp_layer', '#cfamp-layerSelect', '#cfamp-provinceSelect');
 
       // set related layers
       const activeLayerTabBtn = document.getElementById('nav-layer-tab');
