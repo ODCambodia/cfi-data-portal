@@ -71,7 +71,7 @@ L.control.layers(BASE_MAP, null, { position: 'topleft' }).addTo(map);
 L.control.scale().addTo(map);
 
 const OVERLAY_MAP = {};
-const DemoGraphyChart = (function () {
+const DemoGraphyChart = (function() {
   const CHARTS_CONF = {
     committee: {
       typeName: defaultProfileTypeName,
@@ -168,7 +168,7 @@ async function handleRelatedLayerClick(e) {
   });
 
   if (!layerData.features.length > 0) {
-    setTimeout(function () {
+    setTimeout(function() {
       alert('មិនមានព័ត៌មាន');
     }, 1);
     return;
@@ -246,7 +246,7 @@ async function loadRelatedLayers(cfrId) {
   const [cfrRelatedLayers, layersToShow] = await Promise.all([
     Utils.fetchXml({
       baseUrl: `/geoserver/${SERVER}/wfs`,
-      data: { request: 'GetCapabilities' },
+      data: { request: 'GetCapabilities', AcceptLanguage: 'km,en,*' },
     }),
     Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER })
   ]);
@@ -261,7 +261,21 @@ async function loadRelatedLayers(cfrId) {
     }
 
     const isInternalLayer = [...keywordTag].map((item) => item.textContent).some((keyword) => keyword === 'internal_layer');
-    return !isInternalLayer && layersToShow && layersToShow[name];
+
+    // For Khmer language - only show layers with '_km' suffix
+    if (lang === 'kh') {
+      return !isInternalLayer &&
+        name.endsWith('_km') &&
+        layersToShow &&
+        layersToShow[name];
+    }
+    // For other languages - only show layers without '_km' suffix
+    else {
+      return !isInternalLayer &&
+        !name.endsWith('_km') &&
+        layersToShow &&
+        layersToShow[name];
+    }
   });
 
   const relatedTypeName = relatedFeatureTypes.map((item => {
@@ -439,12 +453,12 @@ async function loadCFRMap(options) {
   OVERLAY_MAP[KEYS.CFR_A] = Utils.getLayer(cfr_data, KEYS.CFR_A);
   OVERLAY_MAP[KEYS.CFR_A].addTo(map);
   OVERLAY_MAP[KEYS.CFR_A].off('click');
-  OVERLAY_MAP[KEYS.CFR_A].on('click', async function (e) {
+  OVERLAY_MAP[KEYS.CFR_A].on('click', async function(e) {
     const cfrId = e.layer.feature.id;
     $('#cfrSelect').val(cfrId).trigger('change');
   });
 
-  map.on('zoomend', function () {
+  map.on('zoomend', function() {
     const currentZoom = map.getZoom();
     let radius = currentZoom * 1.2; //or whatever ratio you prefer
     if (currentZoom < 10) {
@@ -471,7 +485,7 @@ async function loadCFRSelect(options) {
   });
 
   cfrSelect.off('change.cfr');
-  cfrSelect.on('change.cfr', async function (e) {
+  cfrSelect.on('change.cfr', async function(e) {
     toggleLoading(true);
     const val = e.currentTarget.value;
     const selectedCFR = cfr_data.features.find((item) => item.id === val);
@@ -571,7 +585,7 @@ async function loadSavedOption() {
   const provinceSelect = $('#provinceSelect');
   provinceSelect.val(savedProvince).trigger('change.select2');
 
-  provinceSelect.on('cacheLoad', async function (e) {
+  provinceSelect.on('cacheLoad', async function(e) {
     await handleProvinceSelect(e, { shouldNotAnimate: true });
     if (!savedCommunity) { return; }
     $('#cfrSelect').val(savedCommunity).trigger('change');
@@ -589,7 +603,7 @@ async function loadSettings() {
   defaultChartTypeName = settings['chart'];
 }
 
-$(document).ready(async function () {
+$(document).ready(async function() {
   await Promise.all([loadSettings(), I18n.init()]);
 
   $('#provinceSelect').select2({
@@ -603,4 +617,3 @@ $(document).ready(async function () {
   await loadProvinceCFR();
   await loadSavedOption();
 });
-
