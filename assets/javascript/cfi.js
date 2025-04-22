@@ -436,7 +436,7 @@ async function loadRelatedLayers(cfiId) {
   const [cfiRelatedLayers, layersToShow] = await Promise.all([
     Utils.fetchXml({
       baseUrl: `/geoserver/${SERVER}/wfs`,
-      data: { request: 'GetCapabilities' },
+      data: { request: 'GetCapabilities', AcceptLanguage: 'km,en,*' },
     }),
     Utils.fetchJson({ baseUrl: '/api/active-layers/' + SERVER }),
   ]);
@@ -454,17 +454,17 @@ async function loadRelatedLayers(cfiId) {
       .map((item) => item.textContent)
       .some((keyword) => keyword === 'internal_layer');
 
-    // For Khmer language - only show layers with '_kh' suffix
+    // For Khmer language - only show layers with '_km' suffix
     if (lang === 'kh') {
       return !isInternalLayer &&
-        name.endsWith('_kh') &&
+        name.endsWith('_km') &&
         layersToShow &&
         layersToShow[name];
     }
-    // For other languages - only show layers without '_kh' suffix
+    // For other languages - only show layers without '_km' suffix
     else {
       return !isInternalLayer &&
-        !name.endsWith('_kh') &&
+        !name.endsWith('_km') &&
         layersToShow &&
         layersToShow[name];
     }
