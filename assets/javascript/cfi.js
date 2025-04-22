@@ -124,7 +124,7 @@ function getESPGToggleBtn(text) {
   const btn = document.createElement('button');
   btn.innerHTML = text;
   btn.id = 'espgToggleBtn';
-  btn.addEventListener('click', function (e) {
+  btn.addEventListener('click', function(e) {
     let text = e.currentTarget.textContent;
     if (text === 'WGS 84') {
       text = 'WGS 84 / UTM zone 48N';
@@ -179,7 +179,7 @@ function drawAboutSection() {
   body.append(chartWrapper);
 }
 
-const DemoGraphyChart = (function () {
+const DemoGraphyChart = (function() {
   const CHARTS_CONF = {
     committee: {
       id: 'committeePieChart',
@@ -352,7 +352,7 @@ async function handleRelatedLayerClick(e) {
   });
 
   if (!layerData.features.length > 0) {
-    setTimeout(function () {
+    setTimeout(function() {
       alert('មិនមានព័ត៌មាន');
     }, 1);
     return;
@@ -432,7 +432,7 @@ async function handleRelatedLayerClick(e) {
 
 async function loadRelatedLayers(cfiId) {
   document.getElementById('relatedLayers').innerHTML = '';
-
+  let lang = I18n.getLang();
   const [cfiRelatedLayers, layersToShow] = await Promise.all([
     Utils.fetchXml({
       baseUrl: `/geoserver/${SERVER}/wfs`,
@@ -453,7 +453,21 @@ async function loadRelatedLayers(cfiId) {
     const isInternalLayer = [...keywordTag]
       .map((item) => item.textContent)
       .some((keyword) => keyword === 'internal_layer');
-    return !isInternalLayer && layersToShow && layersToShow[name];
+
+    // For Khmer language - only show layers with '_kh' suffix
+    if (lang === 'kh') {
+      return !isInternalLayer &&
+        name.endsWith('_kh') &&
+        layersToShow &&
+        layersToShow[name];
+    }
+    // For other languages - only show layers without '_kh' suffix
+    else {
+      return !isInternalLayer &&
+        !name.endsWith('_kh') &&
+        layersToShow &&
+        layersToShow[name];
+    }
   });
 
   const relatedTypeName = relatedFeatureTypes.map((item) => {
@@ -701,7 +715,7 @@ async function showCFI_B(data, defaultCrs) {
 function addBoundaryClickEvent() {
   OVERLAY_MAP[KEYS.CFI_B].off('click');
 
-  OVERLAY_MAP[KEYS.CFI_B].on('click', async function (e) {
+  OVERLAY_MAP[KEYS.CFI_B].on('click', async function(e) {
     toggleLoading(true);
 
     map.setView(e.latlng);
@@ -883,7 +897,7 @@ async function loadSavedOption() {
 
 
   $('#provinceSelect').val(savedProvince).trigger('change.select2');
-  $('#provinceSelect').on('cacheLoad', async function (e) {
+  $('#provinceSelect').on('cacheLoad', async function(e) {
     await handleProvinceSelect(e, { shouldNotAnimate: true });
     if (!savedCommunity) { return; }
 
@@ -903,13 +917,13 @@ async function loadSettings() {
   defaultConservationTypeName = settings['conservation'];
 }
 
-$(document).ready(async function () {
+$(document).ready(async function() {
   await Promise.all([loadSettings(), I18n.init()]);
 
   $('#provinceSelect').select2({
     placeholder: I18n.translate('select_a_province'),
   });
-  
+
   $('#cfiSelect').select2({
     placeholder: I18n.translate('select_a_fishing_community')
   });
