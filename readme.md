@@ -62,6 +62,21 @@ And run use startup.sh at /opt/tomcat/bin
 ```bash
 sudo sh /opt/tomcat/bin/startup.sh
 ```
+## Development 
+In development after marge code or edit code you need to restart you need to restart your process on pm2 
+```bash
+sudo pm2 status
+```
+example output 
+| id  | Name   | mode  | ↺ | status  | cpu  | memory  |
+| --- | ------ | ----- | -- | ------- | ---- | ------- |
+| 0   | myapp  | fork  | 0  | online  | 0%   | 12.1mb  |
+
+```bash
+sudo pm2 restart 0 # this 0 is id get from pm2 status 
+```
+
+
 ## Quick info
 - [Gist github Documents (NOT MINE IT'S FORKED)](https://gist.github.com/SakalSo/a1eb698d6709507c2d34ce287cc594b7) on XML template for WFS-T request when updating row in GEOSERVER layer.  
 Ex: adding / deleting a document row
