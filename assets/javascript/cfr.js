@@ -50,7 +50,7 @@ const BASE_MAP = {
   'ESRI WordImagery': L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: '&copy; ' + mapLink + ', ' + WHO_Link,
-    maxZoom: 20,
+
   }),
   'Open Street Map': L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -603,4 +603,3 @@ $(document).ready(async function () {
   await loadProvinceCFR();
   await loadSavedOption();
 });
-
