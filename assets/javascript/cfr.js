@@ -242,7 +242,7 @@ async function handleRelatedLayerClick(e) {
 
 async function loadRelatedLayers(cfrId) {
   document.getElementById('relatedLayers').innerHTML = '';
-
+  let lang = I18n.getLang();
   const [cfrRelatedLayers, layersToShow] = await Promise.all([
     Utils.fetchXml({
       baseUrl: `/geoserver/${SERVER}/wfs`,
