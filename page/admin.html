@@ -34,6 +34,9 @@
         <button class="nav-link" id="nav-layer-tab" data-bs-toggle="tab" data-bs-target="#nav-layer" type="button"
           role="tab" aria-controls="nav-contact" aria-selected="false"
           data-i18n="manage_related_data">កំណត់សំន៉ំទិន្នន័យពាក់ព័ន្ធ</button>
+        <button class="nav-link" id="nav-template-tab" data-bs-toggle="tab" data-bs-target="#nav-template" type="button"
+          role="tab" aria-controls="nav-template" aria-selected="false"
+          data-i18n="cfamp_template">ទាញយកគំរូ</button>
         <button class="nav-link invisible" id="user-approval-tab" data-bs-toggle="tab" data-bs-target="#user-approval"
           type="button" role="tab" aria-controls="nav-contact" aria-selected="false"
           data-i18n="manage_user_login">កំណត់ការចូលរបស់អ្នកប្រើប្រាស់</button>
@@ -112,6 +115,38 @@
             <button type="submit" class="btn btn-primary" data-i18n="save">រក្សាទុក</button>
           </div>
         </form>
+      </div>
+
+      <!-- Template Download -->
+      <div class="tab-pane fade" id="nav-template" role="tabpanel" aria-labelledby="nav-template-tab">
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="dataTypeSelect" data-i18n="select_data">ជ្រើសរើសប្រភេទទិន្នន័យ</label>
+          </div>
+          <div class="col-auto" style="min-width: 200px;">
+            <select class="form-select" name="dataTypeSelect" id="dataTypeSelect"></select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="provinceSelectTemplate" data-i18n="select_a_province">ជ្រើសរើសខេត្តឬក្រុង</label>
+          </div>
+          <div class="col-auto" style="width: 300px;">
+            <select class="form-select" name="provinceSelectTemplate" id="provinceSelectTemplate" onchange="handleTemplateProvinceChange(this.value)"></select>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="fs-5" for="communitySelect" data-i18n="select_a_community">ជ្រើសរើសសហគមន៍</label>
+          </div>
+          <div class="col-auto" style="min-width: 200px;">
+            <select class="form-select" name="communitySelect" id="communitySelect" disabled></select>
+          </div>
+        </div>
+        <div id="previewContainer" class="mb-3"></div>
+        <button id="downloadTemplateBtn" class="btn btn-primary" type="button" data-i18n="download_template" disabled>
+          ទាញយកគំរូ
+        </button>
       </div>
 
       <div class="tab-pane fade" id="user-approval" role="tabpanel" aria-labelledby="user-approval-tab">
@@ -312,82 +347,261 @@
       return rows;
     }
 
-    async function loadProvincesSelect() {
-      const data = await Utils.fetchGeoJson({
-        data: {
-          typeName: 'cfi:province_boundary_2014',
-          outputFormat: 'application/json',
-          propertyname: 'pro_name_k,hrname,pro_code',
-          SORTBY: 'pro_code ASC',
-        },
-      });
-      const provinceSelect = $('#provinceSelect');
-      provinceSelect.select2({ placeholder: I18n.translate('select_a_province') });
 
-      if (!Array.isArray(data.features) || !data.features.length) {
-        return;
+    let cachedProvinceData = null;
+    let cachedCFIData = {};
+
+    async function loadProvincesSelect() {
+      // Fetch province data only once
+      if (!cachedProvinceData) {
+        cachedProvinceData = await Utils.fetchGeoJson({
+          data: {
+            typeName: 'cfi:province_boundary_2014',
+            outputFormat: 'application/json',
+            propertyname: 'hrname,pro_name_k,pro_code',
+            SORTBY: 'pro_code ASC',
+          },
+        });
       }
 
-      // append options to select
+      const provinceSelect = $('#provinceSelect');
+      const provinceSelectTemplate = $('#provinceSelectTemplate');
+
+      // Initialize province selects
+      provinceSelect.select2({ placeholder: I18n.translate('select_a_province') });
+      provinceSelectTemplate.select2({ placeholder: I18n.translate('select_a_province') });
+
+      // Initialize base options
       provinceSelect.append(new Option());
       provinceSelect.append(new Option(I18n.translate('all_province'), 'all'));
-      provinceSelect.append(Utils.defaultOptionDOM(I18n.translate('select_a_province')));
-      data.features.forEach((item) => {
+      provinceSelectTemplate.append(new Option());
+
+      // Initialize data type select
+      const dataTypeSelect = $('#dataTypeSelect');
+      dataTypeSelect.append(new Option(I18n.translate('select_data'), ''));
+      dataTypeSelect.append(new Option('CFI Status Assessment 2022', 'cfi:cfi_status_assessment_2022'));
+
+      dataTypeSelect.on('change', function() {
+        $('#provinceSelectTemplate').prop('disabled', !this.value);
+        if (!this.value) {
+          $('#communitySelect').prop('disabled', true).empty();
+          $('#downloadTemplateBtn').prop('disabled', true);
+        }
+      });
+
+      cachedProvinceData.features.forEach((item) => {
         const option = document.createElement('option');
         option.text = I18n.translate({ en: 'hrname', kh: 'pro_name_k' }, item.properties);
         option.value = item.id;
         option.dataset.name = item.properties.pro_name_k;
-        provinceSelect.append(option);
+        provinceSelect.append(option.cloneNode(true));
+        provinceSelectTemplate.append(option);
       });
 
       provinceSelect.on('change', async function (e) {
-        const val = e.currentTarget.value;
-        const provinceName = $(provinceSelect).find(':selected').data('name');
         document.getElementById('tableProfile').classList.remove('d-none');
-
         const tbody = document.querySelector('#tableProfile table tbody');
         tbody.innerHTML = I18n.translate('loading...');
 
-        let CQL_FILTER = '';
-        if (val && val !== 'all') {
-          CQL_FILTER = `INTERSECTS(geom, collectGeometries(queryCollection('cfi:province_boundary_2014','geom','IN(''${val}'')')))`;
-        }
+        const val = e.currentTarget.value;
 
-        // refactor this into 1 fetch with better CQL filter
-        // fetching CFR directly would show cfi_reference in excluded cfi_boundary
-        const cfiBoundary = await Utils.fetchGeoJson({
-          data: {
-            typeName: 'cfi:cfi_boundary_2022',
-            CQL_FILTER,
-            propertyname: 'name,province',
+        if (!cachedCFIData[val]) {
+          let CQL_FILTER = '';
+          if (val && val !== 'all') {
+            CQL_FILTER = `DWITHIN(geom, collectGeometries(queryCollection('cfi:province_boundary_2022','geom','IN(''${val}'')')), 0, meters)`;
           }
-        });
 
-        cfiBoundary.features = cfiBoundary.features.filter((item) => item.properties.province.trim() === provinceName);
-
-        const cfisId = cfiBoundary.features.map((item) => item.id.split('.')[1]).join(`'',''`);
-        const cfiRefResponse = await Utils.fetchGeoJson({
-          data: {
-            typeName: 'cfi:cfi_reference',
-            CQL_FILTER: `DWITHIN(geom, collectGeometries(queryCollection('cfi:cfi_boundary_2022','geom','IN(''${cfisId}'')')), 0, meters)`,
-            propertyname: 'name,x,y',
-          }
-        });
-
-        const cfiReference = cfiRefResponse.features;
-        if (cfiReference.length > 0) {
-          cfiReference.sort((a, b) => a.properties.name.localeCompare(b.properties.name, 'km-KH'));
-          tbody.innerHTML = '';
-
-          const tableRows = createRow(cfiReference);
-          tableRows.forEach((tr) => {
-            tbody.append(tr);
+          cachedCFIData[val] = await Utils.fetchGeoJson({
+            data: {
+              srsname: 'EPSG:32648',
+              typeName: 'cfi:cfi_status_assessment_2022',
+              CQL_FILTER,
+            }
           });
-        } else {
-          tbody.innerHTML = I18n.translate('this_province_does_not_have_cfi');
         }
+
+        const cfiResponse = cachedCFIData[val];
+
+        if (cfiResponse.features.length <= 0) {
+          tbody.innerHTML = I18n.translate('this_province_does_not_have_cfi');
+          return;
+        }
+
+        tbody.innerHTML = '';
+        const provinceName = $(provinceSelect).find(':selected').data('name');
+        const cfiReference = cfiResponse.features.filter((item) => item.properties.province.trim() === provinceName);
+        cfiReference.sort((a, b) => a.properties.cfi_name.localeCompare(b.properties.name, 'km-KH'));
+
+        createRow(cfiReference).forEach((tr) => {
+          tbody.append(tr);
+        });
       });
     }
+
+    async function handleTemplateProvinceChange(provinceId) {
+      const dataType = $('#dataTypeSelect').val();
+      if (!dataType) return;
+
+      const communitySelect = $('#communitySelect');
+      communitySelect.empty().prop('disabled', true);
+      $('#downloadTemplateBtn').prop('disabled', true);
+
+      if (!provinceId) return;
+
+      if (!cachedCFIData[provinceId]) {
+        const CQL_FILTER = `DWITHIN(geom, collectGeometries(queryCollection('cfi:province_boundary_2014','geom','IN(''${provinceId}'')')), 0, meters)`;
+        cachedCFIData[provinceId] = await Utils.fetchGeoJson({
+          data: {
+            srsname: 'EPSG:32648',
+            typeName: dataType,
+            CQL_FILTER,
+          }
+        });
+      }
+
+      const response = cachedCFIData[provinceId];
+      if (response.features.length <= 0) return;
+
+      communitySelect.append(new Option(I18n.translate('select_a_community'), ''));
+      response.features.forEach((item) => {
+        const option = new Option(
+          item.properties.cfI_name || item.properties.cfi_name,
+          item.id
+        );
+        communitySelect.append(option);
+      });
+
+      communitySelect.prop('disabled', false);
+      communitySelect.on('change', function() {
+        $('#downloadTemplateBtn').prop('disabled', !this.value);
+      });
+    }
+
+    function formatPropertyName(name) {
+      return name
+        .replace(/_/g, ' ')
+        .replace(/([A-Z])/g, ' $1')
+        .replace(/^./, str => str.toUpperCase());
+    }
+
+    function formatPropertyValue(value) {
+      if (value === null || value === undefined) return '-';
+      if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+      if (Array.isArray(value)) return value.join(', ');
+      return value;
+    }
+
+    $('#communitySelect').on('change', function() {
+      if (this.value) {
+        previewTemplateData();
+      } else {
+        $('#previewContainer').empty();
+        $('#downloadTemplateBtn').prop('disabled', true);
+      }
+    });
+
+    async function previewTemplateData() {
+      const dataType = $('#dataTypeSelect').val();
+      const communityId = $('#communitySelect').val();
+
+      if (!dataType || !communityId) {
+        $('#previewContainer').html('<div class="alert alert-warning">Please select both data type and community</div>');
+        return;
+      }
+
+      try {
+        // Check if we already have this data in our cache
+        const provinceId = $('#provinceSelectTemplate').val();
+        let featureData = null;
+
+        if (cachedCFIData[provinceId]) {
+          featureData = cachedCFIData[provinceId].features.find(f => f.id === communityId);
+        }
+
+        if (!featureData) {
+          const response = await Utils.fetchGeoJson({
+            data: {
+              typeName: dataType,
+              featureID: communityId,
+              outputFormat: 'application/json'
+            }
+          });
+          featureData = response.features[0];
+        }
+
+        currentTemplateData = featureData;
+        renderTemplatePreview(currentTemplateData);
+
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    function renderTemplatePreview(feature) {
+
+      const dataType = $('#dataTypeSelect').val();
+      console.log(dataType)
+
+      const previewHtml = `
+        <div class="template-preview-container">
+        <div class="preview-header mb-3 d-flex justify-content-between align-items-center">
+        <h4>Template Preview</h4>
+        <div>
+        <button id="openTemplateBtn" class="btn btn-sm btn-primary me-2">
+        <i class="bi bi-box-arrow-up-right"></i> Open Fullscreen
+        </button>
+        <button id="refreshPreviewBtn" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+        </div>
+        </div>
+        <iframe id="templatePreviewFrame"
+        src="/template?preview=true&typeName=${dataType}&communityId=${feature.id}"
+        style="width: 100%; height: 700px; border: 1px solid #ddd; border-radius: 4px;"></iframe>
+        </div>
+        `;
+
+      $('#previewContainer').html(previewHtml);
+
+      $('#refreshPreviewBtn').click(() => {
+        $('#templatePreviewFrame').attr('src', `/template?preview=true&communityId=${feature.id}`);
+      });
+    }
+
+    $('#downloadTemplateBtn').on('click', async function() {
+      if (!currentTemplateData) {
+        alert('No template data loaded. Please preview the template first.');
+        return;
+      }
+
+      const communityName = currentTemplateData.properties.cfi_name ||
+        currentTemplateData.properties.cfi_name ||
+        'community_' + currentTemplateData.id;
+      const sanitizedName = communityName.replace(/[^a-z0-9]/gi, '_');
+
+      const originalBtnText = $(this).html();
+      $(this).html('<i class="bi bi-hourglass"></i> Generating PDF...').prop('disabled', true);
+
+      try {
+        const iframe = document.getElementById('templatePreviewFrame');
+        if (!iframe) {
+          throw new Error('Template preview frame not found');
+        }
+
+        const iframeWindow = iframe.contentWindow;
+        if (iframeWindow && typeof iframeWindow.downloadPDF === 'function') {
+          await iframeWindow.downloadPDF(sanitizedName);
+        } else {
+          throw new Error('PDF download function not available in iframe');
+        }
+      } catch (error) {
+        console.error('PDF download failed:', error);
+        alert('Failed to download PDF: ' + error.message);
+      } finally {
+        $('#downloadTemplateBtn').html(originalBtnText).prop('disabled', false);
+      }
+    });
+
 
     function handleShowAddDocumentModal(e) {
       const btn = e.relatedTarget;

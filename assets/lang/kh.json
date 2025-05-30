@@ -1,4 +1,4 @@
-{  
+{
   "Jan": "មករា",
   "Feb": "កុម្ភៈ",
   "Mar": "មីនា",
@@ -47,7 +47,7 @@
   "select_a_fishing_community": "ជ្រើសរើសសហគមន៍នេសាទ",
   "select_a_fish_reservation_community": "ជ្រើសរើសសហគមន៍ស្រះជម្រកត្រី",
   "select_a_province": "ជ្រើសរើសខេត្ត",
-  
+
   "//frontend_right_1": "Profile section",
   "status": "ស្ថានភាព",
   "area_rainy_season": "ទំហំនារដូវវស្សា",
@@ -176,5 +176,9 @@
   "pending_login": "រង់ចាំការអនុញ្ញាត",
   "approved_login": "បានអនុញ្ញាត",
   "approve": "អនុញ្ញាត",
-  "revoke_access": "ដកសិទ្ធិចូលប្រើ"
+  "revoke_access": "ដកសិទ្ធិចូលប្រើ",
+  "select_data": "ជ្រើសរើសប្រភេទទិន្នន័យ",
+  "select_a_community": "ជ្រើសរើសសហគមន៍",
+  "download_template": "ទាញយកគំរូ",
+  "cfamp_template":"CFAMP គំរូ"
 }
