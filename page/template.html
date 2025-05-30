@@ -9,18 +9,141 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
     span {
-      /* background-color: rgba(1, 1, 1, .3); */
-      color: blue;
+      color: #0066cc;
       font-weight: 600;
-      border-radius: .1rem;
-      padding: .1rem;
+      border-radius: 0.1rem;
+      padding: 0.1rem;
+      background-color: rgba(0, 102, 204, 0.05);
     }
 
     .container {
-      /* border: 1px solid;
-      margin: 4rem;
-      padding: 5rem; */
+      margin: 0;
+      padding: 0;
+      max-width: 100%;
+    }
+
+    .table {
+      width: 100%;
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .table th,
+    .table td {
+      padding: 0.5rem;
+      vertical-align: top;
+      border: 1px solid #ddd;
+    }
+
+    .table thead th {
+      vertical-align: bottom;
+      border-bottom: 2px solid #ddd;
+      background-color: #f8f9fa;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    .table-wrapper {
+      break-inside: avoid;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .pdf-print {
+      padding: 0;
+      margin: 0;
+      background: white;
+      color: #333;
+      font-size: 12pt;
+      font-family: Arial, sans-serif;
+    }
+
+    .pdf-print .no-print,
+    .pdf-print button,
+    .pdf-print .actions {
+      display: none !important;
+    }
+
+    .pdf-print .container {
+      margin: 0;
+      padding: 0;
+    }
+
+    .pdf-print .table {
+      font-size: 10pt;
+    }
+
+    .pdf-print .table th,
+    .pdf-print .table td {
+      border: 1px solid #000;
+      padding: 0.3rem;
+    }
+
+    .pdf-print span {
+      color: #0000FF;
+      background-color: transparent;
+    }
+
+    @media screen {
+      .container {
+        margin: 1rem;
+        padding: 0 1rem;
+      }
+
+      .table-wrapper {
+        break-inside: auto;
+      }
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        margin: 0;
+        background: white;
+        color: #333;
+        font-size: 12pt;
+        font-family: Arial, sans-serif;
+      }
+
+      .no-print,
+      button,
+      .actions {
+        display: none !important;
+      }
+
+      .container {
+        margin: 0;
+        padding: 0;
+      }
+
+      .table {
+        page-break-inside: avoid;
+        font-size: 10pt;
+      }
+
+      .table th,
+      .table td {
+        border: 1px solid #000;
+        padding: 0.3rem;
+      }
+
+      .table thead {
+        display: table-header-group;
+      }
+
+      span {
+        color: #0000FF;
+        background-color: transparent;
+      }
     }
   </style>
 </head>
@@ -35,28 +158,32 @@
       <p class="text-center fs-3 fw-bolder">Model Community Fishing Area Management Plan for a 3 year period</p>
       <h3 class="text-center">(<span class="plan_year_start"></span> - <span class="plan_year_end"></span>)</h3>
       <br>
+      <div class="container">
+        <div class="table-wrapper">
       <table style="margin: auto">
         <tr>
-          <td>Name of community fisheries:</span></td>
-          <td><span class="cfi_name"></span></td>
+          <td>Name of community fisheries</td>
+          <td>: <span class="cfi_name"></span></td>
         </tr>
         <tr>
-          <td>Village:</td>
-          <td><span class="cfi_village"></span></td>
+          <td>Village</td>
+          <td>: <span class="cfi_village"></span></td>
         </tr>
         <tr>
-          <td>Commune / Sangkat:</td>
-          <td><span class="cfi_commune"></span></td>
+          <td>Commune / Sangkat</td>
+          <td>: <span class="cfi_commune"></span></td>
         </tr>
         <tr>
-          <td>District / Khan:</td>
-          <td><span class="cfi_district"></span></td>
+          <td>District / Khan</td>
+          <td>: <span class="cfi_district"></span></td>
         </tr>
         <tr>
-          <td>Province / Municipality:</td>
-          <td><span class="cfi_province"></span></td>
+          <td>Province / Municipality</td>
+          <td>: <span class="cfi_province"></span></td>
         </tr>
       </table>
+        </div>
+      </div>
     </section>
 
     <section class="overall_situation">
@@ -186,7 +313,6 @@
       </p>
 
       <div class="rpt_fishing_ground"></div>
-        
       <ul>
         <li>
           <span class="forest_type"></span> having a total area of <span class="forest_area_total"></span> hectares
@@ -233,26 +359,29 @@
             class="">......</span> m, width <span class="">......</span> m)
         </li>
       </ul> -->
-
-      <p class="fs-5">D. Fisheries resources</p>
-      <ul>
-        <li>
-          Types of fish (<span class="">......</span>)
-        </li>
-        <li>
-          Types of aquatic animals (<span class="">......</span>)
-        </li>
-        <li>
-          Types of flood forest, vegetation and aquatic vegetation (<span class="">......</span>)
-        </li>
-      </ul>
-      <p>(As in the table in Annex <span class="">......</span> attached.)</p>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-5">D. Fisheries resources</p>
+          <ul>
+            <li>
+              Types of fish (<span class="">......</span>)
+            </li>
+            <li>
+              Types of aquatic animals (<span class="">......</span>)
+            </li>
+            <li>
+              Types of flood forest, vegetation and aquatic vegetation (<span class="">......</span>)
+            </li>
+          </ul>
+          <p>(As in the table in Annex <span class="">......</span> attached.)</p>
+        </div>
+      </div>
     </section>
 
     <section>
-      <p class="fs-3">4. Fishing</p>
+     <p class="fs-3">4. Fishing</p>
 
-      <p class="fs-4">A. Fishers</p>
+     <p class="fs-4">A. Fishers</p>
       <ul>
         <li>
           Number of fishers who are members of the community fisheries: <span class="cfi_fisher_member_total"></span> persons (<span class="cfi_fisher_member_female"></span> female)
@@ -266,487 +395,538 @@
         </li>
       </ul>
 
-      <p class="fs-4">B. Fishing gears</p>
-      <ul>
-        <li>
-          Fishing gears and boats of community fisheries members:
-        </li>
-      </ul>
 
-      <table class="table ">
-        <thead>
-          <th>Type of Gear</th>
-          <th>Unit</th>
-          <th>Number</th>
-          <th>Size, Length</th>
-          <th>Start month</th>
-          <th>End month</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Gillnets</td>
-            <td>Meter</td>
-            <td class="cfi_gillnet_length_total_m"></td>
-            <td></td>
-            <td class="cfi_gillnet_start_month"></td>
-            <td class="cfi_gillnet_end_month"></td>
-          </tr>
-          <tr>
-            <td>Seine Net</td>
-            <td>Meter</td>
-            <td class="cfi_net_total"></td>
-            <td></td>
-            <td class="cfi_net_start_month"></td>
-            <td class="cfi_net_end_month"></td>
-          </tr>
-          <tr>
-            <td>Long line</td>
-            <td>ផ្លែ</td>
-            <td class="cfi_long_line_total"></td>
-            <td></td>
-            <td class="cfi_long_line_start_month"></td>
-            <td class="cfi_long_line_end_month"></td>
-          </tr>
-          <tr>
-            <td>Trap [lop]</td>
-            <td>លប</td>
-            <td class="cfi_trap_total"></td>
-            <td></td>
-            <td class="cfi_trap_start_month"></td>
-            <td class="cfi_trap_end_month"></td>
-          </tr>
-        </tbody>
-      </table>
-      <table class="table">
-        <thead>
-          <th>Type of Boat</th>
-          <th>Number</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ទូក (មិនមានម៉ាស៊ីន)</td>
-            <td class="cfi_boat_no_motor"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
-            <td class="cfi_boat_motor_type_1"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
-            <td class="cfi_boat_motor_type_2"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
-            <td class="cfi_boat_motor_type_3"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
-            <td class="cfi_boat_motor_type_4"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
-            <td class="cfi_boat_motor_type_5"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
-            <td class="cfi_boat_motor_type_6"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-4">B. Fishing gears</p>
+          <ul>
+            <li>
+              Fishing gears and boats of community fisheries members:
+            </li>
+          </ul>
+          <table class="table ">
+            <thead>
+              <th>Type of Gear</th>
+              <th>Unit</th>
+              <th>Number</th>
+              <th>Size, Length</th>
+              <th>Start month</th>
+              <th>End month</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gillnets</td>
+                <td>Meter</td>
+                <td class="cfi_gillnet_length_total_m"></td>
+                <td></td>
+                <td class="cfi_gillnet_start_month"></td>
+                <td class="cfi_gillnet_end_month"></td>
+              </tr>
+              <tr>
+                <td>Seine Net</td>
+                <td>Meter</td>
+                <td class="cfi_net_total"></td>
+                <td></td>
+                <td class="cfi_net_start_month"></td>
+                <td class="cfi_net_end_month"></td>
+              </tr>
+              <tr>
+                <td>Long line</td>
+                <td>ផ្លែ</td>
+                <td class="cfi_long_line_total"></td>
+                <td></td>
+                <td class="cfi_long_line_start_month"></td>
+                <td class="cfi_long_line_end_month"></td>
+              </tr>
+              <tr>
+                <td>Trap [lop]</td>
+                <td>លប</td>
+                <td class="cfi_trap_total"></td>
+                <td></td>
+                <td class="cfi_trap_start_month"></td>
+                <td class="cfi_trap_end_month"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <ul>
-        <li>Fishing gears and boats of people in the area who are not members of the community fisheries:</li>
-      </ul>
-      <table class="table ">
-        <thead>
-          <th>Type of Gear</th>
-          <th>Unit</th>
-          <th>Number</th>
-          <th>Size, Length</th>
-          <th>Start month</th>
-          <th>End month</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Gillnets</td>
-            <td>Meter</td>
-            <td class="non_cfi_gillnet_length_total_m"></td>
-            <td></td>
-            <td class="non_cfi_gillnet_start_month"></td>
-            <td class="non_cfi_gillnet_end_month"></td>
-          </tr>
-          <tr>
-            <td>Seine Net</td>
-            <td>Meter</td>
-            <td class="non_cfi_net_total"></td>
-            <td></td>
-            <td class="non_cfi_net_start_month"></td>
-            <td class="non_cfi_net_end_month"></td>
-          </tr>
-          <tr>
-            <td>Long line</td>
-            <td>ផ្លែ</td>
-            <td class="non_cfi_long_line_total"></td>
-            <td></td>
-            <td class="non_cfi_long_line_start_month"></td>
-            <td class="non_cfi_long_line_end_month"></td>
-          </tr>
-          <tr>
-            <td>Trap [lop]</td>
-            <td>លប</td>
-            <td class="non_cfi_trap_total"></td>
-            <td></td>
-            <td class="non_cfi_trap_start_month"></td>
-            <td class="non_cfi_trap_end_month"></td>
-          </tr>
-        </tbody>
-      </table>
-      <table class="table">
-        <thead>
-          <th>Type of Boat</th>
-          <th>Number</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ទូក (មិនមានម៉ាស៊ីន)</td>
-            <td class="non_cfi_boat_no_motor"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
-            <td class="non_cfi_boat_motor_type_1"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
-            <td class="non_cfi_boat_motor_type_2"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
-            <td class="non_cfi_boat_motor_type_3"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
-            <td class="non_cfi_boat_motor_type_4"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
-            <td class="non_cfi_boat_motor_type_5"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
-            <td class="non_cfi_boat_motor_type_6"></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="container">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <th>Type of Boat</th>
+              <th>Number</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ទូក (មិនមានម៉ាស៊ីន)</td>
+                <td class="cfi_boat_no_motor"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
+                <td class="cfi_boat_motor_type_1"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
+                <td class="cfi_boat_motor_type_2"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
+                <td class="cfi_boat_motor_type_3"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
+                <td class="cfi_boat_motor_type_4"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
+                <td class="cfi_boat_motor_type_5"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
+                <td class="cfi_boat_motor_type_6"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <ul>
-        <li>Fishing gears and boats of people who come from outside the community fisheries and are:</li>
-      </ul>
-      <table class="table ">
-        <thead>
-          <th>Type of Gear</th>
-          <th>Unit</th>
-          <th>Number</th>
-          <th>Size, Length</th>
-          <th>Start month</th>
-          <th>End month</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Gillnets</td>
-            <td>Meter</td>
-            <td class="migrant_gillnet_length_total_m"></td>
-            <td></td>
-            <td class="migrant_gillnet_start_month"></td>
-            <td class="migrant_gillnet_end_month"></td>
-          </tr>
-          <tr>
-            <td>Seine Net</td>
-            <td>Meter</td>
-            <td class="migrant_net_total"></td>
-            <td></td>
-            <td class="migrant_net_start_month"></td>
-            <td class="migrant_net_end_month"></td>
-          </tr>
-          <tr>
-            <td>Long line</td>
-            <td>ផ្លែ</td>
-            <td class="migrant_long_line_total"></td>
-            <td></td>
-            <td class="migrant_long_line_start_month"></td>
-            <td class="migrant_long_line_end_month"></td>
-          </tr>
-          <tr>
-            <td>Trap [lop]</td>
-            <td>លប</td>
-            <td class="migrant_trap_total"></td>
-            <td></td>
-            <td class="migrant_trap_start_month"></td>
-            <td class="migrant_trap_end_month"></td>
-          </tr>
-        </tbody>
-      </table>
-      <table class="table">
-        <thead>
-          <th>Type of Boat</th>
-          <th>Number</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>ទូក (មិនមានម៉ាស៊ីន)</td>
-            <td class="migrant_boat_no_motor"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
-            <td class="migrant_boat_motor_type_1"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
-            <td class="migrant_boat_motor_type_2"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
-            <td class="migrant_boat_motor_type_3"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
-            <td class="migrant_boat_motor_type_4"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
-            <td class="migrant_boat_motor_type_5"></td>
-          </tr>
-          <tr>
-            <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
-            <td class="migrant_boat_motor_type_6"></td>
-          </tr>
-        </tbody>
-      </table>
+
+      <div class="container">
+
+        <div class="table-wrapper">
+          <ul>
+            <li>Fishing gears and boats of people in the area who are not members of the community fisheries:</li>
+          </ul>
+          <table class="table ">
+            <thead>
+              <th>Type of Gear</th>
+              <th>Unit</th>
+              <th>Number</th>
+              <th>Size, Length</th>
+              <th>Start month</th>
+              <th>End month</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gillnets</td>
+                <td>Meter</td>
+                <td class="non_cfi_gillnet_length_total_m"></td>
+                <td></td>
+                <td class="non_cfi_gillnet_start_month"></td>
+                <td class="non_cfi_gillnet_end_month"></td>
+              </tr>
+              <tr>
+                <td>Seine Net</td>
+                <td>Meter</td>
+                <td class="non_cfi_net_total"></td>
+                <td></td>
+                <td class="non_cfi_net_start_month"></td>
+                <td class="non_cfi_net_end_month"></td>
+              </tr>
+              <tr>
+                <td>Long line</td>
+                <td>ផ្លែ</td>
+                <td class="non_cfi_long_line_total"></td>
+                <td></td>
+                <td class="non_cfi_long_line_start_month"></td>
+                <td class="non_cfi_long_line_end_month"></td>
+              </tr>
+              <tr>
+                <td>Trap [lop]</td>
+                <td>លប</td>
+                <td class="non_cfi_trap_total"></td>
+                <td></td>
+                <td class="non_cfi_trap_start_month"></td>
+                <td class="non_cfi_trap_end_month"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="container">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <th>Type of Boat</th>
+              <th>Number</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ទូក (មិនមានម៉ាស៊ីន)</td>
+                <td class="non_cfi_boat_no_motor"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
+                <td class="non_cfi_boat_motor_type_1"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
+                <td class="non_cfi_boat_motor_type_2"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
+                <td class="non_cfi_boat_motor_type_3"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
+                <td class="non_cfi_boat_motor_type_4"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
+                <td class="non_cfi_boat_motor_type_5"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
+                <td class="non_cfi_boat_motor_type_6"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+      <div class="container">
+        <div class="table-wrapper">
+          <ul>
+            <li>Fishing gears and boats of people who come from outside the community fisheries and are:</li>
+          </ul>
+          <table class="table ">
+            <thead>
+              <th>Type of Gear</th>
+              <th>Unit</th>
+              <th>Number</th>
+              <th>Size, Length</th>
+              <th>Start month</th>
+              <th>End month</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Gillnets</td>
+                <td>Meter</td>
+                <td class="migrant_gillnet_length_total_m"></td>
+                <td></td>
+                <td class="migrant_gillnet_start_month"></td>
+                <td class="migrant_gillnet_end_month"></td>
+              </tr>
+              <tr>
+                <td>Seine Net</td>
+                <td>Meter</td>
+                <td class="migrant_net_total"></td>
+                <td></td>
+                <td class="migrant_net_start_month"></td>
+                <td class="migrant_net_end_month"></td>
+              </tr>
+              <tr>
+                <td>Long line</td>
+                <td>ផ្លែ</td>
+                <td class="migrant_long_line_total"></td>
+                <td></td>
+                <td class="migrant_long_line_start_month"></td>
+                <td class="migrant_long_line_end_month"></td>
+              </tr>
+              <tr>
+                <td>Trap [lop]</td>
+                <td>លប</td>
+                <td class="migrant_trap_total"></td>
+                <td></td>
+                <td class="migrant_trap_start_month"></td>
+                <td class="migrant_trap_end_month"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="container">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <th>Type of Boat</th>
+              <th>Number</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ទូក (មិនមានម៉ាស៊ីន)</td>
+                <td class="migrant_boat_no_motor"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 0-150គីឡូក្រាម)</td>
+                <td class="migrant_boat_motor_type_1"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; 150-500គីឡូក្រាម)</td>
+                <td class="migrant_boat_motor_type_2"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង<=15សេះ; >500គីឡូក្រាម)</td>
+                <td class="migrant_boat_motor_type_3"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 500-1000គីឡូក្រាម)</td>
+                <td class="migrant_boat_motor_type_4"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; 1000-1500គីឡូក្រាម)</td>
+                <td class="migrant_boat_motor_type_5"></td>
+              </tr>
+              <tr>
+                <td>ទូកម៉ាស៊ីន​ (ទូកម៉ាស៊ីន​ (កំលាំង>15សេះ; >1500គីឡូក្រាម))</td>
+                <td class="migrant_boat_motor_type_6"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <p class="fs-5">C. Estimated yearly fish catch per family</p>
       <div class="g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch"></div>
 
-      <p class="fs-4">5. Community fishing area management plan</p>
-      <p class="fs-5">A. Vision</p>
-      <p>
-        The <span class="cfi_name"></span> community fisheries has the vision of participating in managing and using fisheries resources equitably and sustainably in order to contribute to reduction of the poverty of the people.
-      </p>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-4">5. Community fishing area management plan</p>
+          <p class="fs-5">A. Vision</p>
+          <p>
+            The <span class="cfi_name"></span> community fisheries has the vision of participating in managing and using fisheries resources equitably and sustainably in order to contribute to reduction of the poverty of the people.
+          </p>
 
-      <p class="fs-5">B. Objectives</p>
-      <ul>
-        <li>Participate in managing freshwater fishing grounds where fishing lots have been cancelled or parts of fishing lots released, family fishing areas that are set aside for people to fish traditionally or for communities to fish, reserve fishing grounds, flood- plains during the flood season, flooded forest and mangrove forest areas, and coastal fishing grounds.</li>
-        <li>Participate in managing fisheries resources sustainably and ensure the equitable sharing of benefits from fisheries resources among Khmer citizens.</li>
-        <li>To improve the living situation of members of the community fisheries through participatory integrated development.</li>
-        <li>So that Khmer citizens will clearly understand and begin to recognize that they are the owners of natural resources.</li>
-      </ul>
+          <p class="fs-5">B. Objectives</p>
+          <ul>
+            <li>Participate in managing freshwater fishing grounds where fishing lots have been cancelled or parts of fishing lots released, family fishing areas that are set aside for people to fish traditionally or for communities to fish, reserve fishing grounds, flood- plains during the flood season, flooded forest and mangrove forest areas, and coastal fishing grounds.</li>
+            <li>Participate in managing fisheries resources sustainably and ensure the equitable sharing of benefits from fisheries resources among Khmer citizens.</li>
+            <li>To improve the living situation of members of the community fisheries through participatory integrated development.</li>
+            <li>So that Khmer citizens will clearly understand and begin to recognize that they are the owners of natural resources.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-5">C. Community fishing area management plan</p>
 
-      <p class="fs-5">C. Community fishing area management plan</p>
+          <p class="fs-6">C.1 Plan for use of fishing gears</p>
+          <p>The plan for the use of fishing gears in the community fishing area was developed while giving consideration to the types of fishing grounds, the types, sizes, lengths, and numbers of fishing gears, the number of fishers, and fishing seasons.</p>
+          <p>The plan for the use of fishing gears in the community fishing area has been developed as follows:</p>
+          <table class="table">
+            <thead>
+              <th>Name / Location of Fishing Area</th>
+              <th>Time of Fishing</th>
+              <th>Type of Allowed Fishing Gears</th>
+              <th>Size / Length</th>
+              <th>Number</th>
+              <th>Other</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <p class="fs-6">C.1 Plan for use of fishing gears</p>
-      <p>The plan for the use of fishing gears in the community fishing area was developed while giving consideration to the types of fishing grounds, the types, sizes, lengths, and numbers of fishing gears, the number of fishers, and fishing seasons.</p>
-      <p>The plan for the use of fishing gears in the community fishing area has been developed as follows:</p>
-      <table class="table">
-        <thead>
-          <th>Name / Location of Fishing Area</th>
-          <th>Time of Fishing</th>
-          <th>Type of Allowed Fishing Gears</th>
-          <th>Size / Length</th>
-          <th>Number</th>
-          <th>Other</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p class="fs-6">C.2 Plan for improving the fishing grounds</p>
-      <p>The plan for improving the fishing grounds has been developed as shown in the following table:</p>
-      <table class="table">
-        <thead>
-          <th>Name of fishing grounds</th>
-          <th>Area</th>
-          <th>Size of area to be improved</th>
-          <th>Activity</th>
-          <th>Starting date</th>
-          <th>Competition date</th>
-          <th>Other</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-6">C.2 Plan for improving the fishing grounds</p>
+          <p>The plan for improving the fishing grounds has been developed as shown in the following table:</p>
+          <table class="table">
+            <thead>
+              <th>Name of fishing grounds</th>
+              <th>Area</th>
+              <th>Size of area to be improved</th>
+              <th>Activity</th>
+              <th>Starting date</th>
+              <th>Competition date</th>
+              <th>Other</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <p class="fs-6">C.3 Plan for defining and establishing conservation areas</p>
       <p>The plan for defining and establishing conservation areas will be developed as shown in the following table:</p>
       <div class="rpt_potential_conserve"></div>
 
-      <p class="fs-6">C.4 Plan for managing flooded forest</p>
-      <p>The plan for managing flooded forest has been developed as shown in the following table:</p>
-      <table class="table">
-        <thead>
-          <th>Name / Location</th>
-          <th>Area</th>
-          <th>Type of trees to be planted and protected</th>
-          <th>Activity</th>
-          <th>Starting date</th>
-          <th>Competition date</th>
-          <th>Other</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1. Planting flooded forest</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>2. Protecting and thinning flooded forest</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>......</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-6">C.4 Plan for managing flooded forest</p>
+          <p>The plan for managing flooded forest has been developed as shown in the following table:</p>
+          <table class="table">
+            <thead>
+              <th>Name / Location</th>
+              <th>Area</th>
+              <th>Type of trees to be planted and protected</th>
+              <th>Activity</th>
+              <th>Starting date</th>
+              <th>Competition date</th>
+              <th>Other</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1. Planting flooded forest</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>2. Protecting and thinning flooded forest</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>......</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <p class="fs-6">C.5 Plan for aquaculture development</p>
-      <p>The plan for aquaculture development has been developed as follows:</p>
-      <table class="table">
-        <thead>
-          <th>Type of aquaculture</th>
-          <th>Number</th>
-          <th>Type of Fish Figerlings</th>
-          <th>Quantity of Fish Figerlings</th>
-          <th>Starting year</th>
-          <th>Harvesting year</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Cages</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Pens [song]</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Ponds</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>......</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-6">C.5 Plan for aquaculture development</p>
+          <p>The plan for aquaculture development has been developed as follows:</p>
+          <table class="table">
+            <thead>
+              <th>Type of aquaculture</th>
+              <th>Number</th>
+              <th>Type of Fish Figerlings</th>
+              <th>Quantity of Fish Figerlings</th>
+              <th>Starting year</th>
+              <th>Harvesting year</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Cages</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Pens [song]</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Ponds</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>......</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <p class="fs-6">C.6 Plan for financial support for community development</p>
-      <table class="table">
-        <thead>
-          <th>Type of income</th>
-          <th>Activity</th>
-          <th>Starting date</th>
-          <th>Completion date</th>
-          <th>Total income</th>
-          <th>Other</th>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Contributions from community members</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Annual contributions</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>Grants from individuals and organizations</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          <tr>
-            <td>......</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
 
+      <div class="container">
+        <div class="table-wrapper">
+          <p class="fs-6">C.6 Plan for financial support for community development</p>
+          <table class="table">
+            <thead>
+              <th>Type of income</th>
+              <th>Activity</th>
+              <th>Starting date</th>
+              <th>Completion date</th>
+              <th>Total income</th>
+              <th>Other</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Contributions from community members</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Annual contributions</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Grants from individuals and organizations</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>......</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <p class="fs-6">C.7 Other plans...</p>
 
       <p class="fs-5">D. Strategy</p>
@@ -768,310 +948,354 @@
     </section>
   </div>
 
-  <script>
-    const kobo_api = '/api/template';
+ <script>
 
-    async function getapi(api_url) {
-      const response = await fetch(api_url);
 
-      return response.json();
+  const GEOSERVER_BASE_URL = '/geoserver/ows';
+
+  async function fetchCommunityData(communityId,typeName) {
+    try {
+      console.log(typeName)
+      const response = await fetch(
+        `${GEOSERVER_BASE_URL}?service=WFS&version=1.0.0&request=GetFeature&typeName=${typeName}&featureId=${communityId}&outputFormat=application%2Fjson`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.features || data.features.length === 0) {
+        return { error: '<div class="alert alert-danger">Data not found</div>' };
+      }
+      return data.features[0].properties || {};
+    } catch (error) {
+      console.error('Error fetching community data:', error);
+      return { error: '<div class="alert alert-danger">Data not found</div>' };
+    }
+  }
+
+  const querySelectorAll = (selector) => document.querySelectorAll(selector);
+  const getId = (id) => document.getElementById(id);
+
+  // Main initialization
+  document.addEventListener('DOMContentLoaded', async function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeName = urlParams.get('typeName');
+    const communityId = urlParams.get('communityId');
+    const isPreview = urlParams.get('preview') === 'true';
+    console.log(typeName)
+    if (!communityId) {
+      console.error('No communityId provided in URL');
+      return;
     }
 
-    const querySelectorAll = (selector) => document.querySelectorAll(selector);
-    const getId = (id) => document.getElementById(id);
+    // Load community data from GeoServer
+    const communityData = await fetchCommunityData(communityId,typeName);
 
-    //main
-    document.addEventListener('DOMContentLoaded', async function () {
-      // Load data
-      const koboData = (await getapi(kobo_api)).results[3];
 
-      // Insert
-      const dictionary = {
-        '.plan_year_start': 'plan_year_start',
-        '.plan_year_end': 'plan_year_end',
-        '.cfi_name': 'g_section_a_p1/g_cfi_basic_info/cfi_name',
-        '.cfi_village': {
-          'parent': 'g_section_a_p1/rpt_cfi_location',
-          'value': 'g_section_a_p1/rpt_cfi_location/cfi_village',
-        },
-        '.cfi_commune': {
-          'parent': 'g_section_a_p1/rpt_cfi_location',
-          'value': 'g_section_a_p1/rpt_cfi_location/cfi_commune',
-        },
-        '.cfi_district': {
-          'parent': 'g_section_a_p1/rpt_cfi_location',
-          'value': 'g_section_a_p1/rpt_cfi_location/cfi_district',
-        },
-        '.cfi_province': 'g_section_a_p1/cfi_province',
-        '.first_election_year': {
-          'parent': 'g_section_b_p3/g_election_status/rpt_cfi_election',
-          'value': 'g_section_b_p3/g_election_status/rpt_cfi_election/election_year',
-          'index': 0,
-        },
-        '.cfi_register_date': 'g_section_b_p3/g_cfi_register/cfi_register_date',
-        '.cfi_register_month': 'g_section_b_p3/g_cfi_register/cfi_register_month',
-        '.cfi_register_year': 'g_section_b_p3/g_cfi_register/cfi_register_year',
-        '.cfi_member_total': 'g_section_a_p2/g_cfi_member_and_committee/g_cfi_member/cfi_member_total',
-        '.cfi_member_female': 'g_section_a_p2/g_cfi_member_and_committee/g_cfi_member/cfi_member_female',
-        '.cfi_committee_total': 'g_section_a_p2/g_cfi_member_and_committee/g_cfi_committee/cfi_committee_total',
-        '.cfi_committee_female': 'g_section_a_p2/g_cfi_member_and_committee/g_cfi_committee/cfi_committee_female',
-        '.demo_total_family': 'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_total_family',
-        '.demo_total_population': 'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_total_population',
-        '.demo_female_population': 'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_female_population',
-        '.demo_male_population': 'g_section_e_p8/g_cfi_demographic_info/g_demo_population/demo_male_population',
-        '.demo_khmer': 'g_section_e_p8/demo_ethnicity/demo_khmer',
-        '.demo_khmer_islam': 'g_section_e_p8/demo_ethnicity/demo_khmer_islam',
-        '.demo_vietnamese': 'g_section_e_p8/demo_ethnicity/demo_vietnamese',
-        '.demo_total_widow': 'g_section_e_p8/g_cfi_demographic_info/g_demo_widow_widower/demo_total_widow',
-        '.demo_total_disable': 'g_section_e_p8/g_cfi_demographic_info/g_demo_disable/demo_total_disable',
-        '.demo_female_disable': 'g_section_e_p8/g_cfi_demographic_info/g_demo_disable/demo_female_disable',
-        '.demo_total_orphan': 'g_section_e_p8/g_cfi_demographic_info/g_demo_orphan/demo_total_orphan',
-        '.demo_female_orphan': 'g_section_e_p8/g_cfi_demographic_info/g_demo_orphan/demo_female_orphan',
-        '.demo_total_chronic_disease': 'g_section_e_p8/g_cfi_demographic_info/g_demo_chronic_disease/demo_total_chronic_disease',
-        '.demo_female_chronic_disease': 'g_section_e_p8/g_cfi_demographic_info/g_demo_chronic_disease/demo_female_chronic_disease',
-        '.demo_buddist': 'g_section_e_p8/demo_religion/demo_buddist',
-        '.demo_muslim': 'g_section_e_p8/demo_religion/demo_muslim',
-        '.demo_christian': 'g_section_e_p8/demo_religion/demo_christian',
-        '.demo_no_edu_total': 'g_section_e_p8/g_demo_education_lvl/g_demo_no_edu/demo_no_edu_total',
-        '.demo_no_edu_female': 'g_section_e_p8/g_demo_education_lvl/g_demo_no_edu/demo_no_edu_female',
-        '.demo_primary_edu_total': 'g_section_e_p8/g_demo_education_lvl/g_demo_primary_edu/demo_primary_edu_total',
-        '.demo_primary_edu_female': 'g_section_e_p8/g_demo_education_lvl/g_demo_primary_edu/demo_primary_edu_female',
-        '.demo_secondary_edu_total': 'g_section_e_p8/g_demo_education_lvl/g_demo_secondary_edu/demo_secondary_edu_total',
-        '.demo_secondary_edu_female': 'g_section_e_p8/g_demo_education_lvl/g_demo_secondary_edu/demo_secondary_edu_female',
-        '.demo_tertiary_edu_total': 'g_section_e_p8/g_demo_education_lvl/g_demo_tertiary_edu/demo_tertiary_edu_total',
-        '.demo_tertiary_edu_female': 'g_section_e_p8/g_demo_education_lvl/g_demo_tertiary_edu/demo_tertiary_edu_female',
-        '.demo_fishing_total': 'g_section_e_p8/demo_occupation/demo_fishing_total',
-        '.demo_acquaculture_total': 'g_section_e_p8/demo_occupation/g_demo_aquaculture/demo_acquaculture_total',
-        '.demo_crop_farm_total': 'g_section_e_p8/demo_occupation/demo_crop_farm_total',
-        '.demo_rice_farm_total': 'g_section_e_p8/demo_occupation/demo_rice_farm_total',
-        // '.demo_livestock_total': 'g_section_e_p8/demo_occupation/demo_livestock_total',
-        '.demo_technician_total': 'g_section_e_p8/demo_occupation/demo_technician_total',
-        // '.demo_tourist_service': 'g_section_e_p8/demo_occupation/demo_tourist_service',
-        '.demo_vendor_total': 'g_section_e_p8/demo_occupation/demo_vendor_total',
-        // '.demo_gov_official_total': 'g_section_e_p8/demo_occupation/demo_gov_official_total',
-        // '.demo_daily_labor_total': 'g_section_e_p8/demo_occupation/demo_daily_labor_total',
-        '.demo_seaweed_cultivate_total': 'g_section_e_p8/demo_occupation/g_demo_seaweed_cultivation/demo_seaweed_cultivate_total',
-        '.demo_fish_process_total': 'g_section_e_p8/demo_occupation/demo_fish_process_total',
-        '.abolished_fishing_lot_id': 'g_section_c_p5/g_historical_fishing_lot/abolished_fishing_lot_id',
-        '.forest_area_total': 'g_cfi_forest_status/forest_area_total',
-        '.forest_type': 'g_cfi_forest_status/forest_type',
-        '.expanding_conserve': 'g_potential_conserve/expanding_conserve',
-        '.cfi_fisher_member_total': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_member/cfi_fisher_member_total',
-        '.cfi_fisher_member_female': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_member/cfi_fisher_member_female',
-        '.cfi_fisher_not_member_total': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_not_member/cfi_fisher_not_member_total',
-        '.cfi_fisher_not_member_female': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_not_member/cfi_fisher_not_member_female',
-        '.cfi_fisher_migrant_total': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_migrant/cfi_fisher_migrant_total',
-        '.cfi_fisher_migrant_female': 'g_section_f_p9/g_cfi_fishers/g_cfi_fisher_migrant/cfi_fisher_migrant_female',
+    if (Object.keys(communityData).length === 0) {
+      console.error('No data found for community:', communityId);
+      return;
+    }
 
-        '.cfi_gillnet_length_total_m': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_gillnet/cfi_gillnet_length_total_m',
-        '.cfi_gillnet_start_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_gillnet/cfi_gillnet_start_month',
-        '.cfi_gillnet_end_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_gillnet/cfi_gillnet_end_month',
-        '.cfi_net_total': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_seine_net/cfi_net_total',
-        '.cfi_net_start_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_seine_net/cfi_net_start_month',
-        '.cfi_net_end_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_seine_net/cfi_net_end_month',
-        '.cfi_long_line_total': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_long_line/cfi_long_line_total',
-        '.cfi_long_line_start_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_long_line/cfi_long_line_start_month',
-        '.cfi_long_line_end_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_long_line/cfi_long_line_end_month',
-        '.cfi_trap_total': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_trap/cfi_trap_total',
-        '.cfi_trap_start_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_trap/cfi_trap_start_month',
-        '.cfi_trap_end_month': 'g_section_f_p9/g_cfi_fishing_gear/g_cfi_trap/cfi_trap_end_month',
-        '.cfi_boat_no_motor': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_no_motor',
-        '.cfi_boat_motor_type_1': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_1',
-        '.cfi_boat_motor_type_2': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_2',
-        '.cfi_boat_motor_type_3': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_3',
-        '.cfi_boat_motor_type_4': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_4',
-        '.cfi_boat_motor_type_5': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_5',
-        '.cfi_boat_motor_type_6': 'g_section_f_p9/g_cfi_boat_type/cfi_boat_motor_type_6',
+    processCommunityData(communityData);
+  });
 
-        '.non_cfi_gillnet_length_total_m': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_gillnet/non_cfi_gillnet_length_total_m',
-        '.non_cfi_gillnet_start_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_gillnet/non_cfi_gillnet_start_month',
-        '.non_cfi_gillnet_end_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_gillnet/non_cfi_gillnet_end_month',
-        '.non_cfi_net_total': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_seine_net/non_cfi_net_total',
-        '.non_cfi_net_start_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_seine_net/non_cfi_net_start_month',
-        '.non_cfi_net_end_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_seine_net/non_cfi_net_end_month',
-        '.non_cfi_long_line_total': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cif_long_line/non_cfi_long_line_total',
-        '.non_cfi_long_line_start_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cif_long_line/non_cfi_long_line_start_month',
-        '.non_cfi_long_line_end_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cif_long_line/non_cfi_long_line_end_month',
-        '.non_cfi_trap_total': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_trap/non_cfi_trap_total',
-        '.non_cfi_trap_start_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_trap/non_cfi_trap_start_month',
-        '.non_cfi_trap_end_month': 'g_section_f_p10/g_non_cfi_fishing_gear/g_non_cfi_trap/non_cfi_trap_end_month',
-        '.non_cfi_boat_no_motor': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_no_motor',
-        '.non_cfi_boat_motor_type_1': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_1',
-        '.non_cfi_boat_motor_type_2': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_2',
-        '.non_cfi_boat_motor_type_3': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_3',
-        '.non_cfi_boat_motor_type_4': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_4',
-        '.non_cfi_boat_motor_type_5': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_5',
-        '.non_cfi_boat_motor_type_6': 'g_section_f_p10/g_non_cfi_boat_type/non_cfi_boat_motor_type_6',
+  function processCommunityData(geoData) {
+    const dictionary = {
+      '.plan_year_start': 'cfi_register_year',
+      '.plan_year_end': 'cfi_register_year',
+      '.cfi_name': 'cfi_name',
+      '.cfi_village': '',
+      '.cfi_commune': '',
+      '.cfi_district': '',
+      '.cfi_province': 'cfi_province',
+      '.first_election_year': 'cfi_register_year',
+      '.cfi_register_date': function() {
+        const dateParts = geoData.today?.split('/') || [];
+        return dateParts[0] || '......';
+      },
+      '.cfi_register_month': function() {
+        const dateParts = geoData.today?.split('/') || [];
+        return dateParts[1] || '......';
+      },
+      '.cfi_register_year': function() {
+        const dateParts = geoData.today?.split('/') || [];
+        return dateParts[2] || '......';
+      },
+      '.cfi_member_total': 'cfi_member_total',
+      '.cfi_member_female': 'cfi_member_female',
+      '.cfi_committee_total': 'cfi_committee_total',
+      '.cfi_committee_female': 'cfi_committee_female',
+      '.demo_total_family': 'demo_total_family',
+      '.demo_total_population': 'demo_total_population',
+      '.demo_female_population': 'demo_female_population',
+      '.demo_male_population': function() {
+        const totalPopulation = parseInt(data.demo_total_population || 0, 10);
+        const femalePopulation = parseInt(data.demo_female_population || 0, 10);
+        return isNaN(totalPopulation) || isNaN(femalePopulation) ? 'Unknown' : totalPopulation - femalePopulation;
+      },
+      '.demo_khmer': 'demo_khmer',
+      '.demo_khmer_islam': 'demo_khmer_islam',
+      '.demo_vietnamese': 'demo_vietnamese',
+      '.demo_total_widow': 'demo_total_widow',
+      '.demo_total_disable': 'demo_total_disable',
+      '.demo_female_disable': 'demo_female_disable',
+      '.demo_total_orphan': 'demo_total_orphan',
+      '.demo_female_orphan': 'demo_female_orphan',
+      '.demo_total_chronic_disease': 'demo_total_chronic_disease',
+      '.demo_female_chronic_disease': 'demo_female_chronic_disease',
+      '.demo_buddist': 'demo_buddist',
+      '.demo_muslim': 'demo_muslim',
+      '.demo_christian': 'demo_christian',
+      '.demo_no_edu_total': 'demo_no_edu_total',
+      '.demo_no_edu_female': 'demo_no_edu_female',
+      '.demo_primary_edu_total': 'demo_primary_edu_total',
+      '.demo_primary_edu_female': 'demo_primary_edu_female',
+      '.demo_secondary_edu_total': 'demo_secondary_edu_total',
+      '.demo_secondary_edu_female': 'demo_secondary_edu_female',
+      '.demo_tertiary_edu_total': 'demo_tertiary_edu_total',
+      '.demo_tertiary_edu_female': 'demo_tertiary_edu_female',
+      '.demo_fishing_total': 'demo_fishing_total',
+      '.demo_acquaculture_total': 'demo_acquaculture_total',
+      '.demo_crop_farm_total': 'demo_crop_farm_total',
+      '.demo_rice_farm_total': 'demo_rice_farm_total',
+      '.demo_technician_total': 'demo_technician_total',
+      '.demo_vendor_total': 'demo_vendor_total',
+      '.demo_seaweed_cultivate_total': 'demo_seaweed_cultivate_total',
+      '.demo_fish_process_total': 'demo_fish_process_total',
+      '.abolished_fishing_lot_id': 'abolished_fishing_lot_id',
+      '.forest_area_total': 'forest_area_total',
+      '.forest_type': 'forest_type',
+      '.expanding_conserve': 'expanding_conserve',
+      '.cfi_fisher_member_total': 'cfi_fisher_member_total',
+      '.cfi_fisher_member_female': 'cfi_fisher_member_female',
+      '.cfi_fisher_not_member_total': 'cfi_fisher_not_member_total',
+      '.cfi_fisher_not_member_female': 'cfi_fisher_not_member_female',
+      '.cfi_fisher_migrant_total': 'cfi_fisher_migrant_total',
+      '.cfi_fisher_migrant_female': 'cfi_fisher_migrant_female',
+      '.cfi_gillnet_length_total_m': 'cfi_gillnet_length_total_m',
+      '.cfi_gillnet_start_month': 'cfi_gillnet_start_month',
+      '.cfi_gillnet_end_month': 'cfi_gillnet_end_month',
+      '.cfi_net_total': 'cfi_net_total',
+      '.cfi_net_start_month': 'cfi_seine_net_start_month',
+      '.cfi_net_end_month': 'cfi_seine_net_end_month',
+      '.cfi_long_line_total': 'cfi_long_line_total',
+      '.cfi_long_line_start_month': 'cfi_long_line_start_month',
+      '.cfi_long_line_end_month': 'cfi_long_line_end_month',
+      '.cfi_trap_total': 'cfi_trap_total',
+      '.cfi_trap_start_month': 'cfi_trap_start_month',
+      '.cfi_trap_end_month': 'cfi_trap_end_month',
+      '.cfi_boat_no_motor': 'cfi_boat_no_motor',
+      '.cfi_boat_motor_type_1': 'cfi_boat_motor_type_1',
+      '.cfi_boat_motor_type_2': 'cfi_boat_motor_type_2',
+      '.cfi_boat_motor_type_3': 'cfi_boat_motor_type_3',
+      '.cfi_boat_motor_type_4': 'cfi_boat_motor_type_4',
+      '.cfi_boat_motor_type_5': 'cfi_boat_motor_type_5',
+      '.cfi_boat_motor_type_6': 'cfi_boat_motor_type_6',
+      '.non_cfi_gillnet_length_total_m': 'non_cfi_gillnet_length_total_m',
+      '.non_cfi_gillnet_start_month': 'non_cfi_gillnet_start_month',
+      '.non_cfi_gillnet_end_month': 'non_cfi_gillnet_end_month',
+      '.non_cfi_net_total': 'non_cfi_net_total',
+      '.non_cfi_net_start_month': 'non_cfi_seine_net_start_month',
+      '.non_cfi_net_end_month': 'non_cfi_seine_net_end_month',
+      '.non_cfi_long_line_total': 'non_cfi_long_line_total',
+      '.non_cfi_long_line_start_month': 'non_cfi_long_line_start_month',
+      '.non_cfi_long_line_end_month': 'non_cfi_long_line_end_month',
+      '.non_cfi_trap_total': 'non_cfi_trap_total',
+      '.non_cfi_trap_start_month': 'non_cfi_trap_start_month',
+      '.non_cfi_trap_end_month': 'non_cfi_trap_end_month',
+      '.non_cfi_boat_no_motor': 'non_cfi_boat_no_motor',
+      '.non_cfi_boat_motor_type_1': 'non_cfi_boat_motor_type_1',
+      '.non_cfi_boat_motor_type_2': 'non_cfi_boat_motor_type_2',
+      '.non_cfi_boat_motor_type_3': 'non_cfi_boat_motor_type_3',
+      '.non_cfi_boat_motor_type_4': 'non_cfi_boat_motor_type_4',
+      '.non_cfi_boat_motor_type_5': 'non_cfi_boat_motor_type_5',
+      '.non_cfi_boat_motor_type_6': 'non_cfi_boat_motor_type_6',
+      '.migrant_gillnet_length_total_m': 'migrant_gillnet_length_total_m',
+      '.migrant_gillnet_start_month': 'migrant_gillnet_start_month',
+      '.migrant_gillnet_end_month': 'migrant_gillnet_end_month',
+      '.migrant_net_total': 'migrant_net_total',
+      '.migrant_net_start_month': 'migrant_seine_net_start_month',
+      '.migrant_net_end_month': 'migrant_seine_net_end_month',
+      '.migrant_long_line_total': 'migrant_long_line_total',
+      '.migrant_long_line_start_month': 'migrant_long_line_start_month',
+      '.migrant_long_line_end_month': 'migrant_long_line_end_month',
+      '.migrant_trap_total': 'migrant_trap_total',
+      '.migrant_trap_start_month': 'migrant_trap_start_month',
+      '.migrant_trap_end_month': 'migrant_trap_end_month',
+      '.migrant_boat_no_motor': 'migrant_boat_no_motor',
+      '.migrant_boat_motor_type_1': 'migrant_boat_motor_type_1',
+      '.migrant_boat_motor_type_2': 'migrant_boat_motor_type_2',
+      '.migrant_boat_motor_type_3': 'migrant_boat_motor_type_3',
+      '.migrant_boat_motor_type_4': 'migrant_boat_motor_type_4',
+      '.migrant_boat_motor_type_5': 'migrant_boat_motor_type_5',
+      '.migrant_boat_motor_type_6': 'migrant_boat_motor_type_6',
+      '.cfi_hazard': 'cfi_hazard',
+      '.patrol_freq_per_month': 'patrol_freq_per_month',
+      '.total_patrol_team': 'total_patrol_team',
+      '.total_patrol_member': 'total_patrol_member',
+      '.female_patrol_member': 'female_patrol_member',
+      '.chair_name': 'chair_name',
+      '.chair_sex': 'chair_sex',
+      '.chair_phone': 'chair_phone',
+      '.training_total': 'training_total',
+      '.total_election': 'total_election',
+      '.total_agrmt_sign': 'total_agrmt_sign',
+      '.has_member_list': 'has_member_list',
+      '.has_by_law': 'has_by_law',
+      '.has_map': 'has_map',
+      '.has_fishing_area_plan': 'has_fishing_area_plan',
+      '.has_signed_agreement': 'has_signed_agreement',
+      '.has_financial_doc': 'has_financial_doc'
+    };
 
-        '.migrant_gillnet_length_total_m': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_gillnet/migrant_gillnet_length_total_m',
-        '.migrant_gillnet_start_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_gillnet/migrant_gillnet_start_month',
-        '.migrant_gillnet_end_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_gillnet/migrant_gillnet_end_month',
-        '.migrant_net_total': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_seine_net/migrant_net_total',
-        '.migrant_net_start_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_seine_net/migrant_net_start_month',
-        '.migrant_net_end_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_seine_net/migrant_net_end_month',
-        '.migrant_long_line_total': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_long_line/migrant_long_line_total',
-        '.migrant_long_line_start_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_long_line/migrant_long_line_start_month',
-        '.migrant_long_line_end_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_long_line/migrant_long_line_end_month',
-        '.migrant_trap_total': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_trap/migrant_trap_total',
-        '.migrant_trap_start_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_trap/migrant_trap_start_month',
-        '.migrant_trap_end_month': 'g_section_f_p10/g_migrant_fishing_gear/g_migrant_trap/migrant_trap_end_month',
-        '.migrant_boat_no_motor': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_no_motor',
-        '.migrant_boat_motor_type_1': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_1',
-        '.migrant_boat_motor_type_2': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_2',
-        '.migrant_boat_motor_type_3': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_3',
-        '.migrant_boat_motor_type_4': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_4',
-        '.migrant_boat_motor_type_5': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_5',
-        '.migrant_boat_motor_type_6': 'g_section_f_p10/g_migrant_boat_type/migrant_boat_motor_type_6',
+    for (const [selector, source] of Object.entries(dictionary)) {
+      const elements = document.querySelectorAll(selector);
+      let value;
+      if (typeof source === 'function') {
+        value = source();
+      } else {
+        value = geoData[source] || source;
       }
+      elements.forEach(element => {
+        element.textContent = value !== null && value !== undefined && value !== '' ? value : '......';
+      });
+    }
 
-      for (let selector in dictionary) {
-        querySelectorAll(selector).forEach((item) => {
-          if (dictionary[selector].hasOwnProperty('index')) {
-            const parent = dictionary[selector]['parent'];
-            const value = dictionary[selector]['value'];
-            const index = dictionary[selector]['index'];
+    const repeatDictionary = {
+      '.rpt_fishing_ground': {
+        'fish_ground_type': 'cfi_region', // Infer from cfi_region (e.g., "inland")
+        'fish_ground_name': 'cfi_name',
+        'fish_ground_size_ha': 'forest_area_total',
+        'fish_ground_start_month': 'cfi_gillnet_start_month',
+        'fish_ground_end_month': 'cfi_gillnet_end_month'
+      },
+      '.rpt_potential_conserve': {
+        'po_conserve_habitat_type': 'forest_type',
+        'po_conserve_name': 'cfi_name',
+        'po_conserve_size_ha': 'forest_area_total'
+      },
+      '.rpt_inland_fish_caught': {
+        'inland_fish_caught/fish_type': 'inland_fish_caught'
+      },
+      '.rpt_inland_fish_caught_most': {
+        'inland_fish_caught_most/fish_type': 'inland_fish_caught_most'
+      },
+      '.rpt_inland_fish_disappear': {
+        'inland_fish_disappear/fish_type': 'inland_fish_disappear'
+      },
+      '.rpt_inland_aqua_animal_caught': {
+        'inland_aqua_animal_caught/animal_type': 'inland_aqua_animal_caught'
+      },
+      '.rpt_inland_aqua_animal_caught_most': {
+        'inland_aqua_animal_caught_most/animal_type': 'inland_aqua_animal_caught_most'
+      },
+      '.rpt_inland_aqua_animal_disappear': {
+        'inland_aqua_animal_disappear/animal_type': 'inland_aqua_animal_disappear'
+      },
+      '.rpt_inland_aqua_plant_caught': {
+        'inland_aqua_plant_caught/plant_type': 'inland_aqua_plant_caught'
+      },
+      '.rpt_inland_aqua_plant_caught_most': {
+        'inland_aqua_plant_caught_most/plant_type': 'inland_aqua_plant_caught_most'
+      },
+      '.rpt_inland_aqua_plant_disappear': {
+        'inland_aqua_plant_disappear/plant_type': 'inland_aqua_plant_disappear'
+      }
+    };
 
-            item.innerText = koboData[parent][index][value];
-          } else if (Array.isArray(koboData[dictionary[selector]['parent']])) {
-            const parent = dictionary[selector]['parent'];
-            const value = dictionary[selector]['value'];
-
-            item.innerText = koboData[parent].reduce((string, item) => string + item[value], '');
-          } else {
-            if (typeof koboData[dictionary[selector]] !== 'undefined') {              
-              item.innerText = koboData[dictionary[selector]];
-            } else {
-              item.innerText = '.......';
-            }
+    for (let selector in repeatDictionary) {
+      const elements = document.querySelectorAll(selector);
+      elements.forEach(element => {
+        const fields = repeatDictionary[selector];
+        let values = [];
+        if (selector === '.rpt_fishing_ground' || selector === '.rpt_potential_conserve') {
+          const item = {};
+          for (const [key, source] of Object.entries(fields)) {
+            item[key] = geoData[source] || '.......';
           }
-        })
-      }
-
-      const repeatDictionary = {
-        '.rpt_fishing_ground': {
-          'rpt_fishing_ground/fish_ground_type': 'Fish Ground Type',
-          'rpt_fishing_ground/fish_ground_name': 'Name',
-          'rpt_fishing_ground/fish_ground_size_ha': 'Size in Hectare',
-          'rpt_fishing_ground/fish_ground_start_month': 'Start month',
-          'rpt_fishing_ground/fish_ground_end_month': 'End month',
-        },
-        '.rpt_potential_conserve': {
-          'g_potential_conserve/rpt_potential_conserve/po_conserve_habitat_type': 'Habitat Type',
-          'g_potential_conserve/rpt_potential_conserve/po_conserve_name': 'Potential Conservation Area Name',
-          'g_potential_conserve/rpt_potential_conserve/po_conserve_size_ha': 'Size in Hectare',
-          // 'g_potential_conserve/rpt_potential_conserve/po_conserve_area_type': 'Area Type',
-        },
-        '.g_section_g_p11\\/g_estimate_fish_catch\\/rpt_estimate_fish_catch': {
-          'g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch/fish_catch_type': 'Fish Type',
-          'g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch/avg_fish_catch_dry': 'Catch in Dry Season (kg)',
-          'g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch/avg_fish_catch_rainy': 'Catch in Rainy Season (kg)',
-          'g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch/avg_fish_catch_total': 'Annual Catch (kg)',
-          // 'g_section_g_p11/g_estimate_fish_catch/rpt_estimate_fish_catch/avg_fish_catch_female_percent': '5.0'
-        },
-      }
-
-      for (selector in repeatDictionary) {
-        // const className = '.' + selector;
-        // console.log(document.querySelector(selector).className.replaceAll('/', ''));
-        // console.log(selector.replace('\\', ''));
-        // console.log(selector.replace('\\\\', ''))
-        // console.log(selector.replaceAll('\\', ''));
-        // console.log(koboData[selector.slice(1)])
-        // selector.replaceAll('/', '');
-        const table = document.createElement('table');
-
-        const thead = document.createElement('thead');
-
-        // console.log(Object.keys(repeatDictionary[selector]));
-
-        const th = Object.keys(repeatDictionary[selector]).forEach(key => {
-          const temp = document.createElement('th');
-          temp.innerText = repeatDictionary[selector][key];
-          thead.append(temp);
-        });
-
-        const tbody = document.createElement('tbody');
-
-        // console.log(koboData[selector.slice(1).replaceAll('\\', '')]);
-        
-        if (typeof koboData[selector.slice(1).replaceAll('\\', '')] !== 'undefined' || koboData[selector.slice(1)] === null) {
-          koboData[selector.slice(1).replaceAll('\\', '')].forEach(key => {
-            const tr = document.createElement('tr');
-
-            Object.keys(repeatDictionary[selector]).forEach(attr => {
-              const td = document.createElement('td');
-              td.innerText = key[attr];
-              tr.append(td);
-            });
-
-            tbody.append(tr);
-          });
+          values = [Object.values(item).join(', ')];
         } else {
-          const tr = document.createElement('tr');
-
-          Object.keys(repeatDictionary[selector]).forEach(attr => {
-            const td = document.createElement('td');
-            td.innerText = '......';
-            tr.append(td);
-          });
-
-          tbody.append(tr);
+          const source = Object.values(fields)[0];
+          const list = geoData[source]?.split(' ') || [];
+          values = list.length > 0 ? [list.join(', ')] : ['.......'];
         }
+        element.textContent = values.join('; ') || '.......';
+      });
+    }
+  }
 
-        table.append(thead);
-        table.append(tbody);
-        table.classList.add('table');
+  function downloadPDF(geoData) {
+    const element = document.querySelector('.container');
+    const loading = document.querySelector('.loading');
 
-        // console.log(document.querySelectorAll(selector))
-        
-        document.querySelectorAll(selector).forEach(item => {
-          item.append(table)
-        });
+    // Apply print styles temporarily
+    document.body.classList.add('pdf-print');
+
+    // Wrap tables to prevent splitting
+    const tables = element.querySelectorAll('.table');
+    tables.forEach(table => {
+      if (!table.parentElement.classList.contains('table-wrapper')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-wrapper';
+        table.parentElement.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
       }
-
-      // const table = document.createElement('table');
-
-      // const thead = document.createElement('thead');
-
-      // const th = Object.keys(repeatDictionary[]).forEach(key => {
-      //   const temp = document.createElement('th');
-      //   temp.innerText = col[key];
-      //   thead.append(temp);
-      // });
-
-      // const tbody = document.createElement('tbody');
-
-      // koboData['rpt_fishing_ground'].forEach(key => {
-      //   const tr = document.createElement('tr');
-
-      //   Object.keys(col).forEach(attr => {
-      //     const td = document.createElement('td');
-      //     td.innerText = key[attr];
-      //     tr.append(td);
-      //   });
-
-      //   tbody.append(tr);
-      // });
-
-      // table.append(thead);
-      // table.append(tbody);
-      // table.classList.add('table');
-      
-      // document.querySelector('.rpt_fishing_ground').append(table);
-
-      // dictionaryRepeat = {
-      //   '.fishing_ground': {
-      //     'parent': 'rpt_fishing_ground',
-      //     'child': {
-      //       'Type': 'rpt_fishing_ground/fish_ground_type',
-      //       'Name': 'rpt_fishing_ground/fish_ground_name',
-      //       'Size in Hectare': 'rpt_fishing_ground/fish_ground_size_ha',
-      //       'Start month': 'rpt_fishing_ground/fish_ground_start_month',
-      //       'End month': 'rpt_fishing_ground/fish_ground_end_month',
-      //     }
-      //   }
-      // }
     });
+
+    const opt = {
+      margin: [5, 5, 5, 5], // Reduced margins to minimize space
+      filename: `${(geoData.cfr_name || 'community_fisheries').replace(/\s+/g, '_')}_management_plan.pdf`,
+      image: {
+        type: 'jpeg',
+        quality: 1.0,
+        backgroundColor: '#FFFFFF'
+      },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        scrollY: 0, // Ensure no extra space from scrolling
+        windowHeight: element.scrollHeight, // Match the content height
+        windowWidth: element.scrollWidth, // Match the content width
+        logging: false,
+        letterRendering: true,
+        dpi: 300,
+        ignoreElements: (el) => el.classList.contains('loading')
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+        hotfixes: ['px_scaling'],
+        putOnlyUsedFonts: true
+      },
+      pagebreak: { mode: ['css', 'legacy'], avoid: ['.table', '.table-wrapper'] }
+    };
+
+    loading.style.display = 'block';
+
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        document.body.classList.remove('pdf-print');
+        loading.style.display = 'none';
+      })
+      .catch(err => {
+        console.error('PDF generation failed:', err);
+        document.body.classList.remove('pdf-print');
+        loading.style.display = 'none';
+      });
+  }
+
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+  document.head.appendChild(script);
   </script>
 </body>
 
